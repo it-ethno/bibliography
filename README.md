@@ -6,20 +6,20 @@ A bibliography app based on Ruby on Rails, with a responsive HTML frontend.
 I am just starting out with this one, so there is not much yet to tell about it, except for the design objectives.
 
 ## Design Objectives
-1. Should have a simple but nice HTML frontend that is as responsive as possible, so that it is always fun to use it, whether on a smartphone or laptop in a library, or at home on a big screen.
-2. Should satisfy scientific requirements (see below for details).
-3. Should be as accessible as possible, that is: play nicely with screen readers and comparable clients.
-4. Should be as "connectable" as possible, that is: plenty of import and export compatibilities to other bibliographic software and formats like Bibtex, Endnote, and Co.
-5. Should "degrade gracefully" also in terms of storage: when there is no server around, should default to the Local Storage of the browser, with an easy option to save the current data to a disk file using JSON.
-6. Should be useable as a HTML file from disk as well as an URL to a (local) server.
-7. Should contain a seperate server that is easily set up for wider local use allowing to share datasets and collections.
-8. Should allow to manage citations bound to a referenced publication. These citations should be taggable and eportable inside custom collections/sets related to those tags.
+1. Should have **a simple but nice HTML frontend** that is as responsive as possible, so that it is always fun to use it, whether on a smartphone or laptop in a library, or at home on a big screen.
+2. Should **satisfy scientific requirements** (see below for details).
+3. Should be **as accessible as possible**, that is: play nicely with screen readers and comparable clients.
+4. Should be **as "connectable" as possible**, that is: plenty of import and export compatibilities to other bibliographic software and formats like Bibtex, Endnote, and Co.
+5. Should **"degrade gracefully" also in terms of storage**: when there is no server around, should default to the Local Storage of the browser, with an easy option to save the current data to a disk file using JSON.
+6. Should be **useable as a HTML file from disk** as well as **an URL to a (local) server**.
+7. Should **contain a seperate server** that is easily set up for wider local use allowing to share datasets and collections.
+8. Should allow to **manage citations** bound to a referenced publication. These citations should be taggable and eportable inside custom collections/sets related to those tags.
 
 ## Usecases Considered
-- a private person managing her/his books on the shelf.
-- a scientist managing her/his bibliographic references for use in publications, including exact references to citations.
-- a (scientific) institution maintaining a local library, with the need to manage multiple copies of a single book, local signatures, and borrowings.
-- a (scientific) working group sharing a bibliographic stock and discourse.
+- a **private person** managing her/his books on the shelf.
+- a **scientist** managing her/his bibliographic references for use in publications, including exact references to citations.
+- a **(scientific) institution** maintaining a local library, with the need to manage multiple copies of a single book, local signatures, and borrowings.
+- a **(scientific) working group** sharing a bibliographic stock and discourse.
 
 ## About Scientifc Requirements
 "Scientific requirements" is a very broad term, but there are some general usecases that can be applied to any scientific working:
