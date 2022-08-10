@@ -17,14 +17,16 @@
   </head>
   <body>
     <div id="alltainer">
-      <h1 style="margin-top: 100px;">Bibliography</h1>
-      <i class="fa-solid fa-gear" style="margin-bottom: 10px;" title="Open Settings"></i>
-      <div>
-        <i class="fa-solid fa-user-group" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
-        <input id="mainInput" type="text" placeholder="Geben Sie eine neue bibliographische Angabe ein" />
-        <i class="fa-solid fa-file-export" style="margin-left:10px;" title="Open/Close Export Tab"></i>
-        <p class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher.</p>
-        <i class="fa-solid fa-database" style="margin-top:5px;" title="Open/Close Stock"></i>
+      <div id="mainInterface">
+        <h1>Bibliography</h1>
+        <i class="fa-solid fa-gear" style="margin-bottom: 10px;margin-top: 15px;" title="Open Settings"></i>
+        <div>
+          <i id="paneToggler-authors" class="fa-solid fa-user-group paneToggler" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
+          <input id="mainInput" type="text" placeholder="Enter a new bibliographic reference (or a known one to display details)" />
+          <i id="paneToggler-export" class="fa-solid fa-file-export paneToggler" style="margin-left:10px;" title="Open/Close Export Tab"></i>
+          <p class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher.</p>
+          <i id="paneToggler-stock" class="fa-solid fa-database paneToggler" style="margin-top:10px;" title="Open/Close Stock"></i>
+        </div>
       </div>
     </div>
     <div id="authors"><i class="fa-solid fa-user-group" style="font-size: 400%;color:rgb(150,150,150);" title="Autors"></i></div>

@@ -1,3 +1,8 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
 h1 {
   font-family: "Fredericka the Great";
   text-align: center;
@@ -14,21 +19,23 @@ h1 {
     margin-top:8px;
     color:rgb(100,100,100);
 }
+
 .input_clue:hover {
     color:rgb(20, 20, 20);
 }
-#alles {
-  position: relative;
-  top: 0px;
-  bottom: 0px;
-  height: 100%;
-}
+
+
+
 #alltainer {
+  position: absolute;
   width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  position: relative;
+  height: 100%;
+  background-image: url('./images/background_1.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
+
 #authors {
   position: absolute;
   top: 0px;
@@ -40,7 +47,9 @@ h1 {
   align-items: center;
   justify-content: center;
   border-radius: 0 15px 15px 0;
+  visibility: hidden;
 }
+
 #export {
   position: absolute;
   top: 0px;
@@ -52,9 +61,11 @@ h1 {
   align-items: center;
   justify-content: center;
   border-radius: 15px 0 0 15px;
+  visibility: hidden;
 }
+
 #mainInput {
-  width: 58%;
+  width: 56%;
   min-width: 200px;
   max-width: 900px;
   margin: 0 auto;
@@ -63,12 +74,24 @@ h1 {
   padding: 3px 10px;
   color: rgb(120, 120, 120);
 }
+
 #mainInput:focus {
   color: rgb(20, 20, 20);
 }
+
 #mainInput:hover {
   color: rgb(20, 20, 20);
 }
+
+#mainInterface {
+  width: 100%;
+  margin: 15vh auto 20px;
+  text-align: center;
+  position: relative;
+  padding: 20px;
+  background-color: rgba(240, 240, 240, 0.9);
+}
+
 #stock {
   position: absolute;
   bottom: 0px;
@@ -83,4 +106,5 @@ h1 {
   align-items: center;
   justify-content: center;
   border-radius: 15px 15px 0 0;
+  visibility: hidden;
 }
