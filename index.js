@@ -2,7 +2,7 @@ let imageReload = setInterval(loadRandomBackgroundImage, 60000);
 equipListeners();
 
 function loadRandomBackgroundImage() {
-    let randomNum = Math.round((Math.random() * 16) + 1);
+    let randomNum = Math.round((Math.random() * 15) + 1);
     console.log('Random Number: ' + randomNum);
     document.querySelector('#alltainer').style.backgroundImage = "url('./images/background_" + randomNum + ".jpg')";
 }
