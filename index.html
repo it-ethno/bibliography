@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bibliography App</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="index.js" defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet" />
+
+    <script src="https://kit.fontawesome.com/8b7dd93a81.js" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div id="alltainer">
+      <h1 style="margin-top: 100px;">Bibliography</h1>
+      <i class="fa-solid fa-gear" style="margin-bottom: 10px;" title="Open Settings"></i>
+      <div>
+        <i class="fa-solid fa-user-group" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
+        <input id="mainInput" type="text" placeholder="Geben Sie eine neue bibliographische Angabe ein" />
+        <i class="fa-solid fa-file-export" style="margin-left:10px;" title="Open/Close Export Tab"></i>
+        <p class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher.</p>
+        <i class="fa-solid fa-database" style="margin-top:5px;" title="Open/Close Stock"></i>
+      </div>
+    </div>
+    <div id="authors"><i class="fa-solid fa-user-group" style="font-size: 400%;color:rgb(150,150,150);" title="Autors"></i></div>
+    <div id="export"><i class="fa-solid fa-file-export" style="font-size: 400%;color:rgb(150,150,150);" title="Export (Bibliography, Collection)"></i></div>
+    <div id="stock"><i class="fa-solid fa-database" style="font-size: 400%;color:rgb(150,150,150);" title="Stock (Local Database or Remote DB XYZ)"></i></div>
+  </body>
+</html>
