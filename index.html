@@ -9,7 +9,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap" rel="stylesheet" />
+
     <link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet" />
 
     <script src="https://kit.fontawesome.com/8b7dd93a81.js" crossorigin="anonymous"></script>
@@ -19,7 +19,7 @@
     <div id="alltainer">
       <div id="mainInterface">
         <h1>Bibliography</h1>
-        <i class="fa-solid fa-gear" style="margin-bottom: 10px;margin-top: 15px;" title="Open Settings"></i>
+        <i id="settingsToggler" class="fa-solid fa-gear" style="margin-bottom: 10px;margin-top: 15px;" title="Open Settings"></i>
         <div>
           <i id="paneToggler-authors" class="fa-solid fa-user-group paneToggler" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
           <input id="mainInput" type="text" placeholder="Enter a new bibliographic reference (or a known one to display details)" />
@@ -32,5 +32,56 @@
     <div id="authors"><i class="fa-solid fa-user-group" style="font-size: 400%;color:rgb(150,150,150);" title="Autors"></i></div>
     <div id="export"><i class="fa-solid fa-file-export" style="font-size: 400%;color:rgb(150,150,150);" title="Export (Bibliography, Collection)"></i></div>
     <div id="stock"><i class="fa-solid fa-database" style="font-size: 400%;color:rgb(150,150,150);" title="Stock (Local Database or Remote DB XYZ)"></i></div>
+    <div id="settings">
+      <div id="settingsList">
+        <h1>Settings</h1>
+        <h2>Display</h2>
+        <div class="settingsSet">
+          <div class="settingsItem">
+            <label for="languageSelect">Language</label>
+            <select id="languageSelect" name="languageSelect" value="en">
+              <option value="en">English</option>
+              <option value="de">German</option>
+            </select>
+          </div>
+          <div class="settingsItem">
+            <input id="useBackground" type="checkbox" checked><label for="useBackground" class="labelInlineRight">Use Image Background</label>
+          </div>
+          <div class="settingsItem">
+            <input id="useFixedBackground" type="checkbox"><label for="useFixedBackground" class="labelInlineRight">Use Fixed Image Background</label>
+          </div>
+        </div>
+        <h2>Default Formats</h2>
+        <div class="settingsSet">
+          <div class="settingsItem">
+            <label for="standardInput" class="labelBlock">Input</label>
+            <input id="standardInput" type="text" class="inputLongText" placeholder="author.surname, author.prename. year-of-publication. title: subtitle. place-of-publication: publisher.">
+          </div>
+          <div class="settingsItem">
+            <label for="standardOutput" class="labelBlock">Output/Export</label>
+            <input id="standardOutput" type="text" class="inputLongText" placeholder="author.surname, author.prename. year-of-publication. title: subtitle. place-of-publication: publisher.">
+          </div>
+        </div>
+        <h2>Data Storage</h2>
+        <div class="settingsSet">
+          <div class="settingsItem">
+            <input id="useLocalStorage" type="checkbox" checked><label for="useLocalStorage" class="labelInlineRight" title="Use Local Storage to persist data over browser close">Use Local Storage</label>
+          </div>
+          <div class="settingsItem">
+            <label for="serverURL" class="labelBlock">Server URL/IP Adress</label>
+            <input id="serverURL" type="text" class="inputLongText" placeholder="something like 'https://abc.example.org/bibserver/' or '129.130.131.139'">
+          </div>
+          <div class="settingsItem">
+            <label for="serverURL" class="labelInlineLeft">or select a known Server</label>
+            <select id="knownServer" name="knownServer" value="1">
+              <option value="1">Example Server 1</option>
+              <option value="2" title="Set up by Monsieur Bummskopp himself">Local Bummskopp Server</option>
+              <option value="3" title="For the biggest dataset ever">Server from UN Bibliographic Squad</option>
+            </select>
+          </div>
+        </div>
+        <i id="closeSettings" class="fa-solid fa-rectangle-xmark"></i>
+      </div>
+    </div>
   </body>
 </html>
