@@ -16,6 +16,16 @@ h2 {
   color: rgba(81, 81, 81, 0.9);
 }
 
+.authorsPaneItem {
+  padding: 5px 20px;
+  border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+}
+
+.exportPaneItem {
+  padding: 5px 20px;
+  border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+}
+
 .labelBlock {
   display: block;
   margin-bottom: 5px;
@@ -24,9 +34,11 @@ h2 {
 .labelInlineLeft {
   margin-right: 10px;
 }
+
 .labelInlineRight {
   margin-left: 10px;
 }
+
 .input_clue {
   text-align:center;
   font-size:0.9em;
@@ -43,14 +55,48 @@ h2 {
   width: 60%;
   min-width: 300px;
 }
+
+.paneHeader {
+  padding: 8px 20px;
+  background-color: rgba(230, 230, 230, 0.9);
+  color: rgba(100, 100, 100, 1);
+  display: flex;
+  border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+}
+
+.paneHeaderActions {
+  margin-left: auto;
+}
+
+.paneHeaderIcon {
+  margin-right: 7px;
+  font-size: 130%;
+  color:rgb(150,150,150);
+}
+
+.paneHeaderTitle {
+  font-family: "Open Sans";
+}
+
+.paneHeaderTitleSource {
+  font-size: 80%;
+}
+
 .settingsItem {
   margin: 10px 0px;
 }
+
 .settingsSet {
   font-family: "Fredericka the Great";
   color: rgba(50, 50, 50, 1.0);
   margin-bottom: 20px;
 }
+
+.stockPaneItem {
+  padding: 5px 20px;
+  border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+}
+
 
 #alltainer {
   position: absolute;
@@ -63,29 +109,35 @@ h2 {
 }
 
 #authors {
+  padding: 10px 0px;
+  color: rgba(50, 50, 50, 1.0);
+}
+
+#authorsPane {
   position: absolute;
   top: 0px;
   left: 0px;
   bottom: 0px;
   width: 20%;
   background-color: rgba(240, 240, 240, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
   border-radius: 0 15px 15px 0;
   visibility: hidden;
 }
 
 #export {
+  padding: 10px 0px;
+  color: rgba(50, 50, 50, 1.0);  
+}
+
+#exportPane {
   position: absolute;
   top: 0px;
   right: 0px;
   bottom: 0px;
   width: 20%;
   background-color: rgba(240, 240, 240, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
   border-radius: 15px 0 0 15px;
   visibility: hidden;
 }
@@ -136,6 +188,11 @@ h2 {
 }
 
 #stock {
+  padding: 10px 0px;
+  color: rgba(50, 50, 50, 1.0); 
+}
+
+#stockPane {
   position: absolute;
   bottom: 0px;
   background-color: rgba(240, 240, 240, 1);
@@ -145,9 +202,7 @@ h2 {
   border-top: 2px solid rgba(220, 220, 220, 1);
   border-left: 2px solid rgba(220, 220, 220, 1);
   border-right: 2px solid rgba(220, 220, 220, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
   border-radius: 15px 15px 0 0;
   visibility: hidden;
 }

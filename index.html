@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
 
     <script src="https://kit.fontawesome.com/8b7dd93a81.js" crossorigin="anonymous"></script>
 
@@ -21,17 +22,48 @@
         <h1>Bibliography</h1>
         <i id="settingsToggler" class="fa-solid fa-gear" style="margin-bottom: 10px;margin-top: 15px;" title="Open Settings"></i>
         <div>
-          <i id="paneToggler-authors" class="fa-solid fa-user-group paneToggler" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
+          <i id="paneToggler-authorsPane" class="fa-solid fa-user-group paneToggler" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
           <input id="mainInput" type="text" placeholder="Enter a new bibliographic reference (or a known one to display details)" />
-          <i id="paneToggler-export" class="fa-solid fa-file-export paneToggler" style="margin-left:10px;" title="Open/Close Export Tab"></i>
+          <i id="paneToggler-exportPane" class="fa-solid fa-file-export paneToggler" style="margin-left:10px;" title="Open/Close Export Tab"></i>
           <p class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher.</p>
-          <i id="paneToggler-stock" class="fa-solid fa-database paneToggler" style="margin-top:10px;" title="Open/Close Stock"></i>
+          <i id="paneToggler-stockPane" class="fa-solid fa-database paneToggler" style="margin-top:10px;" title="Open/Close Stock"></i>
         </div>
       </div>
     </div>
-    <div id="authors"><i class="fa-solid fa-user-group" style="font-size: 400%;color:rgb(150,150,150);" title="Autors"></i></div>
-    <div id="export"><i class="fa-solid fa-file-export" style="font-size: 400%;color:rgb(150,150,150);" title="Export (Bibliography, Collection)"></i></div>
-    <div id="stock"><i class="fa-solid fa-database" style="font-size: 400%;color:rgb(150,150,150);" title="Stock (Local Database or Remote DB XYZ)"></i></div>
+    <div id="authorsPane">
+      <div class="paneHeader">
+        <div class="paneHeaderTitle"><i class="fa-solid fa-user-group paneHeaderIcon" title="Autors"></i> Authors</div>
+        <div class="paneHeaderActions">
+          <i class="fa-solid fa-grip"></i>
+          <i class="fa-solid fa-table-list"></i>
+          <i class="fa-solid fa-expand"></i>
+        </div>
+      </div>
+      <div id="authors"></div>
+    </div>
+    <div id="exportPane">
+      <div class="paneHeader">
+        <div class="paneHeaderTitle"><i class="fa-solid fa-file-export paneHeaderIcon" title="Export (Bibliography, Collection)"></i> Export</div>
+        <div class="paneHeaderActions">
+          <i class="fa-solid fa-grip"></i>
+          <i class="fa-solid fa-table-list"></i>
+          <i class="fa-solid fa-expand"></i>
+        </div>
+      </div>
+      <div id="export"></div>
+    </div>
+    <div id="stockPane">
+      <div class="paneHeader">
+        <div class="paneHeaderTitle"><i class="fa-solid fa-database paneHeaderIcon" title="Stock (Local Database or Remote DB XYZ)"></i> Stock | <span class="paneHeaderTitleSource">Local (saved x minutes ago)</span></div>
+        <div class="paneHeaderActions">
+          <i class="fa-solid fa-grip"></i>
+          <i class="fa-solid fa-table-list"></i>
+          <i class="fa-solid fa-expand"></i>
+        </div>
+      </div>
+      <div id="stock"></div>
+    </div>
+    
     <div id="settings">
       <div id="settingsList">
         <h1>Settings</h1>
