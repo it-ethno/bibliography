@@ -1,3 +1,5 @@
+/* Global Variables */
+
 let settings = {
     language: 'en',
     useBackground: true,
@@ -6,12 +8,20 @@ let settings = {
     fixedBackground: '',
     inputFormat: '',
     outputFormat: '',
-    serverURL: ''
+    serverURL: '',
+    useLocalStorage: true
 };
 
 let authors = new Map();
 let books = new Map();
 let publishers = new Map();
+
+let imageReload = setInterval(loadRandomBackgroundImage, 60000);
+
+let authorsPane = document.querySelector('#authors');
+let exportPane = document.querySelector('#export');
+let stockPane = document.querySelector('#stock');
+
 
 /* Class Definitions */
 
@@ -40,7 +50,6 @@ class Book {
         if (books.has(title)) {
             return books.get(title);
         } else {
-            console.log(options);
             this.uid = options.uid || uid();
             this.title = title;
             this.subtitle = options.subtitle || '';
@@ -154,28 +163,21 @@ class Citation {
     notes;
     date_added;
 
-    constructor(quote, page, book_id) {
+    constructor(quote, page, book_id, options = {}) {
+        this.uid = options.uid || uid();
         this.citation_text = quote;
         this.page = page;
         this.book_id = book_id;
-        this.date_added = Date.now();
-        this.uid = uid();
-
+        this.date_added = options.date_added || Date.now();
+        this.notes = options.notes || [];
     }
 }
 
 
 /* Functional Code */
 
-const uid = () => {
-    return (Date.now().toString(32) + Math.random().toString(16).replace(/\./g, '')).substring(0, 20);
-}
+const uid = () => { return (Date.now().toString(32) + Math.random().toString(16).replace(/\./g, '')).substring(0, 20); }
 
-let imageReload = setInterval(loadRandomBackgroundImage, 60000);
-
-let authorsPane = document.querySelector('#authors');
-let exportPane = document.querySelector('#export');
-let stockPane = document.querySelector('#stock');
 
 initializeApp();
 
@@ -379,8 +381,9 @@ function populateLocalStorage() {
 
 function loadLocalStorage() {
     settings = JSON.parse(localStorage.getItem('settings'));
+    /* TODO Some attributes of the settings object need to be transformed to their original form before persistence! */
     
-    /* The JSON stringify method stripped our instanced classes of their methods so we have to re-construct them! */
+    /* The JSON stringify method stripped our class instances of their methods so we have to re-construct them! */
     persistedBooks = new Map(Object.entries(JSON.parse(localStorage.getItem('books'))));
     persistedAuthors = new Map(Object.entries(JSON.parse(localStorage.getItem('authors'))));
     persistedPublishers = new Map(Object.entries(JSON.parse(localStorage.getItem('publishers'))));
@@ -392,5 +395,6 @@ function loadLocalStorage() {
     Array.from(persistedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
     Array.from(persistedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
     Array.from(persistedPublishers).forEach((publisher) => { publishers.set(publisher[0], new Publisher(publisher[1].name, publisher[1].places[0], publisher[1])); });
-    /* END Instances Reconstruction */
+    /* End Instances Reconstruction */
+
 }
