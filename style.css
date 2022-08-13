@@ -16,9 +16,17 @@ h2 {
   color: rgba(81, 81, 81, 0.9);
 }
 
+.action {
+  cursor: pointer;
+}
+
 .authorsPaneItem {
   padding: 5px 20px;
   border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+}
+
+.exportFileType {
+  font-size: 130%;
 }
 
 .exportPaneItem {
@@ -44,7 +52,7 @@ h2 {
   font-size:0.9em;
   font-style: italic;
   margin-top:8px;
-  color:rgb(100,100,100);
+  color:rgba(100, 100, 100, 0.5);
 }
 
 .input_clue:hover {
@@ -56,9 +64,32 @@ h2 {
   min-width: 300px;
 }
 
+.lastAdditionsItem {
+  font-family: 'DM Mono';
+  font-size: 85%;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.paneActions {
+  display: flex;
+  padding: 5px 20px;
+  background-color: rgba(100, 100, 100, 1);
+  color: rgba(240, 240, 240, 1);
+  font-family: 'Open Sans';
+}
+
+.paneActionsLabel {
+  font-size: 85%;
+}
+
+.paneActionsRight {
+  margin-left: auto;
+}
+
 .paneHeader {
   padding: 8px 20px;
-  background-color: rgba(230, 230, 230, 0.9);
+  background-color: rgba(220, 220, 220, 0.9);
   color: rgba(100, 100, 100, 1);
   display: flex;
   border-bottom: 1px solid rgba(150, 150, 150, 1.0);
@@ -142,6 +173,30 @@ h2 {
   visibility: hidden;
 }
 
+#formatConfigurator {
+  visibility: hidden;
+  position: fixed;
+  top: 0px; 
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  padding: 50px;
+  background-color: rgba(240, 240, 240, 0.95);
+}
+
+#mainFocusContent {
+  width: 60%;
+  padding: 40px;
+  background-color: rgba(240, 240, 240, 0.95);
+  border-radius: 15px;
+}
+
+#mainFocusPane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #mainInput {
   width: 56%;
   min-width: 200px;
@@ -205,4 +260,5 @@ h2 {
   overflow: hidden;
   border-radius: 15px 15px 0 0;
   visibility: hidden;
+  z-index: 1;
 }

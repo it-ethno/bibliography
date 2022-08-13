@@ -21,8 +21,10 @@ class Book {
     subtitle;
     author_id;
     author_name;
+    author_prename;
     year;
     publisher_id;
+    publisher_name;
     place;
     edition;
     is_anthology;
@@ -32,42 +34,48 @@ class Book {
     number_pages;
     isbn;
     language;
+    link;
 
     constructor(title, options = {}) {
-        this.uid = uid();
-        this.title = title;
-        this.subtitle = options.subtitle || '';
-        this.year = options.year || new Date().getFullYear();
-        this.is_anthology = options.is_anthology || false;
-        this.place = options.place || '';
-        this.notes = [];
-        this.quotes = [];
-        this.signatures = [];
-        this.isbn = options.isbn || '';
-        this.number_pages = options.number_pages || 0;
-        this.language = options.language || 'Language Unknown';
-        this.author_name = options.surname;
-        this.author_prename = options.prename;
-        
-        let author = (options.surname || '') + ', ' + (options.prename || '');
-        if (author !== ', ') {
-            if (!authors.has(author)) {
-                let a = new Author(options.surname, options.prename);
-                this.author_id = a.uid;
-            } else {
-                this.author_id = authors.get(author).uid;
+        if (books.has(title)) {
+            return books.get(title);
+        } else {    
+            this.uid = uid();
+            this.title = title;
+            this.subtitle = options.subtitle || '';
+            this.year = options.year || new Date().getFullYear();
+            this.is_anthology = options.is_anthology || false;
+            this.place = options.place || '';
+            this.notes = [];
+            this.quotes = [];
+            this.signatures = [];
+            this.isbn = options.isbn || '';
+            this.number_pages = options.number_pages || 0;
+            this.language = options.language || 'Language Unknown';
+            this.author_name = options.surname;
+            this.author_prename = options.prename;
+            this.publisher_name = options.publisher;
+
+            let author = (options.surname || '') + ', ' + (options.prename || '');
+            if (author !== ', ') {
+                if (!authors.has(author)) {
+                    let a = new Author(options.surname, options.prename);
+                    this.author_id = a.uid;
+                } else {
+                    this.author_id = authors.get(author).uid;
+                }
             }
+
+            if (!publishers.has(options.publisher)) {
+                let p = new Publisher(options.publisher, this.place);
+                this.publisher_id = p.uid;
+            } else {
+                this.publisher_id = publishers.get(options.publisher).uid;
+            }
+
+            books.set(this.title, this);
+            localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
         }
-
-        if (!publishers.has(options.publisher)) {
-            let p = new Publisher(options.publisher, this.place);
-            this.publisher_id = p.uid;
-        } else {
-            this.publisher_id = publishers.get(options.publisher).uid;
-        }
-
-        books.set(this.title, this);
-
     }
 }
 
@@ -87,7 +95,8 @@ class Author {
         this.uid = uid();
         this.surname = surname;
         this.prename = prename;
-        authors.set(this.surname + ', ' + this.prename, this);    
+        authors.set(this.surname + ', ' + this.prename, this);
+        localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));    
     }
 }
 
@@ -123,6 +132,7 @@ class Publisher {
         this.places.push(place);
 
         publishers.set(this.name, this);
+        localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
     }
 }
 
@@ -152,11 +162,12 @@ const uid = () => {
 }
 
 let imageReload = setInterval(loadRandomBackgroundImage, 60000);
-equipListeners();
 
 let authorsPane = document.querySelector('#authors');
 let exportPane = document.querySelector('#export');
 let stockPane = document.querySelector('#stock');
+
+initializeApp();
 
 function parseMainInput() {
     let input = document.querySelector('#mainInput').value;
@@ -184,7 +195,6 @@ function parseMainInput() {
         place: location,
         publisher: pubName
     });
-
     updateDisplay();
 
 }
@@ -219,11 +229,78 @@ function updateExportPane() {
 
 }
 
+function maximizePane(e) {
+    let target = document.querySelector('#' + e.target.id.substring(16));
+    e.target.classList.remove('fa-expand');
+    e.target.classList.add('fa-compress');
+    e.target.removeEventListener('click', maximizePane);
+    e.target.addEventListener('click', minimizePane);
+    target.style.top = '0px';
+    target.style.right = '0px';
+    target.style.bottom = '0px';
+    target.style.left = '0px';
+    target.style.height = '100%';
+    target.style.width = '100%';
+    target.style.borderRadius = '15px';
+    target.style.backgroundColor = 'rgba(240, 240, 240, 0.98)';
+    target.style.zIndex = '10';
+}
+
+function minimizePane(e) {
+    let target = document.querySelector('#' + e.target.id.substring(16));
+    e.target.classList.remove('fa-compress');
+    e.target.classList.add('fa-expand');
+    e.target.removeEventListener('click', minimizePane);
+    e.target.addEventListener('click', maximizePane);
+    target.style.zIndex = '1';
+    switch(target.id) {
+        case 'authorsPane':
+            target.style.top = '0px';
+            target.style.right = '';
+            target.style.bottom = '0px';
+            target.style.left = '0px';
+            target.style.height = '';
+            target.style.width = '20%';
+            target.style.borderRadius = '0 15px 15px 0';
+            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+            break;
+        case 'stockPane':
+            target.style.top = '';
+            target.style.right = '20%';
+            target.style.bottom = '0px';
+            target.style.left = '20%';
+            target.style.height = '';
+            target.style.width = '';
+            target.style.borderRadius = '15px 15px 0 0';
+            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+            break;
+        case 'exportPane':
+            target.style.top = '0px';
+            target.style.right = '0px';
+            target.style.bottom = '0px';
+            target.style.left = '';
+            target.style.height = '';
+            target.style.width = '20%';
+            target.style.borderRadius = '15px 0 0 15px';
+            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+            break;
+    }
+}
+
+function showLastAdditions() {
+    Array.from(books).forEach((book) => {
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('lastAdditionsItem');
+        newDiv.textContent = book[1].author_name + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place;
+        document.querySelector('#latestAdditions').appendChild(newDiv);
+    })
+}
+
 function observeMainInput(e) {
-    console.log(e.key);
     if (e.keyCode === 13) {
         parseMainInput();
     }
+    /* TODO Parse input and reflect current progress in Standard Format String below mainInput (green coloring) */
 }
 
 function loadRandomBackgroundImage() {
@@ -237,6 +314,8 @@ function togglePane(e) {
 
 function equipListeners() {
     document.querySelectorAll('.paneToggler').forEach( (node) => { node.addEventListener('click', togglePane); });
+    document.querySelectorAll('.configuratorToggler').forEach( (node) => { node.addEventListener('click', toggleConfigurator); });
+    document.querySelectorAll('.maximizePaneToggler').forEach( (node) => { node.addEventListener('click', maximizePane); });
     document.querySelector('#settingsToggler').addEventListener('click', toggleSettings);
     document.querySelector('#closeSettings').addEventListener('click', toggleSettings);
     document.querySelector('#mainInput').addEventListener('keydown', observeMainInput);
@@ -247,6 +326,11 @@ function toggleSettings() {
     settings.style.visibility === 'visible' ? settings.style.visibility = 'hidden' : settings.style.visibility = 'visible';
 }
 
+function toggleConfigurator() {
+    let configurator = document.querySelector('#formatConfigurator');
+    configurator.style.visibility === 'visible' ? configurator.style.visibility = 'hidden' : configurator.style.visibility = 'visible';
+}
+
 function handleSettingsChange(e) {
     switch(e.target.id) {
 
@@ -255,4 +339,33 @@ function handleSettingsChange(e) {
 
 function exportLocalDataToJsonFile() {
     
+}
+
+function initializeApp() {
+    initializeLocalStorage();
+    equipListeners();
+    updateDisplay();
+    showLastAdditions();
+}
+
+function initializeLocalStorage() {
+    if (!localStorage.getItem('settings')) {
+        populateLocalStorage();
+    } else {
+        loadLocalStorage();
+    }
+}
+
+function populateLocalStorage() {
+    localStorage.setItem('settings', JSON.stringify(settings));
+    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
+    localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
+    localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
+}
+
+function loadLocalStorage() {
+    settings = JSON.parse(localStorage.getItem('settings'));
+    books = new Map(Object.entries(JSON.parse(localStorage.getItem('books'))));
+    authors = new Map(Object.entries(JSON.parse(localStorage.getItem('authors'))));
+    publishers = new Map(Object.entries(JSON.parse(localStorage.getItem('publishers'))));
 }

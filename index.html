@@ -12,6 +12,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&display=swap" rel="stylesheet">
 
     <script src="https://kit.fontawesome.com/8b7dd93a81.js" crossorigin="anonymous"></script>
 
@@ -20,50 +21,68 @@
     <div id="alltainer">
       <div id="mainInterface">
         <h1>Bibliography</h1>
-        <i id="settingsToggler" class="fa-solid fa-gear" style="margin-bottom: 10px;margin-top: 15px;" title="Open Settings"></i>
+        <i id="settingsToggler" class="fa-solid fa-gear action" style="margin-bottom: 10px;margin-top: 15px;" title="Open Settings"></i>
         <div>
-          <i id="paneToggler-authorsPane" class="fa-solid fa-user-group paneToggler" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
+          <i id="paneToggler-authorsPane" class="fa-solid fa-user-group paneToggler action" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
           <input id="mainInput" type="text" placeholder="Enter a new bibliographic reference (or a known one to display details)" />
-          <i id="paneToggler-exportPane" class="fa-solid fa-file-export paneToggler" style="margin-left:10px;" title="Open/Close Export Tab"></i>
-          <p class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher.</p>
-          <i id="paneToggler-stockPane" class="fa-solid fa-database paneToggler" style="margin-top:10px;" title="Open/Close Stock"></i>
+          <i id="paneToggler-exportPane" class="fa-solid fa-file-export paneToggler action" style="margin-left:10px;" title="Open/Close Export Tab"></i>
+          <p class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher. <i class="fa-solid fa-circle-plus action" title="Show a form for a new book"></i></p>
+          <div></div>
+          <i id="paneToggler-stockPane" class="fa-solid fa-database paneToggler action" style="margin-top:10px;" title="Open/Close Stock"></i>
+        </div>
+      </div>
+      <div id="mainFocusPane">
+        <div id="mainFocusContent">
+          <h2 style="margin-bottom:10px;">Last Book Additions</h2>
+          <div id="latestAdditions"></div>
         </div>
       </div>
     </div>
     <div id="authorsPane">
       <div class="paneHeader">
-        <div class="paneHeaderTitle"><i class="fa-solid fa-user-group paneHeaderIcon" title="Autors"></i> Authors</div>
+        <div class="paneHeaderTitle"><i id="paneTitller-authorsPane" class="fa-solid fa-user-group paneHeaderIcon paneToggler" title="Autors"></i> Authors</div>
+        <!-- <div class="paneHeaderTitle"><i id="paneTitller-authorsPane" class="fa-solid fa-book-open-reader paneHeaderIcon paneToggler" title="Publishers"></i> Publishers</div> -->
         <div class="paneHeaderActions">
-          <i class="fa-solid fa-grip"></i>
+          <i class="fa-solid fa-grip"></i> 
           <i class="fa-solid fa-table-list"></i>
-          <i class="fa-solid fa-expand"></i>
+          <i id="maximizeToggler-authorsPane" class="fa-solid fa-expand maximizePaneToggler"></i>
         </div>
       </div>
       <div id="authors"></div>
     </div>
     <div id="exportPane">
       <div class="paneHeader">
-        <div class="paneHeaderTitle"><i class="fa-solid fa-file-export paneHeaderIcon" title="Export (Bibliography, Collection)"></i> Export</div>
+        <div class="paneHeaderTitle"><i id="paneTitller-exportPane" class="fa-solid fa-file-export paneHeaderIcon paneToggler" title="Export (Bibliography, Collection)"></i> Export</div>
         <div class="paneHeaderActions">
+
           <i class="fa-solid fa-grip"></i>
           <i class="fa-solid fa-table-list"></i>
-          <i class="fa-solid fa-expand"></i>
+          <i id="maximizeToggler-exportPane" class="fa-solid fa-expand maximizePaneToggler"></i>
+        </div>
+      </div>
+      <div class="paneActions">
+        <div class="paneActionsLabel">Export the items below to</div>
+        <div class="paneActionsRight">
+          <i class="fa-solid fa-file-pdf exportFileType" title="Export your current selection to a PDF bibliography"></i>
+          <i class="fa-solid fa-file-csv exportFileType" title="Export your current selection to a file of Comma Seperated Values"></i>
+          <i class="fa-solid fa-file-code exportFileType" title="Export your current selection to a XML File (BibTex and Co)"></i>
+          <i class="fa-solid fa-file-lines exportFileType" title="Export your current selection to a JSON File"></i>
         </div>
       </div>
       <div id="export"></div>
     </div>
     <div id="stockPane">
       <div class="paneHeader">
-        <div class="paneHeaderTitle"><i class="fa-solid fa-database paneHeaderIcon" title="Stock (Local Database or Remote DB XYZ)"></i> Stock | <span class="paneHeaderTitleSource">Local (saved x minutes ago)</span></div>
+        <div class="paneHeaderTitle"><i id="paneTitller-stockPane" class="fa-solid fa-database paneHeaderIcon paneToggler" title="Stock (Local Database or Remote DB XYZ)"></i> Stock | <span class="paneHeaderTitleSource">Local (saved x minutes ago)</span></div>
         <div class="paneHeaderActions">
           <i class="fa-solid fa-grip"></i>
           <i class="fa-solid fa-table-list"></i>
-          <i class="fa-solid fa-expand"></i>
+          <i id="maximizeToggler-stockPane" class="fa-solid fa-expand maximizePaneToggler"></i>
         </div>
       </div>
       <div id="stock"></div>
     </div>
-    
+
     <div id="settings">
       <div id="settingsList">
         <h1>Settings</h1>
@@ -88,10 +107,12 @@
           <div class="settingsItem">
             <label for="standardInput" class="labelBlock">Input</label>
             <input id="standardInput" type="text" class="inputLongText" placeholder="author.surname, author.prename. year-of-publication. title: subtitle. place-of-publication: publisher.">
+            <i class="fa-solid fa-wrench configuratorToggler"></i>
           </div>
           <div class="settingsItem">
             <label for="standardOutput" class="labelBlock">Output/Export</label>
             <input id="standardOutput" type="text" class="inputLongText" placeholder="author.surname, author.prename. year-of-publication. title: subtitle. place-of-publication: publisher.">
+            <i class="fa-solid fa-wrench configuratorToggler"></i>
           </div>
         </div>
         <h2>Data Storage</h2>
@@ -113,6 +134,12 @@
           </div>
         </div>
         <i id="closeSettings" class="fa-solid fa-rectangle-xmark"></i>
+      </div>
+    </div>
+    <div id="formatConfigurator">
+      <div id="configurator">
+        <h1>Format Configurator</h1>
+        <i class="fa-solid fa-rectangle-xmark configuratorToggler"></i>
       </div>
     </div>
   </body>
