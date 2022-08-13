@@ -39,38 +39,39 @@ class Book {
     constructor(title, options = {}) {
         if (books.has(title)) {
             return books.get(title);
-        } else {    
-            this.uid = uid();
+        } else {
+            console.log(options);
+            this.uid = options.uid || uid();
             this.title = title;
             this.subtitle = options.subtitle || '';
             this.year = options.year || new Date().getFullYear();
             this.is_anthology = options.is_anthology || false;
             this.place = options.place || '';
-            this.notes = [];
-            this.quotes = [];
-            this.signatures = [];
+            this.notes = options.notes || [];
+            this.quotes = options.quotes || [];
+            this.signatures = options.signatures || [];
             this.isbn = options.isbn || '';
             this.number_pages = options.number_pages || 0;
             this.language = options.language || 'Language Unknown';
-            this.author_name = options.surname;
-            this.author_prename = options.prename;
-            this.publisher_name = options.publisher;
+            this.author_surname = options.author_surname || '';
+            this.author_prename = options.author_prename || '';
+            this.publisher_name = options.publisher_name || '';
 
-            let author = (options.surname || '') + ', ' + (options.prename || '');
+            let author = (options.author_surname || '') + ', ' + (options.author_prename || '');
             if (author !== ', ') {
                 if (!authors.has(author)) {
-                    let a = new Author(options.surname, options.prename);
+                    let a = new Author(options.author_surname, options.author_prename);
                     this.author_id = a.uid;
                 } else {
                     this.author_id = authors.get(author).uid;
                 }
             }
 
-            if (!publishers.has(options.publisher)) {
-                let p = new Publisher(options.publisher, this.place);
+            if (!publishers.has(options.publisher_name)) {
+                let p = new Publisher(options.publisher_name, this.place);
                 this.publisher_id = p.uid;
             } else {
-                this.publisher_id = publishers.get(options.publisher).uid;
+                this.publisher_id = publishers.get(options.publisher_name).uid;
             }
 
             books.set(this.title, this);
@@ -91,10 +92,18 @@ class Author {
     professorships;
     place;
 
-    constructor(surname, prename) {
-        this.uid = uid();
+    constructor(surname, prename, options = {}) {
+        this.uid = options.uid || uid();
+        this.titles = options.titles || [];
+        this.date_birth = options.date_birth || '';
+        this.date_death = options.date_death || '';
+        this.bio = options.bio || '';
+        this.notes = options.notes || [];
+        this.professorships = options.professorships || [];
+        this.place = options.place || '';
         this.surname = surname;
         this.prename = prename;
+
         authors.set(this.surname + ', ' + this.prename, this);
         localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));    
     }
@@ -123,12 +132,13 @@ class Publisher {
     founders;
     notes;
 
-    constructor(name, place) {
-        this.uid = uid();
+    constructor(name, place, options = {}) {
+        this.uid = options.uid || uid();
         this.name = name;
-        this.places = [];
-        this.founders = [];
-        this.notes = [];
+        this.places = options.places || [];
+        this.founders = options.founders || [];
+        this.notes = options.notes || [];
+
         this.places.push(place);
 
         publishers.set(this.name, this);
@@ -187,14 +197,16 @@ function parseMainInput() {
     let publisher = inputVals[3].split(':');
     let location = publisher[0].trim();
     let pubName = publisher[1].trim();
+
     let book = new Book(title, {
         subtitle: subtitle,
         year: year,
-        surname: surname,
-        prename: prename,
+        author_surname: surname,
+        author_prename: prename,
         place: location,
-        publisher: pubName
+        publisher_name: pubName
     });
+    
     updateDisplay();
 
 }
@@ -203,6 +215,7 @@ function updateDisplay() {
     updateAuthorsPane();
     updateStockPane();
     updateExportPane();
+    showLastAdditions();
 }
 
 function updateAuthorsPane() {
@@ -288,10 +301,11 @@ function minimizePane(e) {
 }
 
 function showLastAdditions() {
+    document.querySelector('#latestAdditions').innerHTML = '';
     Array.from(books).forEach((book) => {
         let newDiv = document.createElement('div');
         newDiv.classList.add('lastAdditionsItem');
-        newDiv.textContent = book[1].author_name + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place;
+        newDiv.textContent = book[1].author_surname + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place + ':' + book[1].publisher_name;
         document.querySelector('#latestAdditions').appendChild(newDiv);
     })
 }
@@ -365,7 +379,18 @@ function populateLocalStorage() {
 
 function loadLocalStorage() {
     settings = JSON.parse(localStorage.getItem('settings'));
-    books = new Map(Object.entries(JSON.parse(localStorage.getItem('books'))));
-    authors = new Map(Object.entries(JSON.parse(localStorage.getItem('authors'))));
-    publishers = new Map(Object.entries(JSON.parse(localStorage.getItem('publishers'))));
+    
+    /* The JSON stringify method stripped our instanced classes of their methods so we have to re-construct them! */
+    persistedBooks = new Map(Object.entries(JSON.parse(localStorage.getItem('books'))));
+    persistedAuthors = new Map(Object.entries(JSON.parse(localStorage.getItem('authors'))));
+    persistedPublishers = new Map(Object.entries(JSON.parse(localStorage.getItem('publishers'))));
+
+    books = new Map();
+    authors = new Map();
+    publishers = new Map();
+
+    Array.from(persistedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
+    Array.from(persistedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
+    Array.from(persistedPublishers).forEach((publisher) => { publishers.set(publisher[0], new Publisher(publisher[1].name, publisher[1].places[0], publisher[1])); });
+    /* END Instances Reconstruction */
 }
