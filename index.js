@@ -232,12 +232,91 @@ function updateAuthorsPane() {
 
 function updateStockPane() {
     stockPane.innerHTML = '';
-    Array.from(books.keys()).forEach(book => {
-        let newDiv = document.createElement('div');
-        newDiv.classList.add('stockPaneItem');
-        newDiv.textContent = book;
-        stockPane.appendChild(newDiv);
+    let table = document.createElement('table');
+    table.classList.add('stockTable');
+    table.setAttribute('cellspacing', '0');
+    table.setAttribute('cellpadding', '0');
+    
+    let headerRow = document.createElement('tr');
+    
+    let headerTitle = document.createElement('th');
+    headerTitle.textContent = 'Title';
+    headerRow.appendChild(headerTitle);
+
+    let headerYear = document.createElement('th');
+    headerYear.textContent = 'Year';
+    headerYear.classList.add('stockColYear');
+    headerRow.appendChild(headerYear);
+    
+    let headerAuthor = document.createElement('th');
+    headerAuthor.textContent = 'Author';
+    headerRow.appendChild(headerAuthor);
+
+    let headerPlace = document.createElement('th');
+    headerPlace.textContent = 'Place';
+    headerRow.appendChild(headerPlace);
+
+    let headerPublisher = document.createElement('th');
+    headerPublisher.textContent = 'Publisher';
+    headerRow.appendChild(headerPublisher);
+
+    let headerActions = document.createElement('th');
+    headerActions.classList.add('tableHeaderRight');
+    headerActions.textContent = 'Actions';
+    headerRow.appendChild(headerActions);
+
+    table.appendChild(headerRow);
+    stockPane.appendChild(table);
+
+    Array.from(books).forEach(book => {
+        let bookRow = document.createElement('tr');
+        bookRow.classList.add('stockRow');
+
+        let bookTitle = document.createElement('td');
+        bookTitle.textContent = book[0];
+        bookRow.appendChild(bookTitle);
+
+        let bookYear = document.createElement('td');
+        bookYear.classList.add('stockColYear');
+        bookYear.textContent = book[1].year;
+        bookRow.appendChild(bookYear);
+
+        let bookAuthor = document.createElement('td');
+        bookAuthor.textContent = book[1].author_surname + ', ' + book[1].author_prename;
+        bookRow.appendChild(bookAuthor);
+
+        let bookPlace = document.createElement('td');
+        bookPlace.textContent = book[1].place;
+        bookRow.appendChild(bookPlace);
+
+        let bookPublisher = document.createElement('td');
+        bookPublisher.textContent = book[1].publisher_name;
+        bookRow.appendChild(bookPublisher);
+
+        let bookActions = document.createElement('td');
+        bookActions.classList.add('stockColActions');
+
+        let bookTrash = document.createElement('i');
+        bookTrash.classList.add('fa-solid');
+        bookTrash.classList.add('fa-trash-can');
+        bookTrash.classList.add('action');
+        bookTrash.title = "Delete '" + book[0] + "'";
+        bookTrash.id = 'delBtn-' + book[0];
+        bookTrash.addEventListener('click', deleteBook);
+        bookActions.appendChild(bookTrash);
+        bookRow.appendChild(bookActions);
+        table.appendChild(bookRow);
     });
+}
+
+function deleteBook(e) {
+    books.delete(e.target.id.substring(7));
+    saveBooksToLocalStorage();
+    updateDisplay();
+}
+
+function saveBooksToLocalStorage() {
+    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
 }
 
 function updateExportPane() {
@@ -307,7 +386,7 @@ function showLastAdditions() {
     Array.from(books).forEach((book) => {
         let newDiv = document.createElement('div');
         newDiv.classList.add('lastAdditionsItem');
-        newDiv.textContent = book[1].author_surname + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place + ':' + book[1].publisher_name;
+        newDiv.textContent = book[1].author_surname + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place + ': ' + book[1].publisher_name + '.';
         document.querySelector('#latestAdditions').appendChild(newDiv);
     })
 }
@@ -326,6 +405,8 @@ function loadRandomBackgroundImage() {
 function togglePane(e) {
     let targetNode = document.querySelector('#' + e.target.id.substring(12));
     targetNode.style.visibility === 'visible' ? targetNode.style.visibility = 'hidden' : targetNode.style.visibility = 'visible';
+    console.log(targetNode.style.opacity);
+    (targetNode.style.opacity === '0' || targetNode.style.opacity === '') ? targetNode.style.opacity = '1' : targetNode.style.opacity = '0';
 }
 
 function equipListeners() {
@@ -335,11 +416,29 @@ function equipListeners() {
     document.querySelector('#settingsToggler').addEventListener('click', toggleSettings);
     document.querySelector('#closeSettings').addEventListener('click', toggleSettings);
     document.querySelector('#mainInput').addEventListener('keydown', observeMainInput);
+    document.querySelector('#mainInput').addEventListener('focus', mainInputFocus);
+    document.querySelector('#mainInput').addEventListener('blur', mainInputBlur);
+    document.querySelector('#directExportLink').addEventListener('click', exportLocalDataToJsonFile);
+    document.querySelector('#localPurgeBtn').addEventListener('click', purgeLocalStorage);
+    document.querySelector('#importFileInput').addEventListener('change', importDataFile);
+}
+
+function mainInputFocus() {
+    let mainInputClue = document.querySelector('#mainInputClue');
+    mainInputClue.style.color = 'rgba(30, 30, 30, 1.0)';
+    mainInputClue.classList.add('shake-horizontal');
+}
+
+function mainInputBlur() {    
+    let mainInputClue = document.querySelector('#mainInputClue');
+    mainInputClue.classList.remove('shake-horizontal');
+    mainInputClue.style.color = 'rgba(100, 100, 100, 0.5)';
 }
 
 function toggleSettings() {
     let settings = document.querySelector('#settings');
     settings.style.visibility === 'visible' ? settings.style.visibility = 'hidden' : settings.style.visibility = 'visible';
+    document.querySelector('#numbersPurge').innerHTML = 'Clicking the purge button will delete <em>' + books.size + ' books</em>, <em>' + authors.size + ' authors</em>, and <em>' + publishers.size + ' publishers</em>!!!';
 }
 
 function toggleConfigurator() {
@@ -354,7 +453,28 @@ function handleSettingsChange(e) {
 }
 
 function exportLocalDataToJsonFile() {
-    
+    booksStr = JSON.stringify(Object.fromEntries(books));
+    rightNow = new Date();
+    filename = 'books-' + (rightNow.getMonth()+1) + '-' + rightNow.getDate() + '-' + rightNow.getFullYear() + '--' + rightNow.getHours() + '-' + rightNow.getMinutes() + '.json';
+    booksUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(booksStr);
+    let ghostLink = document.createElement('a');
+    ghostLink.setAttribute('href', booksUri);
+    ghostLink.setAttribute('download', filename);
+    ghostLink.click();
+}
+
+function importDataFile(e) {
+    let files = e.target.files;
+    let reader = new FileReader();
+    reader.onload = createBooksFromFile;
+    reader.readAsText(files[0]);
+}
+
+function createBooksFromFile(e) {
+    let importedBooks = new Map(Object.entries(JSON.parse(e.target.result)));
+    Array.from(importedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
+    console.log('JSON Data successfully imported! ' + books.size + ' Books added.');
+    updateDisplay();
 }
 
 function initializeApp() {
@@ -397,4 +517,15 @@ function loadLocalStorage() {
     Array.from(persistedPublishers).forEach((publisher) => { publishers.set(publisher[0], new Publisher(publisher[1].name, publisher[1].places[0], publisher[1])); });
     /* End Instances Reconstruction */
 
+}
+
+function purgeLocalStorage() {
+    books = new Map();
+    authors = new Map();
+    publishers = new Map();
+
+    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
+    localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
+    localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
+    updateDisplay();
 }
