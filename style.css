@@ -20,6 +20,11 @@ h2 {
   text-align: center;
   color: rgba(70, 70, 70, 0.99);
   font-weight: 500;
+  margin-bottom: 10px;
+}
+
+h3 {
+  color: rgba(50, 50, 50, 0.9);
 }
 
 table {
@@ -49,6 +54,22 @@ td {
 
 .action:hover {
   color: rgba(30, 30, 30, 0.95);
+}
+
+.addTagBtn {
+  padding: 5px 10px;
+}
+
+.addTagForm {
+  padding: 10px;
+  background-color: rgba(70, 70, 70, 0.9);
+  color: rgba(240, 240, 240, 0.9);
+  position: absolute;
+  border-radius: 10px;
+}
+
+.addTagInput {
+  width: 120px;
 }
 
 .authorsPaneItem {
@@ -93,6 +114,11 @@ td {
 
 .flextainer {
   display: flex;
+}
+
+.headerAction {
+  font-size:80%;
+  color:rgba(80, 80, 80, 0.9);
 }
 
 .heartbeat {
@@ -184,6 +210,23 @@ td {
   font-size: 80%;
 }
 
+.screensaver {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  background-color: rgba(20, 20, 20, 1.0);
+  color: rgba(250, 250, 250, 1.0);
+  z-index: 100;
+  padding: 50px;
+}
+
+.screenSaverLetter {
+  font-size: 800%;
+  font-family: 'Open Sans';
+}
+
 .settingsItem {
   margin: 10px 0px;
 }
@@ -212,15 +255,27 @@ td {
 }
 
 .stockRow {
+  cursor: pointer;
+}
+
+.stockRow:hover {
   background-color: rgba(210, 210, 210, 1);
 }
 
 .stockRow:nth-child(odd) {
-  background-color: rgba(220, 220, 220, 1);
+  background-color: rgba(250, 250, 250, 1);
+}
+
+.stockRow:nth-child(odd):hover {
+  background-color: rgba(210, 210, 210, 1);
 }
 
 .stockRow:nth-child(even) {
+  background-color: rgba(230, 230, 230, 1);
+}
 
+.stockRow:nth-child(even):hover {
+  background-color: rgba(210, 210, 210, 1);
 }
 
 .stockTable {
@@ -231,12 +286,17 @@ td {
   text-align: right;
 }
 
+.text-flicker-in-glow {
+	animation: text-flicker-in-glow 4s linear both;
+}
+
 .wobble-hor-bottom {
 	animation: wobble-hor-bottom 0.8s both;
 }
 
+
 #alltainer {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
   background-image: url('./images/background_1.jpg');
@@ -252,7 +312,7 @@ td {
 }
 
 #authorsPane {
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   bottom: 0px;
@@ -262,7 +322,43 @@ td {
   opacity: 0.0;
   border-radius: 0 15px 15px 0;
   visibility: hidden;
-  transition: opacity 0.8s ease, visibility 0.9s ease;
+  transition: opacity 0.8s ease, visibility 0.9s ease, top 1s ease, right 1s ease, bottom 1s ease, left 1s ease, height 1s ease, width 1s ease;
+}
+
+#bookDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+#bookNotes {
+  margin-top: 15px;
+  
+}
+
+#bookQuotes {
+  margin-top: 15px;
+}
+
+#bookSignatures {
+
+}
+
+#detailAuthor {
+  font-size: 120%;
+  margin-bottom: 10px;
+}
+
+#detailTitle {
+  font-size: 200%;
+}
+
+#detailView {
+  visibility: hidden;
+  opacity: 0;
+  font-family: 'EB Garamond';
+  
+  display: flex;
+  transition: opacity 0.8s ease, visibility 0.8s ease, height 0.8s ease;
 }
 
 #export {
@@ -275,13 +371,14 @@ td {
   top: 0px;
   right: 0px;
   bottom: 0px;
+  left: 80%;
   width: 20%;
   background-color: rgba(240, 240, 240, 1);
   overflow: hidden;
   border-radius: 15px 0 0 15px;
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.8s ease, visibility 0.9s ease;
+  transition: opacity 0.8s ease, visibility 0.9s ease, top 1s ease, right 1s ease, bottom 1s ease, left 1s ease, height 1s ease, width 1s ease, border-radius 1s ease;
 }
 
 #formatConfigurator {
@@ -295,11 +392,19 @@ td {
   background-color: rgba(240, 240, 240, 0.95);
 }
 
+#latestAdditions {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
 #mainFocusContent {
   width: 60%;
   padding: 40px;
   background-color: rgba(240, 240, 240, 0.9);
   border-radius: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
 #mainFocusPane {
@@ -333,7 +438,17 @@ td {
   text-align: center;
   position: relative;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
   background-color: rgba(240, 240, 240, 0.9);
+  transition: margin-top 1s ease, padding 1s ease;
+}
+
+#mainTitle {
+  visibility: visible;
+  opacity: 1;
+  display: block;
+  transition: opacity 0.8s ease, visibility 0.8s ease, height 0.8s ease;
 }
 
 #settings {
@@ -353,18 +468,31 @@ td {
   text-align: center;
 }
 
+#settingsToggler {
+  margin-bottom: 10px;
+  margin-top: 15px;
+  transition: margin-top 0.5s ease;
+}
+
+#signaturesAndNotes {
+  margin-top: auto;
+  border-top: 1px solid rgba(200, 200, 200, 0.8);
+}
+
 #stock {
   padding: 0px 0px;
   color: rgba(50, 50, 50, 1.0); 
 }
 
 #stockPane {
-  position: absolute;
+  position: fixed;
   bottom: 0px;
+  top:80%;
   background-color: rgba(240, 240, 240, 1);
   height: 20%;
   left: 20%;
   right: 20%;
+  width: 60%;
   border-top: 2px solid rgba(220, 220, 220, 1);
   border-left: 2px solid rgba(220, 220, 220, 1);
   border-right: 2px solid rgba(220, 220, 220, 1);
@@ -373,9 +501,15 @@ td {
   visibility: hidden;
   z-index: 1;
   opacity: 0;
-  transition: opacity 0.8s ease, visibility 0.9s ease;
+  transition: opacity 0.8s ease, visibility 0.9s ease, top 1s ease, right 1s ease, bottom 1s ease, left 1s ease, height 1s ease, width 1s ease, border-radius 1s ease;
 }
 
+#tagsAndQuotes {
+  margin-left: auto;
+  min-width: 30%;
+  padding-left: 30px;
+  border-left: 1px solid rgba(200, 200, 200, 0.7);
+}
 
 /* ----------------------------------------------
  * Generated by Animista on 2022-8-15 17:33:9
@@ -568,5 +702,143 @@ td {
   }
   75% {
     transform: translateX(-6px) rotate(-1.2deg);
+  }
+}
+
+/* ----------------------------------------------
+ * Generated by Animista on 2022-8-16 1:12:4
+ * Licensed under FreeBSD License.
+ * See http://animista.net/license for more info. 
+ * w: http://animista.net, t: @cssanimista
+ * ---------------------------------------------- */
+
+/**
+ * ----------------------------------------
+ * animation text-flicker-in-glow
+ * ----------------------------------------
+ */
+ @keyframes text-flicker-in-glow {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  10.1% {
+    opacity: 1;
+    text-shadow: none;
+  }
+  10.2% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  20% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  20.1% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.25);
+  }
+  20.6% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  30% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  30.1% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.45), 0 0 60px rgba(255, 255, 255, 0.25);
+  }
+  30.5% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.45), 0 0 60px rgba(255, 255, 255, 0.25);
+  }
+  30.6% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  45% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  45.1% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.45), 0 0 60px rgba(255, 255, 255, 0.25);
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.45), 0 0 60px rgba(255, 255, 255, 0.25);
+  }
+  55% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.45), 0 0 60px rgba(255, 255, 255, 0.25);
+  }
+  55.1% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  57% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  57.1% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.55), 0 0 60px rgba(255, 255, 255, 0.35);
+  }
+  60% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.55), 0 0 60px rgba(255, 255, 255, 0.35);
+  }
+  60.1% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  65% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  65.1% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.55), 0 0 60px rgba(255, 255, 255, 0.35), 0 0 100px rgba(255, 255, 255, 0.1);
+  }
+  75% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.55), 0 0 60px rgba(255, 255, 255, 0.35), 0 0 100px rgba(255, 255, 255, 0.1);
+  }
+  75.1% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  77% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  77.1% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.55), 0 0 60px rgba(255, 255, 255, 0.4), 0 0 110px rgba(255, 255, 255, 0.2), 0 0 100px rgba(255, 255, 255, 0.1);
+  }
+  85% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.55), 0 0 60px rgba(255, 255, 255, 0.4), 0 0 110px rgba(255, 255, 255, 0.2), 0 0 100px rgba(255, 255, 255, 0.1);
+  }
+  85.1% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  86% {
+    opacity: 0;
+    text-shadow: none;
+  }
+  86.1% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.45), 0 0 110px rgba(255, 255, 255, 0.25), 0 0 100px rgba(255, 255, 255, 0.1);
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.45), 0 0 110px rgba(255, 255, 255, 0.25), 0 0 100px rgba(255, 255, 255, 0.1);
   }
 }

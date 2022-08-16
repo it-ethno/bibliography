@@ -13,6 +13,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap" rel="stylesheet">
 
     <script src="https://kit.fontawesome.com/8b7dd93a81.js" crossorigin="anonymous"></script>
 
@@ -20,8 +23,8 @@
   <body>
     <div id="alltainer">
       <div id="mainInterface">
-        <h1>Bibliography</h1>
-        <i id="settingsToggler" class="fa-solid fa-gear action" style="margin-bottom: 10px;margin-top: 15px;" title="Open Settings"></i>
+        <h1 id="mainTitle">Bibliography</h1>
+        <i id="settingsToggler" class="fa-solid fa-gear action" title="Open Settings"></i>
         <div>
           <i id="paneToggler-authorsPane" class="fa-solid fa-user-group paneToggler action" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
           <input id="mainInput" type="text" placeholder="Enter a new bibliographic reference (or a known one to display details)" />
@@ -32,8 +35,35 @@
       </div>
       <div id="mainFocusPane">
         <div id="mainFocusContent">
-          <h2 style="margin-bottom:10px;">Last Book Additions</h2>
           <div id="latestAdditions"></div>
+          <div id="detailView">
+            <div id="bookDetails">
+              <div id="detailTitle" class="detailItem"></div>
+              <div id="detailAuthor" class="detailItem"></div>
+              <div style="margin-bottom: 20px;"><span id="detailYear" class="detailItem"></span> - <span id="detailPublisher" class="detailItem"></span> (<span id="detailPlace" class="detailItem"></span>)</div>
+              <div id="signaturesAndNotes">
+                <div id="bookSignatures">
+                <h3>Signatures <span class="headerAction"><i class="fa-solid fa-circle-plus"></i></span></h3>
+                <div id="signaturesList"></div>
+              </div>
+                <div id="bookNotes">
+                  <h3>Notes <span class="headerAction"><i class="fa-solid fa-square-plus"></i></span></h3>
+                  <div id="notesList"></div>
+                </div>
+              </div>
+
+            </div>
+            <div id="tagsAndQuotes">
+              <div id="bookTags">
+                <h3>Tags <i id="bookNewTag" class="fa-solid fa-circle-plus headerAction newTag"></i></h3>
+                <div id="tagsList"></div>
+              </div>
+              <div id="bookQuotes">
+                <h3>Quotes <i class="fa-solid fa-square-plus headerAction"></i></h3>
+                <div id="quotesList"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -60,7 +90,7 @@
         </div>
       </div>
       <div class="paneActions">
-        <div class="paneActionsLabel">Export the items below to</div>
+        <div class="paneActionsLabel">Export items to</div>
         <div class="paneActionsRight">
           <i class="fa-solid fa-file-pdf exportFileType action" title="Export your current selection to a PDF bibliography"></i>
           <i class="fa-solid fa-file-csv exportFileType action" title="Export your current selection to a file of Comma Seperated Values"></i>
@@ -143,6 +173,9 @@
           <div class="settingsItem">
             <label for="importFileInput">Import Data File</label>
             <input id="importFileInput" type="file" name="files[]">
+          </div>
+          <div class="settingsItem">
+            <i id="screensaverBtn" class="fa-solid fa-display"></i>
           </div>
         </div>
         <i id="closeSettings" class="fa-solid fa-rectangle-xmark action"></i>

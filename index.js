@@ -6,6 +6,8 @@ let settings = {
     changeInterval: 1,
     useFixedBackground: false,
     fixedBackground: '',
+    useTransparency: true,
+    useAcademicMode: true,
     inputFormat: '',
     outputFormat: '',
     serverURL: '',
@@ -15,6 +17,10 @@ let settings = {
 let authors = new Map();
 let books = new Map();
 let publishers = new Map();
+let quotes = new Map();
+let notes = new Map();
+let signatures = new Map();
+let tags = new Map();
 
 let imageReload = setInterval(loadRandomBackgroundImage, 60000);
 
@@ -45,6 +51,8 @@ class Book {
     isbn;
     language;
     link;
+    tags;
+    date_added;
 
     constructor(title, options = {}) {
         if (books.has(title)) {
@@ -56,8 +64,10 @@ class Book {
             this.year = options.year || new Date().getFullYear();
             this.is_anthology = options.is_anthology || false;
             this.place = options.place || '';
+            this.edition = options.edition || '';
             this.notes = options.notes || [];
             this.quotes = options.quotes || [];
+            this.tags = options.tags || [];
             this.signatures = options.signatures || [];
             this.isbn = options.isbn || '';
             this.number_pages = options.number_pages || 0;
@@ -65,8 +75,10 @@ class Book {
             this.author_surname = options.author_surname || '';
             this.author_prename = options.author_prename || '';
             this.publisher_name = options.publisher_name || '';
+            this.date_added = options.date_added || new Date();
 
             let author = (options.author_surname || '') + ', ' + (options.author_prename || '');
+
             if (author !== ', ') {
                 if (!authors.has(author)) {
                     let a = new Author(options.author_surname, options.author_prename);
@@ -85,7 +97,115 @@ class Book {
 
             books.set(this.title, this);
             localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
+            
         }
+    }
+
+    showDetails = () => {
+        prepareForDetailsView();
+        document.querySelector('#detailTitle').innerHTML = '&laquo; ' + this.title + ' &raquo;';
+        document.querySelector('#detailYear').textContent = this.year;
+        document.querySelector('#detailAuthor').textContent = 'by ' + this.author_prename + ' ' + this.author_surname;
+        document.querySelector('#detailPublisher').textContent = this.publisher_name;
+        document.querySelector('#detailPlace').textContent = this.place;
+        let signList = document.querySelector('#signaturesList');
+        signList.textContent = '';
+        let notesList = document.querySelector('#notesList');
+        notesList.textContent = '';
+        let tagsList = document.querySelector('#tagsList');
+        tagsList.textContent = '';
+        let quotesList = document.querySelector('#quotesList');
+        quotesList.textContent = '';
+        let tagPlus = document.querySelector('#bookNewTag');
+        tagPlus.setAttribute('data-book-key', this.uid);
+        tagPlus.addEventListener('click', this.addTagForm);
+
+        if (this.signatures.length > 0) {
+            this.signatures.forEach((sign) => {
+                let newDiv = document.createElement('div');
+                newDiv.classList.add('signatureItem');
+                newDiv.textContent = sign;
+                signList.appendChild(newDiv);
+            });
+        } else {
+            signList.textContent = 'No Signatures yet';
+        }
+
+        if (this.notes.length > 0) {
+            this.notes.forEach((note) => {
+                let newDiv = document.createElement('div');
+                newDiv.classList.add('noteItem');
+                newDiv.textContent = note;
+                notesList.appendChild(newDiv);
+            });
+        } else {
+            notesList.textContent = 'No Notes yet';
+        }
+
+        if (this.quotes.length > 0) {
+            this.quotes.forEach((quote) => {
+                let newDiv = document.createElement('div');
+                newDiv.classList.add('quoteItem');
+                newDiv.textContent = quote;
+                quotesList.appendChild(newDiv);
+            });
+        } else {
+            quotesList.textContent = 'No Quotes yet';
+        }
+
+        if (this.tags.length > 0) {
+            this.tags.forEach((tag) => {
+                let tagObj = tags.get(tag);
+                let newDiv = document.createElement('div');
+                newDiv.classList.add('tagItem');
+                newDiv.textContent = tagObj.label;
+                tagsList.appendChild(newDiv);
+            });
+        } else {
+            tagsList.textContent = 'No Tags yet';
+        }
+    }
+
+    addTagForm = (e) => {
+        console.log('about to add tag form...');
+        let plusPosition = e.target.getBoundingClientRect();
+        let newDiv = document.createElement('div');
+        newDiv.id = 'tagForm-' + this.uid;
+        newDiv.classList.add('addTagForm');
+        newDiv.style.top = plusPosition.top - 15 + 'px';
+        newDiv.style.left = plusPosition.left + 20 + 'px';
+        let newIcon = document.createElement('i');
+        newIcon.classList.add('fa-solid');
+        newIcon.classList.add('fa-hashtag');
+        newDiv.appendChild(newIcon);
+        let newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.classList.add('addTagInput');
+        newInput.id= 'addTagInput-' + this.uid;
+        newDiv.appendChild(newInput);
+        let newBtn = document.createElement('button');
+        newBtn.type = 'button';
+        newBtn.classList.add('addTagBtn');
+        newBtn.textContent = 'Add Tag';
+        newBtn.addEventListener('click', this.addTag);
+        newDiv.appendChild(newBtn);
+        document.querySelector('#alltainer').appendChild(newDiv);
+    }
+
+    addTag = (e) => {
+        let inputTag = document.querySelector('#addTagInput-' + this.uid).value;
+        console.log(inputTag);
+        let newTag = new Tag(inputTag);
+        this.tags.push(newTag.uid);
+        this.save();
+        document.querySelector('#tagForm-' + this.uid).remove();
+        this.showDetails();
+    }
+
+    save = () => {
+        console.log('Saving...');
+        books.set(this.uid, this);
+        localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
     }
 }
 
@@ -98,8 +218,10 @@ class Author {
     date_death;
     bio;
     notes;
+    tags;
     professorships;
     place;
+    date_added;
 
     constructor(surname, prename, options = {}) {
         this.uid = options.uid || uid();
@@ -112,6 +234,8 @@ class Author {
         this.place = options.place || '';
         this.surname = surname;
         this.prename = prename;
+        this.date_added = options.date_added || new Date();
+        this.tags = options.tags || [];
 
         authors.set(this.surname + ', ' + this.prename, this);
         localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));    
@@ -140,6 +264,8 @@ class Publisher {
     date_foundation;
     founders;
     notes;
+    tags;
+    date_added;
 
     constructor(name, place, options = {}) {
         this.uid = options.uid || uid();
@@ -147,6 +273,7 @@ class Publisher {
         this.places = options.places || [];
         this.founders = options.founders || [];
         this.notes = options.notes || [];
+        this.tags = options.tags || [];
 
         this.places.push(place);
 
@@ -155,21 +282,84 @@ class Publisher {
     }
 }
 
-class Citation {
+class Quote {
     uid;
     book_id;
     page;
-    citation_text;
+    quote_text;
     notes;
+    tags;
     date_added;
 
-    constructor(quote, page, book_id, options = {}) {
+    constructor(quote, options = {}) {
         this.uid = options.uid || uid();
-        this.citation_text = quote;
-        this.page = page;
-        this.book_id = book_id;
+        this.quote_text = quote;
+        this.page = options.page || 'unknown';
+        this.book_id = options.book_id || 'unknown';
         this.date_added = options.date_added || Date.now();
+        this.tags = options.tags || [];
         this.notes = options.notes || [];
+
+        quotes.set(this.uid, this);
+        localStorage.setItem('quotes', JSON.stringify(Object.fromEntries(quotes)));
+
+    }
+}
+
+class Note {
+    uid;
+    title;
+    note_text;
+    tags;
+    parent_id;
+    date_added;
+
+    constructor(text, options = {}) {
+        this.uid = options.uid || uid();
+        this.note_text = text;
+        this.title = options.title || '';
+        this.parent_id = options.parent_id || '';
+        this.tags = options.tags || [];
+        this.date_added = options.date_added || new Date();
+
+        notes.set(this.uid, this);
+        localStorage.setItem('notes', JSON.stringify(Object.fromEntries(notes)));
+    }
+}
+
+class Signature {
+    uid;
+    label;
+    notes;
+    tags;
+    date_added;
+
+    constructor(label, options = {}) {
+        this.uid = options.uid || uid();
+        this.label = label;
+        this.notes = options.notes || [];
+        this.tags = options.tags || [];
+        this.date_added = options.date_added || new Date();
+
+        signatures.set(this.uid, this);
+        localStorage.setItem('signatures', JSON.stringify(Object.fromEntries(signatures)));
+    }
+}
+
+class Tag {
+    uid;
+    label;
+    description;
+    date_added;
+
+    constructor(label, options = {}) {
+        this.uid = options.uid || uid();
+        this.label = label;
+        this.description = options.description || '';
+        this.date_added = options.date_added || new Date();
+
+        tags.set(this.uid, this);
+        localStorage.setItem('tags', JSON.stringify(Object.fromEntries(tags)));
     }
 }
 
@@ -208,7 +398,7 @@ function parseMainInput() {
         place: location,
         publisher_name: pubName
     });
-    
+    book.showDetails();
     updateDisplay();
 
 }
@@ -271,6 +461,7 @@ function updateStockPane() {
     Array.from(books).forEach(book => {
         let bookRow = document.createElement('tr');
         bookRow.classList.add('stockRow');
+        bookRow.addEventListener('click', book[1].showDetails);
 
         let bookTitle = document.createElement('td');
         bookTitle.textContent = book[0];
@@ -307,6 +498,30 @@ function updateStockPane() {
         bookRow.appendChild(bookActions);
         table.appendChild(bookRow);
     });
+}
+
+function prepareForDetailsView() {
+    let mainInterface = document.querySelector('#mainInterface');
+    let mainTitle = document.querySelector('#mainTitle');
+    let settings = document.querySelector('#settingsToggler');
+    let latestAdds = document.querySelector('#latestAdditions');
+    let details = document.querySelector('#detailView');
+
+    mainInterface.style.marginTop = '0px';
+    mainInterface.style.padding = '10px';
+    
+    settings.style.marginTop = '0px';
+
+    mainTitle.style.opacity = '0';
+    mainTitle.style.height = '0';
+    mainTitle.style.visibility = 'collapse';
+
+    latestAdds.style.opacity = '0';
+    latestAdds.style.visibility = 'collapse';
+    
+    
+    details.style.opacity = '1';
+    details.style.visibility = 'visible';
 }
 
 function deleteBook(e) {
@@ -382,12 +597,17 @@ function minimizePane(e) {
 }
 
 function showLastAdditions() {
-    document.querySelector('#latestAdditions').innerHTML = '';
+    let latestAdds = document.querySelector('#latestAdditions');
+    latestAdds.innerHTML = '';
+    let newHeader = document.createElement('h2');
+    newHeader.textContent = 'Last Book Additions';
+    latestAdds.appendChild(newHeader);
+
     Array.from(books).forEach((book) => {
         let newDiv = document.createElement('div');
         newDiv.classList.add('lastAdditionsItem');
         newDiv.textContent = book[1].author_surname + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place + ': ' + book[1].publisher_name + '.';
-        document.querySelector('#latestAdditions').appendChild(newDiv);
+        latestAdds.appendChild(newDiv);
     })
 }
 
@@ -421,6 +641,11 @@ function equipListeners() {
     document.querySelector('#directExportLink').addEventListener('click', exportLocalDataToJsonFile);
     document.querySelector('#localPurgeBtn').addEventListener('click', purgeLocalStorage);
     document.querySelector('#importFileInput').addEventListener('change', importDataFile);
+    document.querySelector('#screensaverBtn').addEventListener('click', toggleFullScreenSaver);
+}
+
+function showNewTagInput(e) {
+
 }
 
 function mainInputFocus() {
@@ -453,10 +678,28 @@ function handleSettingsChange(e) {
 }
 
 function exportLocalDataToJsonFile() {
-    booksStr = JSON.stringify(Object.fromEntries(books));
+    let exportData = [];
+    let booksStr = JSON.stringify(Object.fromEntries(books));
+    let authorsStr = JSON.stringify(Object.fromEntries(authors));
+    let pubsStr = JSON.stringify(Object.fromEntries(publishers));
+    let quotesStr = JSON.stringify(Object.fromEntries(quotes));
+    let notesStr = JSON.stringify(Object.fromEntries(notes));
+    let tagsStr = JSON.stringify(Object.fromEntries(tags));
+    let signStr = JSON.stringify(Object.fromEntries(signatures));
+
+    exportData.push(booksStr);
+    exportData.push(authorsStr);
+    exportData.push(pubsStr);
+    exportData.push(quotesStr);
+    exportData.push(notesStr);
+    exportData.push(tagsStr);
+    exportData.push(signStr);
+
+    let expStr = JSON.stringify(exportData);
+
     rightNow = new Date();
     filename = 'books-' + (rightNow.getMonth()+1) + '-' + rightNow.getDate() + '-' + rightNow.getFullYear() + '--' + rightNow.getHours() + '-' + rightNow.getMinutes() + '.json';
-    booksUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(booksStr);
+    booksUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(expStr);
     let ghostLink = document.createElement('a');
     ghostLink.setAttribute('href', booksUri);
     ghostLink.setAttribute('download', filename);
@@ -471,10 +714,61 @@ function importDataFile(e) {
 }
 
 function createBooksFromFile(e) {
-    let importedBooks = new Map(Object.entries(JSON.parse(e.target.result)));
+    let importData = JSON.parse(e.target.result);
+    console.log(importData);
+
+    let importedBooks = new Map(Object.entries(JSON.parse(importData[0])));
+    console.log(importedBooks);
     Array.from(importedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
+
+    let importedAuthors = new Map(Object.entries(JSON.parse(importData[1])));
+    Array.from(importedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
+    console.log(importedAuthors);
+
+    let importedPublishers = new Map(Object.entries(JSON.parse(importData[2])));
+    Array.from(importedPublishers).forEach((pub) => { publishers.set(pub[0], new Publisher(pub[0], pub[1].place, pub[1])); });
+    console.log(importedPublishers);
+    
+    let importedQuotes = new Map(Object.entries(JSON.parse(importData[3])));
+    Array.from(importedQuotes).forEach((quote) => { quotes.set(quote[0], new Quote(quote[1].quote_text, quote[1])); });
+    console.log(importedQuotes);
+
+    let importedNotes = new Map(Object.entries(JSON.parse(importData[4])));
+    Array.from(importedNotes).forEach((note) => { notes.set(note[0], new Note(note[1].note_text, note[1])); });
+    console.log(importedNotes);
+
+    let importedTags = new Map(Object.entries(JSON.parse(importData[5])));
+    Array.from(importedTags).forEach((tag) => { tags.set(tag[0], new Tag(tag[1].label, tag[1])); });
+    console.log(importedTags);
+
+    let importedSignatures = new Map(Object.entries(JSON.parse(importData[6])));
+    Array.from(importedSignatures).forEach((sign) => { signatures.set(sign[0], new Signature(sign[1].label, sign[1])); });
+    console.log(importedSignatures);
+
     console.log('JSON Data successfully imported! ' + books.size + ' Books added.');
     updateDisplay();
+    
+}
+
+function toggleFullScreenSaver() {
+    let screensaver = document.createElement('div');
+    screensaver.classList.add('screensaver');
+    
+    let letter = document.createElement('div');
+    letter.classList.add('screenSaverLetter');
+    letter.classList.add('text-flicker-in-glow');
+    letter.textContent = 'A';
+    screensaver.appendChild(letter);
+    document.querySelector('#alltainer').appendChild(screensaver);
+
+    /*
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
+    */
+
 }
 
 function initializeApp() {
@@ -497,6 +791,10 @@ function populateLocalStorage() {
     localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
     localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
     localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
+    localStorage.setItem('quotes', JSON.stringify(Object.fromEntries(quotes)));
+    localStorage.setItem('notes', JSON.stringify(Object.fromEntries(notes)));
+    localStorage.setItem('signatures', JSON.stringify(Object.fromEntries(signatures)));
+    localStorage.setItem('tags', JSON.stringify(Object.fromEntries(tags)));
 }
 
 function loadLocalStorage() {
@@ -504,17 +802,31 @@ function loadLocalStorage() {
     /* TODO Some attributes of the settings object need to be transformed to their original form before persistence! */
     
     /* The JSON stringify method stripped our class instances of their methods so we have to re-construct them! */
+    
     persistedBooks = new Map(Object.entries(JSON.parse(localStorage.getItem('books'))));
     persistedAuthors = new Map(Object.entries(JSON.parse(localStorage.getItem('authors'))));
     persistedPublishers = new Map(Object.entries(JSON.parse(localStorage.getItem('publishers'))));
+    persistedQuotes = new Map(Object.entries(JSON.parse(localStorage.getItem('quotes'))));
+    persistedNotes = new Map(Object.entries(JSON.parse(localStorage.getItem('notes'))));
+    persistedSignatures = new Map(Object.entries(JSON.parse(localStorage.getItem('signatures'))));
+    persistedTags = new Map(Object.entries(JSON.parse(localStorage.getItem('tags'))));
 
     books = new Map();
     authors = new Map();
     publishers = new Map();
+    quotes = new Map();
+    notes = new Map();
+    signatures = new Map();
+    tags = new Map();
 
     Array.from(persistedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
     Array.from(persistedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
     Array.from(persistedPublishers).forEach((publisher) => { publishers.set(publisher[0], new Publisher(publisher[1].name, publisher[1].places[0], publisher[1])); });
+    Array.from(persistedQuotes).forEach((quote) => { quotes.set(quote[0], new Quote(quote[1].quote_text, quote[1])) });
+    Array.from(persistedNotes).forEach((note) => { notes.set(note[0], new Note(note[1].note_text, note[1])) });
+    Array.from(persistedSignatures).forEach((signature) => { signatures.set(signature[0], new Signature(signature[1].label, signature[1])) });
+    Array.from(persistedTags).forEach((tag) => { tags.set(tag[0], new Tag(tag[1].label, tag[1])) });
+
     /* End Instances Reconstruction */
 
 }
