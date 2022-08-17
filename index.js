@@ -22,6 +22,8 @@ let notes = new Map();
 let signatures = new Map();
 let tags = new Map();
 
+let transientSelection = new Set();
+
 let imageReload = setInterval(loadRandomBackgroundImage, 60000);
 
 let authorsPane = document.querySelector('#authors');
@@ -104,10 +106,16 @@ class Book {
     showDetails = () => {
         prepareForDetailsView();
         document.querySelector('#detailTitle').innerHTML = '&laquo; ' + this.title + ' &raquo;';
+        if (this.subtitle !== '') {
+            document.querySelector('#detailSubtitle').innerHTML = '&raquo; ' + this.subtitle + ' &laquo;';
+        } else {
+            document.querySelector('#detailSubtitle').innerHTML = '';
+        }
         document.querySelector('#detailYear').textContent = this.year;
         document.querySelector('#detailAuthor').textContent = 'by ' + this.author_prename + ' ' + this.author_surname;
         document.querySelector('#detailPublisher').textContent = this.publisher_name;
         document.querySelector('#detailPlace').textContent = this.place;
+        
         let signList = document.querySelector('#signaturesList');
         signList.textContent = '';
         let notesList = document.querySelector('#notesList');
@@ -116,15 +124,45 @@ class Book {
         tagsList.textContent = '';
         let quotesList = document.querySelector('#quotesList');
         quotesList.textContent = '';
-        let tagPlus = document.querySelector('#bookNewTag');
-        tagPlus.setAttribute('data-book-key', this.uid);
+
+        let formerPluses = document.querySelectorAll('.detailAction');
+        formerPluses.forEach((node) => { node.remove(); });
+
+        let signPlus = document.createElement('i');
+        signPlus.classList.add('fa-solid');
+        signPlus.classList.add('fa-square-plus');
+        signPlus.classList.add('detailAction');
+        signPlus.addEventListener('click', this.addSignatureForm);
+        document.querySelector('#signaturesHeader').appendChild(signPlus);
+
+        let notePlus = document.createElement('i');
+        notePlus.classList.add('fa-solid');
+        notePlus.classList.add('fa-square-plus');
+        notePlus.classList.add('detailAction');
+        notePlus.addEventListener('click', this.addNoteForm);
+        document.querySelector('#notesHeader').appendChild(notePlus);
+
+        let tagPlus = document.createElement('i');
+        tagPlus.classList.add('fa-solid');
+        tagPlus.classList.add('fa-square-plus');
+        tagPlus.classList.add('detailAction');
         tagPlus.addEventListener('click', this.addTagForm);
+        document.querySelector('#tagsHeader').appendChild(tagPlus);        
+        
+        let quotePlus = document.createElement('i');
+        quotePlus.classList.add('fa-solid');
+        quotePlus.classList.add('fa-square-plus');
+        quotePlus.classList.add('detailAction');
+        quotePlus.addEventListener('click', this.addQuoteForm);
+        document.querySelector('#quotesHeader').appendChild(quotePlus);        
+        
 
         if (this.signatures.length > 0) {
             this.signatures.forEach((sign) => {
+                let signObj = signatures.get(sign);
                 let newDiv = document.createElement('div');
                 newDiv.classList.add('signatureItem');
-                newDiv.textContent = sign;
+                newDiv.textContent = signObj.label;
                 signList.appendChild(newDiv);
             });
         } else {
@@ -133,9 +171,10 @@ class Book {
 
         if (this.notes.length > 0) {
             this.notes.forEach((note) => {
+                let noteObj = notes.get(note);
                 let newDiv = document.createElement('div');
                 newDiv.classList.add('noteItem');
-                newDiv.textContent = note;
+                newDiv.textContent = noteObj.note_text;
                 notesList.appendChild(newDiv);
             });
         } else {
@@ -144,9 +183,10 @@ class Book {
 
         if (this.quotes.length > 0) {
             this.quotes.forEach((quote) => {
+                let quoteObj = quotes.get(quote);
                 let newDiv = document.createElement('div');
                 newDiv.classList.add('quoteItem');
-                newDiv.textContent = quote;
+                newDiv.innerHTML = '&quot;' + quoteObj.quote_text + '&quot; <span class="quotePage">(page ' + quoteObj.page + ')</span>';
                 quotesList.appendChild(newDiv);
             });
         } else {
@@ -166,30 +206,185 @@ class Book {
         }
     }
 
+    addSignatureForm = (e) => {
+        if (!document.querySelector('.addSignatureForm')) {
+            let plusPosition = e.target.getBoundingClientRect();
+            let newDiv = document.createElement('div');
+            newDiv.id = 'signatureForm-' + this.uid;
+            newDiv.classList.add('addSignatureForm');
+            newDiv.style.top = plusPosition.top - 12 + 'px';
+            newDiv.style.left = plusPosition.left + 20 + 'px';
+            let newLabel = document.createElement('label');
+            newLabel.textContent = 'New Signature: ';
+            newDiv.appendChild(newLabel);
+            let newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.classList.add('addSignatureInput');
+            newInput.id = 'addSignatureInput-' + this.uid;
+            newDiv.appendChild(newInput);
+            let newBtn = document.createElement('button');
+            newBtn.type = 'button';
+            newBtn.classList.add('addSignatureBtn');
+            newBtn.textContent = 'Add';
+            newBtn.addEventListener('click', this.addSignature);
+            newDiv.appendChild(newBtn);
+            document.querySelector('#alltainer').appendChild(newDiv);
+        } else {
+            document.querySelector('.addSignatureForm').remove();
+        }
+
+    }
+
+    addNoteForm = (e) => {
+        if (!document.querySelector('.addNoteForm')) {
+            let plusPosition = e.target.getBoundingClientRect();
+            let newDiv = document.createElement('div');
+            newDiv.id = 'noteForm-' + this.uid;
+            newDiv.classList.add('addNoteForm');
+            newDiv.style.top = plusPosition.top - 15 + 'px';
+            newDiv.style.left = plusPosition.left + 20 + 'px';
+            let newLabel = document.createElement('label');
+            newLabel.textContent = 'New Note: ';
+            newLabel.classList.add('labelBlock');
+            newDiv.appendChild(newLabel);
+            let newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.classList.add('addNoteTitleInput');
+            newInput.id= 'addNoteTitleInput-' + this.uid;
+            newInput.placeholder = 'Some Title (optional!)';
+            newDiv.appendChild(newInput);
+            let newTextArea = document.createElement('textarea');
+            newTextArea.classList.add('addNoteTextArea');
+            newTextArea.id = 'addNoteTextArea-' + this.uid;
+            newTextArea.placeholder = 'The Content of your new note for this book';
+            newDiv.appendChild(newTextArea);
+            let newBtn = document.createElement('button');
+            newBtn.type = 'button';
+            newBtn.classList.add('addNoteBtn');
+            newBtn.textContent = 'Add Note';
+            newBtn.addEventListener('click', this.addNote);
+            newDiv.appendChild(newBtn);
+            document.querySelector('#alltainer').appendChild(newDiv); 
+        } else {
+            document.querySelector('.addNoteForm').remove();
+        }
+        
+    }
+
     addTagForm = (e) => {
-        console.log('about to add tag form...');
-        let plusPosition = e.target.getBoundingClientRect();
-        let newDiv = document.createElement('div');
-        newDiv.id = 'tagForm-' + this.uid;
-        newDiv.classList.add('addTagForm');
-        newDiv.style.top = plusPosition.top - 15 + 'px';
-        newDiv.style.left = plusPosition.left + 20 + 'px';
-        let newIcon = document.createElement('i');
-        newIcon.classList.add('fa-solid');
-        newIcon.classList.add('fa-hashtag');
-        newDiv.appendChild(newIcon);
-        let newInput = document.createElement('input');
-        newInput.type = 'text';
-        newInput.classList.add('addTagInput');
-        newInput.id= 'addTagInput-' + this.uid;
-        newDiv.appendChild(newInput);
-        let newBtn = document.createElement('button');
-        newBtn.type = 'button';
-        newBtn.classList.add('addTagBtn');
-        newBtn.textContent = 'Add Tag';
-        newBtn.addEventListener('click', this.addTag);
-        newDiv.appendChild(newBtn);
-        document.querySelector('#alltainer').appendChild(newDiv);
+        if (!document.querySelector('.addTagForm')) {
+            let plusPosition = e.target.getBoundingClientRect();
+            let newDiv = document.createElement('div');
+            newDiv.id = 'tagForm-' + this.uid;
+            newDiv.classList.add('addTagForm');
+            newDiv.style.top = plusPosition.top - 15 + 'px';
+            newDiv.style.left = plusPosition.left + 20 + 'px';
+            
+            let topline = document.createElement('div');
+            topline.classList.add('flextainer');
+            let newIcon = document.createElement('i');
+            newIcon.classList.add('fa-solid');
+            newIcon.classList.add('fa-hashtag');
+            newIcon.classList.add('labelInlineLeft');
+            topline.appendChild(newIcon);
+            let newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.classList.add('addTagInput');
+            newInput.id= 'addTagInput-' + this.uid;
+            topline.appendChild(newInput);
+            let newBtn = document.createElement('button');
+            newBtn.type = 'button';
+            newBtn.classList.add('addTagBtn');
+            newBtn.textContent = 'Add';
+            newBtn.addEventListener('click', this.addTag);
+            topline.appendChild(newBtn);
+
+            let closeBtn = document.createElement('i');
+            closeBtn.classList.add('fa-solid');
+            closeBtn.classList.add('fa-square-xmark');
+            closeBtn.classList.add('closeBtn');
+            closeBtn.addEventListener('click', () => { document.querySelector('#tagForm-' + this.uid).remove(); });
+            topline.appendChild(closeBtn);
+            newDiv.appendChild(topline);
+
+            let commonTags = [...tags.values()].sort((a, b) => a.label.localeCompare(b.label));
+            console.log(commonTags);
+            let knownTagsDiv = document.createElement('div');
+            knownTagsDiv.classList.add('knownTagsList');
+            commonTags.forEach((tag) => {
+                let tagDiv = document.createElement('div');
+                tagDiv.classList.add('tagListItem');
+                tagDiv.textContent = tag.label;
+                knownTagsDiv.appendChild(tagDiv);
+            })
+            newDiv.appendChild(knownTagsDiv);
+
+            document.querySelector('#alltainer').appendChild(newDiv);
+        } else {
+            document.querySelector('.addTagForm').remove();
+        }
+        
+    }
+
+    addQuoteForm = (e) => {
+        if (!document.querySelector('.addQuoteForm')) {
+            let plusPosition = e.target.getBoundingClientRect();
+            let newDiv = document.createElement('div');
+            newDiv.id = 'quoteForm-' + this.uid;
+            newDiv.classList.add('addQuoteForm');
+            newDiv.style.top = plusPosition.top - 15 + 'px';
+            newDiv.style.left = plusPosition.left + 20 + 'px';
+            let newLabel = document.createElement('label');
+            newLabel.textContent = 'New Quote: ';
+            newLabel.classList.add('labelBlock');
+            newDiv.appendChild(newLabel);
+            let newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.classList.add('addQuoteTitleInput');
+            newInput.id = 'addQuoteTitleInput-' + this.uid;
+            newInput.placeholder = 'Some Title (optional!)';
+            newDiv.appendChild(newInput);
+            let newTextArea = document.createElement('textarea');
+            newTextArea.classList.add('addQuoteTextArea');
+            newTextArea.id = 'addQuoteTextArea-' + this.uid;
+            newTextArea.placeholder = 'Your new Quote from this book';
+            newDiv.appendChild(newTextArea);
+            let newPage = document.createElement('input');
+            newPage.type = 'number';
+            newPage.id = 'addQuotePageInput-' + this.uid;
+            newPage.classList.add('addQuotePageInput');
+            newPage.placeholder = 'Page Number';
+            newDiv.appendChild(newPage); 
+            let newBtn = document.createElement('button');
+            newBtn.type = 'button';
+            newBtn.classList.add('addQuoteBtn');
+            newBtn.textContent = 'Add Quote';
+            newBtn.addEventListener('click', this.addQuote);
+            newDiv.appendChild(newBtn);
+            document.querySelector('#alltainer').appendChild(newDiv);
+        } else {
+            document.querySelector('.addQuoteForm').remove();
+        }
+        
+    }
+    
+    addSignature = (e) => {
+        let inputSign = document.querySelector('#addSignatureInput-' + this.uid).value;
+        let newSign = new Signature(inputSign);
+        this.signatures.push(newSign.uid);
+        this.save();
+        document.querySelector('#signatureForm-' + this.uid).remove();
+        this.showDetails();
+    }
+
+    addNote = (e) => {
+        let title = document.querySelector('#addNoteTitleInput-' + this.uid).value;
+        let text = document.querySelector('#addNoteTextArea-' + this.uid).value;
+        let newNote = new Note(text, { title: title });
+        this.notes.push(newNote.uid);
+        this.save();
+        document.querySelector('#noteForm-' + this.uid).remove();
+        this.showDetails();
     }
 
     addTag = (e) => {
@@ -201,10 +396,21 @@ class Book {
         document.querySelector('#tagForm-' + this.uid).remove();
         this.showDetails();
     }
+    
+    addQuote = (e) => {
+        let title = document.querySelector('#addQuoteTitleInput-' + this.uid).value;
+        let text = document.querySelector('#addQuoteTextArea-' + this.uid).value;
+        let page = document.querySelector('#addQuotePageInput-' + this.uid).value;
+        let newQuote = new Quote(text, { title: title, page: page });
+        this.quotes.push(newQuote.uid);
+        this.save();
+        document.querySelector('#quoteForm-' + this.uid).remove();
+        this.showDetails();
+    }
 
     save = () => {
         console.log('Saving...');
-        books.set(this.uid, this);
+        books.set(this.title, this);
         localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
     }
 }
@@ -420,6 +626,32 @@ function updateAuthorsPane() {
     });
 }
 
+function toggleAllCheckboxes(e) {
+    let nodes = document.querySelectorAll('.checkItem');
+    if (e.target.checked) {
+        nodes.forEach((node) => {
+            node.checked = true;
+            transientSelection.add(node.id.substring(9)); 
+         });
+    } else {
+        nodes.forEach((node) => {
+            node.checked = false; 
+         });
+         transientSelection.clear();
+    }
+    updateExportPane();
+}
+
+function toggleCheckbox(e) {
+    e.stopImmediatePropagation();
+    if (e.target.checked) {
+        transientSelection.add(e.target.id.substring(9));
+    } else {
+        transientSelection.delete(e.target.id.substring(9));
+    }
+    updateExportPane();
+}
+
 function updateStockPane() {
     stockPane.innerHTML = '';
     let table = document.createElement('table');
@@ -429,6 +661,16 @@ function updateStockPane() {
     
     let headerRow = document.createElement('tr');
     
+    let headerCheck = document.createElement('th');
+    headerCheck.classList.add('stockColCheck');
+    headerCheck.title = 'Select all items';
+    let allCheck = document.createElement('input');
+    allCheck.type = 'checkbox';
+    allCheck.checked = false;
+    allCheck.addEventListener('click', toggleAllCheckboxes);
+    headerCheck.appendChild(allCheck);
+    headerRow.appendChild(headerCheck);
+
     let headerTitle = document.createElement('th');
     headerTitle.textContent = 'Title';
     headerRow.appendChild(headerTitle);
@@ -462,6 +704,17 @@ function updateStockPane() {
         let bookRow = document.createElement('tr');
         bookRow.classList.add('stockRow');
         bookRow.addEventListener('click', book[1].showDetails);
+
+        let bookCheck = document.createElement('td');
+        bookCheck.classList.add('stockColCheckItem');
+        let checkBook = document.createElement('input');
+        checkBook.type = 'checkbox';
+        transientSelection.has(book[1].title) ? checkBook.checked = true : checkBook.checked = false;
+        checkBook.classList.add('checkItem');
+        checkBook.id = 'checkbox-' + book[1].title;
+        checkBook.addEventListener('click', toggleCheckbox);
+        bookCheck.appendChild(checkBook);
+        bookRow.appendChild(bookCheck);
 
         let bookTitle = document.createElement('td');
         bookTitle.textContent = book[0];
@@ -525,6 +778,7 @@ function prepareForDetailsView() {
 }
 
 function deleteBook(e) {
+    e.preventDefault();
     books.delete(e.target.id.substring(7));
     saveBooksToLocalStorage();
     updateDisplay();
@@ -535,7 +789,50 @@ function saveBooksToLocalStorage() {
 }
 
 function updateExportPane() {
+    let exportList = document.querySelector('#export');
+    exportList.innerHTML = '';
 
+    transientSelection.forEach((item) => {
+        let book = books.get(item);
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('exportListItem');
+        newDiv.innerHTML = book.author_surname + ', ' + book.author_prename + '. ' + book.year + '. ' + book.title + '. ' + book.place + ': ' + book.publisher_name + '.';
+        exportList.appendChild(newDiv);
+    });
+}
+
+function maximizeMainContent(e) {
+    let main = document.querySelector('#mainFocusContent');
+    main.style.position = 'absolute';
+    main.style.top = '0px';
+    main.style.right = '0px';
+    main.style.bottom = '0px';
+    main.style.left = '0px';
+    main.style.width = '100%';
+    main.style.height = '100%';
+    main.style.zIndex = '11';
+    e.target.classList.remove('fa-expand');
+    e.target.classList.add('fa-compress');
+    e.target.removeEventListener('click', maximizeMainContent);
+    e.target.addEventListener('click', minimizeMainContent);
+    console.log('Hi! (from maximize)' + e.target.id);  
+}
+
+function minimizeMainContent(e) {
+    console.log('HI! (from minimize)');
+    console.log(e.target.id);
+    let main = document.querySelector('#mainFocusContent');
+    main.style.position = 'relative';
+    main.style.top = '';
+    main.style.right = '';
+    main.style.bottom = '';
+    main.style.left = '';
+    main.style.width = '60%';
+    main.style.height = '50%';
+    e.target.classList.remove('fa-compress');
+    e.target.classList.add('fa-expand');
+    e.target.removeEventListener('click', minimizeMainContent);
+    e.target.addEventListener('click', maximizeMainContent);    
 }
 
 function maximizePane(e) {
@@ -625,7 +922,6 @@ function loadRandomBackgroundImage() {
 function togglePane(e) {
     let targetNode = document.querySelector('#' + e.target.id.substring(12));
     targetNode.style.visibility === 'visible' ? targetNode.style.visibility = 'hidden' : targetNode.style.visibility = 'visible';
-    console.log(targetNode.style.opacity);
     (targetNode.style.opacity === '0' || targetNode.style.opacity === '') ? targetNode.style.opacity = '1' : targetNode.style.opacity = '0';
 }
 
@@ -642,6 +938,7 @@ function equipListeners() {
     document.querySelector('#localPurgeBtn').addEventListener('click', purgeLocalStorage);
     document.querySelector('#importFileInput').addEventListener('change', importDataFile);
     document.querySelector('#screensaverBtn').addEventListener('click', toggleFullScreenSaver);
+    document.querySelector('#detailToggleFull').addEventListener('click', maximizeMainContent);
 }
 
 function showNewTagInput(e) {
