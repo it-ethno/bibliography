@@ -71,13 +71,15 @@
     </div>
     <div id="authorsPane" class="pane">
       <div class="paneHeader">
-        <div class="paneHeaderTitle"><i id="paneTitller-authorsPane" class="fa-solid fa-user-group paneHeaderIcon paneToggler action" title="Autors"></i> Authors</div>
-        <!-- <div class="paneHeaderTitle"><i id="paneTitller-authorsPane" class="fa-solid fa-book-open-reader paneHeaderIcon paneToggler" title="Publishers"></i> Publishers</div> -->
+        <div class="paneHeaderTitle"><i id="paneTitller-authorsPane" class="fa-solid fa-people-group paneHeaderIcon paneToggler action" title="Autors"></i> Authors</div>
+        <div class="paneHeaderTitle"><i id="authorsPane-publisherTab" class="fa-solid fa-book-open-reader paneHeaderIcon tabIcon" title="Publishers"></i></div>
         <div class="paneHeaderActions">
-          <i class="fa-solid fa-arrow-down-a-z action"></i>
-          <i class="fa-solid fa-arrow-down-1-9 action selected"></i> |
-          <i class="fa-solid fa-grip action"></i> 
-          <i class="fa-solid fa-table-list action"></i>
+          <i id="authorsPane-sortAlpha" class="fa-solid fa-arrow-down-a-z action"></i>
+          <i id="authorsPane-sortAlphaReverse" class="fa-solid fa-arrow-down-z-a action"></i>
+          <i id="authorsPane-sortOrderAdded" class="fa-solid fa-arrow-down-1-9 action selected"></i>
+          <i id="authorsPane-sortOrderAddedReverse" class="fa-solid fa-arrow-down-9-1 action"></i> |
+          <i id="authorsPane-listCardlets" class="fa-solid fa-grip action"></i> 
+          <i id="authorsPane-listTable" class="fa-solid fa-table-list action selected"></i>
           <i id="maximizeToggler-authorsPane" class="fa-solid fa-expand maximizePaneToggler action"></i>
         </div>
       </div>
@@ -86,21 +88,24 @@
     <div id="exportPane" class="pane">
       <div class="paneHeader">
         <div class="paneHeaderTitle"><i id="paneTitller-exportPane" class="fa-solid fa-file-export paneHeaderIcon paneToggler action" title="Export (Bibliography, Collection)"></i> Export</div>
+        <div class="paneHeaderTitle"><i class="fa-solid fa-boxes-stacked action tabIcon" title="View your Collections"></i></div>
         <div class="paneHeaderActions">
-          <i class="fa-solid fa-arrow-down-a-z action"></i>
-          <i class="fa-solid fa-arrow-down-1-9 action selected"></i> |
-          <i class="fa-solid fa-grip action"></i>
-          <i class="fa-solid fa-table-list action"></i>
+          <i id="exportPane-sortAlpha" class="fa-solid fa-arrow-down-a-z action"></i>
+          <i id="exportPane-sortAlphaReverse" class="fa-solid fa-arrow-down-z-a action"></i>
+          <i id="exportPane-sortOrderAdded" class="fa-solid fa-arrow-down-1-9 action"></i>
+          <i id="exportPane-sortOrderAddedReverse" class="fa-solid fa-arrow-down-1-9 action selected"></i> |
+          <i id="exportPane-listCardlets" class="fa-solid fa-grip action"></i>
+          <i id="exportPane-listTable" class="fa-solid fa-table-list action"></i>
           <i id="maximizeToggler-exportPane" class="fa-solid fa-expand maximizePaneToggler action"></i>
         </div>
       </div>
       <div class="paneActions">
         <div class="paneActionsLabel">Export items to</div>
         <div class="paneActionsRight">
-          <i class="fa-solid fa-file-pdf exportFileType exportAction" title="Export your current selection to a PDF bibliography"></i>
-          <i class="fa-solid fa-file-csv exportFileType exportAction" title="Export your current selection to a file of Comma Seperated Values"></i>
-          <i class="fa-solid fa-file-code exportFileType exportAction" title="Export your current selection to a XML File (BibTex and Co)"></i>
-          <i class="fa-solid fa-file-lines exportFileType exportAction" title="Export your current selection to a JSON File"></i>
+          <i id="exportPane-exportPDF" class="fa-solid fa-file-pdf exportFileType exportAction" title="Export your current selection to a PDF bibliography"></i>
+          <i id="exportPane-exportJSON" class="fa-solid fa-file-lines exportFileType exportAction" title="Export your current selection to a JSON File"></i>
+          <i id="exportPane-exportXML" class="fa-solid fa-file-code exportFileType exportAction" title="Export your current selection to a XML File (BibTex and Co)"></i>
+          <i id="exportPane-exportCSV" class="fa-solid fa-file-csv exportFileType exportAction" title="Export your current selection to a file of Comma Seperated Values"></i>
         </div>
       </div>
       <div id="export"></div>
@@ -111,19 +116,19 @@
           <span class="paneHeaderTitleSource">Local (<span id="stockNumberTitles"></span> - saved <span id="stockLastSaved"></span> minutes ago)</span>
         </div>
         <div class="paneHeaderActions">
-          <i class="fa-solid fa-box action" title="Create a Collection from selected items"></i>
-          <i class="fa-solid fa-eye action" title="Watch selected items next to each other or in a slideshow"></i>
-          <i class="fa-solid fa-file-export action" style="padding-right:1px;" title="Export selected items to a file (opens a pane on the right side"></i>
-          <i class="fa-solid fa-dumpster-fire action" title="Delete the selected items (NO undo possible!)"></i> |
-          <i class="fa-solid fa-arrow-down-a-z action" title="Sort alphabetically"></i>
-          <i class="fa-solid fa-arrow-down-z-a action" title="Sort alphabetically reverse"></i>
-          <i class="fa-solid fa-arrow-down-1-9 action selected" title="Sort by date added"></i>
-          <i class="fa-solid fa-arrow-down-9-1 action" title="Sort by date added reverse"></i> |
-          <i class="fa-solid fa-grip action" title="List items as blobby Cardlets"></i>
-          <i class="fa-solid fa-table-list action selected" title="List items as configurable table"></i> |
+          <i id="stockPane-createCollection" class="fa-solid fa-box action" title="Create a Collection from selected items"></i>
+          <i id="stockPane-watchSlideshow" class="fa-solid fa-eye action" title="Watch selected items next to each other or in a slideshow"></i>
+          <i id="stockPane-exportItems" class="fa-solid fa-file-export action" style="padding-right:1px;" title="Export selected items to a file (opens a pane on the right side)"></i>
+          <i id="stockPane-deleteItems" class="fa-solid fa-dumpster-fire action" title="Delete the selected items (NO undo possible!)"></i> |
+          <i id="stockPane-sortAlpha" class="fa-solid fa-arrow-down-a-z action" title="Sort alphabetically"></i>
+          <i id="stockPane-sortAlphaReverse" class="fa-solid fa-arrow-down-z-a action" title="Sort alphabetically reverse"></i>
+          <i id="stockPane-sortOrderAdded" class="fa-solid fa-arrow-down-1-9 action selected" title="Sort by date added"></i>
+          <i id="stockPane-sortOrderAddedReverse" class="fa-solid fa-arrow-down-9-1 action" title="Sort by date added reverse"></i> |
+          <i id="stockPane-listCardlets" class="fa-solid fa-grip action" title="List items as cardlets"></i>
+          <i id="stockPane-listTable" class="fa-solid fa-table-list action selected" title="List items as configurable table"></i> |
           <i id="maximizeToggler-stockPane" class="fa-solid fa-expand maximizePaneToggler action" title="Expand this pane to full browser size"></i>
-          <i class="fa-solid fa-maximize action" title="Expand this pane to fullscreen"></i> |
-          <i class="fa-solid fa-ellipsis-vertical action" title="Configure view"></i>
+          <i id="fullscreenToggler-stockPane" class="fa-solid fa-maximize action" title="Expand this pane to fullscreen"></i> |
+          <i id="stockPane-togglePaneSettings" class="fa-solid fa-ellipsis-vertical action" title="Configure view"></i>
         </div>
       </div>
       <div id="stock"></div>
