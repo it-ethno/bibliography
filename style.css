@@ -283,6 +283,7 @@ td {
   display: flex;
   align-items: baseline;
   border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+  
 }
 
 .paneHeaderActions {
@@ -410,6 +411,11 @@ td {
 
 .tableHeaderRight {
   text-align: right;
+}
+
+.tableHeaderRow {
+  position: sticky;
+  top: 0px;
 }
 
 .tagListItem {
@@ -549,8 +555,7 @@ td {
   display: flex;
   flex-direction: column;
   position: relative;
-  
-  transition: top 1s ease, right 1s ease, bottom 1s ease, left 1s ease, width 1s ease, height 1s ease;
+  transition: top 1s ease, right 1s ease, bottom 1s ease, left 1s ease, width 1s ease, height 1s ease, position 1s ease;
 }
 
 #mainFocusPane {
@@ -594,6 +599,7 @@ td {
   visibility: visible;
   opacity: 1;
   display: block;
+  height: auto;
   transition: opacity 0.8s ease, visibility 0.8s ease, height 0.8s ease;
 }
 
@@ -629,8 +635,11 @@ td {
 }
 
 #stock {
-  padding: 0px 0px;
-  color: rgba(50, 50, 50, 1.0); 
+  padding: 0px 0px 10px;
+  color: rgba(50, 50, 50, 1.0);
+  overflow-y: scroll;
+  height: 100%;
+  scrollbar-width: thin;
 }
 
 #stockPane {
@@ -650,6 +659,7 @@ td {
   visibility: hidden;
   z-index: 1;
   opacity: 0;
+  
   transition: opacity 0.8s ease, visibility 0.9s ease, top 1s ease, right 1s ease, bottom 1s ease, left 1s ease, height 1s ease, width 1s ease, border-radius 1s ease;
 }
 

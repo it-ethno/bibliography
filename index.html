@@ -26,7 +26,7 @@
         <h1 id="mainTitle">Bibliography</h1>
         <i id="settingsToggler" class="fa-solid fa-gear action" title="Open Settings"></i>
         <div>
-          <i id="paneToggler-authorsPane" class="fa-solid fa-user-group paneToggler action" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
+          <i id="paneToggler-authorsPane" class="fa-solid fa-people-group paneToggler action" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
           <input id="mainInput" type="text" placeholder="Enter a new bibliographic reference (or a known one to display details)" />
           <i id="paneToggler-exportPane" class="fa-solid fa-file-export paneToggler action" style="margin-left:10px;" title="Open/Close Export Tab"></i>
           <div id="mainInputClue" class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher. <i class="fa-solid fa-circle-plus action coveredAction" title="Show a form for a new book"></i></div>
@@ -69,7 +69,7 @@
         </div>
       </div>
     </div>
-    <div id="authorsPane">
+    <div id="authorsPane" class="pane">
       <div class="paneHeader">
         <div class="paneHeaderTitle"><i id="paneTitller-authorsPane" class="fa-solid fa-user-group paneHeaderIcon paneToggler action" title="Autors"></i> Authors</div>
         <!-- <div class="paneHeaderTitle"><i id="paneTitller-authorsPane" class="fa-solid fa-book-open-reader paneHeaderIcon paneToggler" title="Publishers"></i> Publishers</div> -->
@@ -83,7 +83,7 @@
       </div>
       <div id="authors"></div>
     </div>
-    <div id="exportPane">
+    <div id="exportPane" class="pane">
       <div class="paneHeader">
         <div class="paneHeaderTitle"><i id="paneTitller-exportPane" class="fa-solid fa-file-export paneHeaderIcon paneToggler action" title="Export (Bibliography, Collection)"></i> Export</div>
         <div class="paneHeaderActions">
@@ -105,15 +105,20 @@
       </div>
       <div id="export"></div>
     </div>
-    <div id="stockPane">
+    <div id="stockPane" class="pane">
       <div class="paneHeader">
-        <div class="paneHeaderTitle"><i id="paneTitller-stockPane" class="fa-solid fa-database paneHeaderIcon paneToggler action" title="Stock (Local Database or Remote DB XYZ)"></i> Stock | <span class="paneHeaderTitleSource">Local (saved x minutes ago)</span></div>
+        <div class="paneHeaderTitle"><i id="paneTitller-stockPane" class="fa-solid fa-database paneHeaderIcon paneToggler action" title="Stock (Local Database or Remote DB XYZ)"></i> Stock | 
+          <span class="paneHeaderTitleSource">Local (<span id="stockNumberTitles"></span> - saved <span id="stockLastSaved"></span> minutes ago)</span>
+        </div>
         <div class="paneHeaderActions">
+          <i class="fa-solid fa-box action" title="Create a Collection from selected items"></i>
           <i class="fa-solid fa-eye action" title="Watch selected items next to each other or in a slideshow"></i>
           <i class="fa-solid fa-file-export action" style="padding-right:1px;" title="Export selected items to a file (opens a pane on the right side"></i>
           <i class="fa-solid fa-dumpster-fire action" title="Delete the selected items (NO undo possible!)"></i> |
           <i class="fa-solid fa-arrow-down-a-z action" title="Sort alphabetically"></i>
-          <i class="fa-solid fa-arrow-down-1-9 action selected" title="Sort by Date Added"></i> |
+          <i class="fa-solid fa-arrow-down-z-a action" title="Sort alphabetically reverse"></i>
+          <i class="fa-solid fa-arrow-down-1-9 action selected" title="Sort by date added"></i>
+          <i class="fa-solid fa-arrow-down-9-1 action" title="Sort by date added reverse"></i> |
           <i class="fa-solid fa-grip action" title="List items as blobby Cardlets"></i>
           <i class="fa-solid fa-table-list action selected" title="List items as configurable table"></i> |
           <i id="maximizeToggler-stockPane" class="fa-solid fa-expand maximizePaneToggler action" title="Expand this pane to full browser size"></i>

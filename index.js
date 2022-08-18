@@ -11,7 +11,9 @@ let settings = {
     inputFormat: '',
     outputFormat: '',
     serverURL: '',
-    useLocalStorage: true
+    useLocalStorage: true,
+    isFirstStart: true,
+    autoSaveInterval: 45
 };
 
 let authors = new Map();
@@ -23,8 +25,10 @@ let signatures = new Map();
 let tags = new Map();
 
 let transientSelection = new Set();
+let lastSave = new Date();
 
 let imageReload = setInterval(loadRandomBackgroundImage, 60000);
+let autoSave = setInterval(exportLocalDataToJsonFile, 60000 * settings.autoSaveInterval);
 
 let authorsPane = document.querySelector('#authors');
 let exportPane = document.querySelector('#export');
@@ -653,6 +657,8 @@ function toggleCheckbox(e) {
 }
 
 function updateStockPane() {
+    document.querySelector('#stockNumberTitles').textContent = books.size + ' Titles';
+    document.querySelector('#stockLastSaved').textContent = Math.abs(Math.round(((lastSave.getTime() - new Date().getTime()) / 1000) / 60));
     stockPane.innerHTML = '';
     let table = document.createElement('table');
     table.classList.add('stockTable');
@@ -660,6 +666,7 @@ function updateStockPane() {
     table.setAttribute('cellpadding', '0');
     
     let headerRow = document.createElement('tr');
+    headerRow.classList.add('tableHeaderRow');
     
     let headerCheck = document.createElement('th');
     headerCheck.classList.add('stockColCheck');
@@ -803,24 +810,25 @@ function updateExportPane() {
 
 function maximizeMainContent(e) {
     let main = document.querySelector('#mainFocusContent');
-    main.style.position = 'absolute';
+    let coords = main.getBoundingClientRect();
+    console.log(coords);
+
+    main.style.position = 'fixed';
+    main.style.zIndex = '2';
     main.style.top = '0px';
     main.style.right = '0px';
     main.style.bottom = '0px';
     main.style.left = '0px';
     main.style.width = '100%';
     main.style.height = '100%';
-    main.style.zIndex = '11';
     e.target.classList.remove('fa-expand');
     e.target.classList.add('fa-compress');
     e.target.removeEventListener('click', maximizeMainContent);
     e.target.addEventListener('click', minimizeMainContent);
-    console.log('Hi! (from maximize)' + e.target.id);  
+     
 }
 
 function minimizeMainContent(e) {
-    console.log('HI! (from minimize)');
-    console.log(e.target.id);
     let main = document.querySelector('#mainFocusContent');
     main.style.position = 'relative';
     main.style.top = '';
@@ -836,11 +844,13 @@ function minimizeMainContent(e) {
 }
 
 function maximizePane(e) {
+    e.stopImmediatePropagation();
     let target = document.querySelector('#' + e.target.id.substring(16));
     e.target.classList.remove('fa-expand');
     e.target.classList.add('fa-compress');
     e.target.removeEventListener('click', maximizePane);
     e.target.addEventListener('click', minimizePane);
+
     target.style.top = '0px';
     target.style.right = '0px';
     target.style.bottom = '0px';
