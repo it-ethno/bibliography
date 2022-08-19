@@ -3,7 +3,7 @@
 let settings = {
     language: 'en',
     useBackground: true,
-    changeInterval: 1,
+    backgroundInterval: 5,
     useFixedBackground: false,
     fixedBackground: '',
     useTransparency: true,
@@ -13,7 +13,9 @@ let settings = {
     serverURL: '',
     useLocalStorage: true,
     isFirstStart: true,
-    autoSaveInterval: 45
+    autoSaveInterval: 60,
+    sortOrderStock: 'alpha',
+    displayStock: 'table'
 };
 
 let authors = new Map();
@@ -23,11 +25,12 @@ let quotes = new Map();
 let notes = new Map();
 let signatures = new Map();
 let tags = new Map();
+let collections = new Map();
 
 let transientSelection = new Set();
 let lastSave = new Date();
 
-let imageReload = setInterval(loadRandomBackgroundImage, 60000);
+let imageReload = setInterval(loadRandomBackgroundImage, 60000 * settings.backgroundInterval);
 let autoSave = setInterval(exportLocalDataToJsonFile, 60000 * settings.autoSaveInterval);
 
 let authorsPane = document.querySelector('#authors');
@@ -573,6 +576,29 @@ class Tag {
     }
 }
 
+class Collection {
+    uid;
+    title;
+    books;
+    titles;
+    tags;
+    notes;
+    authors;
+    
+    constructor(title, options = {}) {
+        this.uid = options.uid || uid();
+        this.title = title;
+        this.books = options.books || [];
+        this.titles = options.titles || [];
+        this.tags = options.tags || [];
+        this.notes = options.notes || [];
+        this.authors = options.authors || [];
+
+        collections.set(this.title, this);
+        localStorage.setItem('collections', JSON.stringify(Object.fromEntries(collections)));
+    }
+}
+
 
 /* Functional Code */
 
@@ -706,8 +732,28 @@ function updateStockPane() {
 
     table.appendChild(headerRow);
     stockPane.appendChild(table);
+    
+    setStockOrderIcon();
 
-    Array.from(books).forEach(book => {
+    let sortedBooks;
+    
+
+    switch (settings.sortOrderStock) {
+        case 'alpha':
+            sortedBooks = Array.from(books).sort((a, b) => a[1].title.localeCompare(b[1].title));
+            break;
+        case 'alpha-reverse':
+            sortedBooks = Array.from(books).sort((a, b) => a[1].title.localeCompare(b[1].title)).reverse();
+            break;
+        case 'added':
+            sortedBooks = Array.from(books);
+            break;
+        case 'added-reverse':
+            sortedBooks = Array.from(books).reverse();
+            break;
+    }
+
+    sortedBooks.forEach(book => {
         let bookRow = document.createElement('tr');
         bookRow.classList.add('stockRow');
         bookRow.addEventListener('click', book[1].showDetails);
@@ -758,6 +804,25 @@ function updateStockPane() {
         bookRow.appendChild(bookActions);
         table.appendChild(bookRow);
     });
+}
+
+function setStockOrderIcon() {
+    let orderIcons = document.querySelectorAll('.orderIcon');
+    orderIcons.forEach((icon) => { icon.classList.remove('selected'); });
+    switch (settings.sortOrderStock) {
+        case 'alpha':
+            document.querySelector('#stockPane-sortAlpha').classList.add('selected');
+            break;
+        case 'alpha-reverse':
+            document.querySelector('#stockPane-sortAlphaReverse').classList.add('selected');
+            break;
+        case 'added':
+            document.querySelector('#stockPane-sortOrderAdded').classList.add('selected');
+            break;
+        case 'added-reverse':
+            document.querySelector('#stockPane-sortOrderAddedReverse').classList.add('selected');
+            break;
+    }
 }
 
 function prepareForDetailsView() {
@@ -949,6 +1014,266 @@ function equipListeners() {
     document.querySelector('#importFileInput').addEventListener('change', importDataFile);
     document.querySelector('#screensaverBtn').addEventListener('click', toggleFullScreenSaver);
     document.querySelector('#detailToggleFull').addEventListener('click', maximizeMainContent);
+
+    document.querySelector('#stockPane-createCollection').addEventListener('click', showNewCollectionForm);
+    document.querySelector('#stockPane-watchSlideshow').addEventListener('click', startBookSlideshow);
+    document.querySelector('#stockPane-exportItems').addEventListener('click', exportSelectedTitles);
+    document.querySelector('#stockPane-deleteItems').addEventListener('click', showSerialDeleteWarning);
+    document.querySelector('#stockPane-sortAlpha').addEventListener('click', setOrder);
+    document.querySelector('#stockPane-sortAlphaReverse').addEventListener('click', setOrder);
+    document.querySelector('#stockPane-sortOrderAdded').addEventListener('click', setOrder);
+    document.querySelector('#stockPane-sortOrderAddedReverse').addEventListener('click', setOrder);
+    document.querySelector('#stockPane-listCardlets').addEventListener('click', setListType);
+    document.querySelector('#stockPane-listTable').addEventListener('click', setListType);
+    document.querySelector('#fullscreenToggler-stockPane').addEventListener('click', showFullscreenStock);
+    document.querySelector('#stockPane-configureDBs').addEventListener('click', showDBSetup);
+    document.querySelector('#stockPane-togglePaneSettings').addEventListener('click', showStockSettings);
+
+}
+
+function setListType(e) {
+    let typeIcons = document.querySelectorAll('.listTypeIcon');
+    typeIcons.forEach((icon) => { icon.classList.remove('selected'); });
+
+    switch (e.target.id) {
+        case 'stockPane-listCardlets':
+            settings.displayStock = 'cardlets';
+            break;
+        case 'stockPane-listTable':
+            settings.displayStock = 'table';
+            break;
+    }
+
+    e.target.classList.add('selected');
+    updateStockPane();
+}
+
+function setOrder(e) {
+    let orderIcons = document.querySelectorAll('.orderIcon');
+    orderIcons.forEach((icon) => { icon.classList.remove('selected'); });
+
+    switch (e.target.id) {
+        case 'stockPane-sortAlpha':
+            settings.sortOrderStock = 'alpha';
+            break;
+        case 'stockPane-sortAlphaReverse':
+            settings.sortOrderStock = 'alpha-reverse';
+            break;
+        case 'stockPane-sortOrderAdded':
+            settings.sortOrderStock = 'added';
+            break;
+        case 'stockPane-sortOrderAddedReverse':
+            settings.sortOrderStock = 'added-reverse';
+            break;
+    }
+    saveSettings();
+    e.target.classList.add('selected');
+    updateStockPane();
+}
+
+function saveSettings() {
+    localStorage.setItem('settings', JSON.stringify(settings));
+}
+
+function showFullscreenStock() {
+    console.log('HI! from showFullscreenStock!');
+    document.documentElement.requestFullscreen();
+
+    let maxIcon = document.querySelector('#maximizeToggler-stockPane');
+    let fullIcon = document.querySelector('#fullscreenToggler-stockPane');
+    let stockPane = document.querySelector('#stockPane');
+
+    maxIcon.classList.remove('fa-expand');
+    maxIcon.classList.add('fa-compress');
+    maxIcon.removeEventListener('click', maximizePane);
+    maxIcon.addEventListener('click', minimizePane);
+
+    fullIcon.classList.remove('fa-maximize');
+    fullIcon.classList.add('fa-minimize');
+    fullIcon.removeEventListener('click', showFullscreenStock);
+    fullIcon.addEventListener('click', endFullscreenStock);
+
+    stockPane.style.top = '0px';
+    stockPane.style.right = '0px';
+    stockPane.style.bottom = '0px';
+    stockPane.style.left = '0px';
+    stockPane.style.height = '100%';
+    stockPane.style.width = '100%';
+    stockPane.style.borderRadius = '15px';
+    stockPane.style.backgroundColor = 'rgba(240, 240, 240, 0.98)';
+    stockPane.style.zIndex = '10';
+}
+
+function endFullscreenStock() {
+    console.log('HI! from endFullscreen!');
+    document.exitFullscreen();
+
+    let maxIcon = document.querySelector('#maximizeToggler-stockPane');
+    let fullIcon = document.querySelector('#fullscreenToggler-stockPane');
+    let stockPane = document.querySelector('#stockPane');
+
+    maxIcon.classList.remove('fa-compress');
+    maxIcon.classList.add('fa-expand');
+    maxIcon.removeEventListener('click', minimizePane);
+    maxIcon.addEventListener('click', maximizePane);
+
+    fullIcon.classList.remove('fa-minimize');
+    fullIcon.classList.add('fa-maximize');
+    fullIcon.removeEventListener('click', endFullscreenStock);
+    fullIcon.addEventListener('click', showFullscreenStock);
+
+    stockPane.style.top = '';
+    stockPane.style.right = '20%';
+    stockPane.style.bottom = '0px';
+    stockPane.style.left = '20%';
+    stockPane.style.height = '';
+    stockPane.style.width = '';
+    stockPane.style.borderRadius = '15px 15px 0 0';
+    stockPane.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+}
+
+function showStockSettings() {
+    console.log('HI! from showStockSettings!');
+}
+
+function showDBSetup() {
+    console.log('HI! from showDBSetup!');
+}
+
+function startBookSlideshow(e) {
+    if (transientSelection.size > 0) {
+
+    } else {
+        showMessage('The book slideshow could not be started, because there were no titles selected!');
+    }
+}
+
+function exportSelectedTitles(e) {
+    if (transientSelection.size > 0) {
+
+    } else {
+        showMessage('The export could not be started, because there were no titles selected!');
+    }
+}
+
+function showSerialDeleteWarning(e) {
+    if (transientSelection.size > 0) {
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('fullscreenDialog');
+        newDiv.id = 'stockPane-serialDeleteDialog';
+
+        let newInnerDiv = document.createElement('div');
+        newInnerDiv.classList.add('fullscreenDialogInner');
+        newDiv.appendChild(newInnerDiv);
+
+        let newH = document.createElement('h1');
+        newH.classList.add('fullscreenWarning');
+        newH.textContent = 'WARNING!';
+        newInnerDiv.appendChild(newH);
+
+        let newDesc = document.createElement('p');
+        newDesc.classList.add('fullscreenDescription');
+        newDesc.textContent = 'You are about to DELETE ' + transientSelection.size + ' titles FOREVER!';
+        newInnerDiv.appendChild(newDesc);
+
+        let newH2 = document.createElement('h2');
+        newH2.classList.add('fullscreenRequest');
+        newH2.textContent = 'Are you really sure you wanna do this???';
+        newInnerDiv.appendChild(newH2);
+
+        let newCount = document.createElement('p');
+        newCount.textContent = 'Titles to be deleted';
+        newCount.classList.add('fullscreenListHeader');
+        newCount.classList.add('fullscreenUnderline');
+        newInnerDiv.appendChild(newCount);
+
+        let newList = document.createElement('ol');
+        newList.classList.add('fullscreenList');
+        newInnerDiv.appendChild(newList);
+
+        Array.from(transientSelection).forEach((item) => {
+            let newItem = document.createElement('li');
+            newItem.textContent = item;
+            newList.appendChild(newItem);
+        });
+
+        let newBtnCancel = document.createElement('button');
+        newBtnCancel.textContent = 'Forget it - Do not do it!';
+        newBtnCancel.classList.add('fullscreenBtnCancel');
+        newBtnCancel.addEventListener('click', () => { document.querySelector('#stockPane-serialDeleteDialog').remove(); });
+        newDiv.appendChild(newBtnCancel);
+
+        let newBtnOk = document.createElement('button');
+        newBtnOk.textContent = 'OK - DO IT!';
+        newBtnOk.classList.add('fullscreenBtnOk');
+        newBtnOk.addEventListener('click', serialDeleteBooks);
+        newDiv.appendChild(newBtnOk);
+
+        document.querySelector('body').appendChild(newDiv);
+    } else {
+        showMessage('The fire-dumpster could not be activated, because there were no titles selected!');
+    }
+}
+
+function showMessage(message) {
+    let date = new Date().toLocaleTimeString().replaceAll(':', '-');
+    let newDiv = document.createElement('div');
+    newDiv.classList.add('screenMessage');
+    newDiv.id = 'message-' + date;
+    newDiv.style.left = (window.innerWidth / 2 - 150) + 'px';
+    let innerDiv = document.createElement('div');
+    innerDiv.textContent = message;
+    newDiv.appendChild(innerDiv);
+
+    let closeBtn = document.createElement('i');
+    closeBtn.classList.add('fa-solid');
+    closeBtn.classList.add('fa-square-xmark');
+    closeBtn.addEventListener('click', () => { document.querySelector('#message-' + date). remove(); });
+    newDiv.appendChild(closeBtn);
+
+    document.querySelector('body').appendChild(newDiv);
+}
+
+function serialDeleteBooks(e) {
+    let n = transientSelection.size;
+    Array.from(transientSelection).forEach((book) => { books.delete(book); });
+    showMessage(n + ' books have been deleted');
+}
+
+function showNewCollectionForm(e) {
+    if (transientSelection.size > 0) {
+        let coords = e.target.getBoundingClientRect();
+
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('modalDialog');
+        newDiv.id = 'stockPane-newCollectionModal';
+        newDiv.style.top = coords.top + 30 + 'px';
+        newDiv.style.left = coords.left - 50 + 'px';
+
+        let newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.placeholder = 'A Name for your new Collection';
+        newInput.id = 'stockPane-newCollectionInput';
+        newDiv.appendChild(newInput);
+
+        let newBtn = document.createElement('button');
+        newBtn.type = 'button';
+        newBtn.textContent = 'Create';
+        newBtn.addEventListener('click', createNewCollection);
+        newDiv.appendChild(newBtn);
+        
+        document.querySelector('body').appendChild(newDiv);
+    } else {
+        showMessage('A Collection could not be created, because there were no titles selected!');
+    }
+
+}
+
+function createNewCollection(e) {
+    let name = document.querySelector('#stockPane-newCollectionInput').value;
+    let c = new Collection(name, { titles: Array.from(transientSelection) });
+    document.querySelector('#stockPane-newCollectionModal').remove();
+    showMessage('A new collection named "' + name + '" has been created!');
 }
 
 function showNewTagInput(e) {
@@ -1102,6 +1427,7 @@ function populateLocalStorage() {
     localStorage.setItem('notes', JSON.stringify(Object.fromEntries(notes)));
     localStorage.setItem('signatures', JSON.stringify(Object.fromEntries(signatures)));
     localStorage.setItem('tags', JSON.stringify(Object.fromEntries(tags)));
+    localStorage.setItem('collections', JSON.stringify(Object.fromEntries(collections)));
 }
 
 function loadLocalStorage() {
@@ -1117,6 +1443,7 @@ function loadLocalStorage() {
     persistedNotes = new Map(Object.entries(JSON.parse(localStorage.getItem('notes'))));
     persistedSignatures = new Map(Object.entries(JSON.parse(localStorage.getItem('signatures'))));
     persistedTags = new Map(Object.entries(JSON.parse(localStorage.getItem('tags'))));
+    persistedCollections = new Map(Object.entries(JSON.parse(localStorage.getItem('collections'))));
 
     books = new Map();
     authors = new Map();
@@ -1125,15 +1452,16 @@ function loadLocalStorage() {
     notes = new Map();
     signatures = new Map();
     tags = new Map();
+    collections = new Map();
 
     Array.from(persistedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
     Array.from(persistedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
     Array.from(persistedPublishers).forEach((publisher) => { publishers.set(publisher[0], new Publisher(publisher[1].name, publisher[1].places[0], publisher[1])); });
-    Array.from(persistedQuotes).forEach((quote) => { quotes.set(quote[0], new Quote(quote[1].quote_text, quote[1])) });
-    Array.from(persistedNotes).forEach((note) => { notes.set(note[0], new Note(note[1].note_text, note[1])) });
-    Array.from(persistedSignatures).forEach((signature) => { signatures.set(signature[0], new Signature(signature[1].label, signature[1])) });
-    Array.from(persistedTags).forEach((tag) => { tags.set(tag[0], new Tag(tag[1].label, tag[1])) });
-
+    Array.from(persistedQuotes).forEach((quote) => { quotes.set(quote[0], new Quote(quote[1].quote_text, quote[1])); });
+    Array.from(persistedNotes).forEach((note) => { notes.set(note[0], new Note(note[1].note_text, note[1])); });
+    Array.from(persistedSignatures).forEach((signature) => { signatures.set(signature[0], new Signature(signature[1].label, signature[1])); });
+    Array.from(persistedTags).forEach((tag) => { tags.set(tag[0], new Tag(tag[1].label, tag[1])); });
+    Array.from(persistedCollections).forEach((collection) => { collections.set(collection[0], new Collection(collection[1].title, collection[1])); });
     /* End Instances Reconstruction */
 
 }

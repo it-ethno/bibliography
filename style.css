@@ -204,6 +204,72 @@ td {
   align-items: top;
 }
 
+.fullscreenBtnCancel {
+  padding: 10px;
+  margin: 10px;
+  background-color: rgba(146, 202, 26, 0.905);
+  font-family: 'Fredericka the Great';
+  font-size: 120%;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.fullscreenBtnOk {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: rgba(202, 26, 26, 0.905);
+  font-family: 'Fredericka the Great';
+  font-size: 120%;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.fullscreenDescription {
+  color: rgba(202, 26, 26, 0.905);
+  font-size: 120%;
+}
+
+.fullscreenDialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  z-index: 2;
+  background-color: rgba(202, 26, 26, 0.905);
+  color: rgba(250, 250, 250, 1);
+  font-family: 'Fredericka the Great';
+  transition: top 1s ease, right 1s ease, bottom 1s ease, left 1s ease;
+}
+
+.fullscreenDialogInner {
+  padding: 50px;
+  background-color: rgba(240, 240, 240, 0.95);
+  text-align: center;
+  border-radius: 15px;
+}
+
+.fullscreenList {
+  color: rgba(202, 26, 26, 0.905);
+}
+
+.fullscreenListHeader {
+  font-size: 120%;
+  color: rgba(202, 26, 26, 0.905);
+}
+
+.fullscreenUnderline {
+  text-decoration: underline;
+}
+
+.fullscreenWarning {
+
+}
+
 .headerAction {
   font-size:80%;
   color:rgba(80, 80, 80, 0.9);
@@ -257,6 +323,15 @@ td {
   font-size: 85%;
   margin-bottom: 5px;
   text-align: center;
+}
+
+.modalDialog {
+  position: absolute;
+  z-index: 2;
+  padding: 10px;
+  background-color: rgba(100, 100, 100, 0.8);
+  color: rgba(250, 250, 250, 1);
+  border-radius: 10px;
 }
 
 .paneActions {
@@ -315,6 +390,21 @@ td {
   font-size: 85%;
 }
 
+.screenMessage {
+  position: fixed;
+  top:30%;
+  padding: 20px;
+  background-color: rgba(240, 240, 240, 0.95);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  gap: 20px;
+  border: 5px solid rgba(100, 100, 100, 0.8);
+}
+
 .screensaver {
   position: fixed;
   top: 0px;
@@ -337,6 +427,10 @@ td {
   color: rgba(240, 240, 240, 1);
   padding: 3px;
   border-radius: 5px;
+}
+
+.selected:hover {
+  color: rgba(240, 240, 240, 1);
 }
 
 .settingsItem {
