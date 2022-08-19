@@ -974,8 +974,8 @@ function showLastAdditions() {
     let newHeader = document.createElement('h2');
     newHeader.textContent = 'Last Book Additions';
     latestAdds.appendChild(newHeader);
-
-    Array.from(books).forEach((book) => {
+    let latest5 = Array.from(books).reverse().slice(0, 5);
+    latest5.forEach((book) => {
         let newDiv = document.createElement('div');
         newDiv.classList.add('lastAdditionsItem');
         newDiv.textContent = book[1].author_surname + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place + ': ' + book[1].publisher_name + '.';
@@ -1045,6 +1045,7 @@ function setListType(e) {
     }
 
     e.target.classList.add('selected');
+    saveSettings();
     updateStockPane();
 }
 
@@ -1073,6 +1074,27 @@ function setOrder(e) {
 
 function saveSettings() {
     localStorage.setItem('settings', JSON.stringify(settings));
+}
+
+function resetSettings() {
+    settings = {
+        language: 'en',
+        useBackground: true,
+        backgroundInterval: 5,
+        useFixedBackground: false,
+        fixedBackground: '',
+        useTransparency: true,
+        useAcademicMode: true,
+        inputFormat: '',
+        outputFormat: '',
+        serverURL: '',
+        useLocalStorage: true,
+        isFirstStart: true,
+        autoSaveInterval: 60,
+        sortOrderStock: 'alpha',
+        displayStock: 'table'
+    };
+    saveSettings();
 }
 
 function showFullscreenStock() {
@@ -1383,16 +1405,42 @@ function createBooksFromFile(e) {
 }
 
 function toggleFullScreenSaver() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    }
+    
+    let num = Math.round(Math.random() * (quotes.size - 1));
+    let cites = Array.from(quotes);
+
+    if (document.querySelector('.screensaver')) {
+        document.querySelector('.screensaver').remove();
+    }
+
     let screensaver = document.createElement('div');
     screensaver.classList.add('screensaver');
     
-    let letter = document.createElement('div');
-    letter.classList.add('screenSaverLetter');
-    letter.classList.add('text-flicker-in-glow');
-    letter.textContent = 'A';
-    screensaver.appendChild(letter);
-    document.querySelector('#alltainer').appendChild(screensaver);
+    let letterContainer = document.createElement('div');
+    letterContainer.classList.add('screensaver-lettercontainer');
 
+    let text = cites[num][1].quote_text;
+    console.log(text);
+    Array.from(text).forEach((letter) => {
+        let letterChar = document.createElement('div');
+        letterChar.classList.add('screenSaverLetter');
+        letterChar.style.fontSize = Math.round((Math.random() * 200) + 200) + '%';
+        if (letter === ' ') { letterChar.style.marginRight = '30px'; }
+        let n = Math.round(Math.random() * 4);
+        letterChar.style.animation = 'text-flicker-in-glow ' + n + 's linear both';
+        letterChar.textContent = letter;
+        letterContainer.appendChild(letterChar);
+    });
+
+    screensaver.appendChild(letterContainer);
+
+    document.querySelector('body').appendChild(screensaver);
+    document.querySelector('body').addEventListener('keydown', (e) => {
+        if (e.code === 'Space') { toggleFullScreenSaver(); }
+    });
     /*
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
@@ -1405,6 +1453,7 @@ function toggleFullScreenSaver() {
 
 function initializeApp() {
     initializeLocalStorage();
+
     equipListeners();
     updateDisplay();
     showLastAdditions();
@@ -1432,10 +1481,16 @@ function populateLocalStorage() {
 
 function loadLocalStorage() {
     settings = JSON.parse(localStorage.getItem('settings'));
-    /* TODO Some attributes of the settings object need to be transformed to their original form before persistence! */
     
+    /* Some attributes of the settings object need to be transformed to their original form after persisting them! */
+    /* settings.useBackground = settings.useBackground === 'true';
+    settings.useFixedBackground = settings.useFixedBackground === 'true';
+    settings.useTransparency = settings.useTransparency === 'true';
+    settings.useAcademicMode = settings.useAcademicMode === 'true';
+    settings.useLocalStorage = settings.useLocalStorage === 'true';
+    settings.isFirstStart = settings.isFirstStart === 'true';
+    */
     /* The JSON stringify method stripped our class instances of their methods so we have to re-construct them! */
-    
     persistedBooks = new Map(Object.entries(JSON.parse(localStorage.getItem('books'))));
     persistedAuthors = new Map(Object.entries(JSON.parse(localStorage.getItem('authors'))));
     persistedPublishers = new Map(Object.entries(JSON.parse(localStorage.getItem('publishers'))));
