@@ -32,6 +32,7 @@ let lastSave = new Date();
 
 let imageReload = setInterval(loadRandomBackgroundImage, 60000 * settings.backgroundInterval);
 let autoSave = setInterval(exportLocalDataToJsonFile, 60000 * settings.autoSaveInterval);
+let screensaver = setInterval(toggleFullScreenSaver, 30000);
 
 let authorsPane = document.querySelector('#authors');
 let exportPane = document.querySelector('#export');
@@ -1423,14 +1424,21 @@ function toggleFullScreenSaver() {
     letterContainer.classList.add('screensaver-lettercontainer');
 
     let text = cites[num][1].quote_text;
+    let timing = ['ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear'];
+
     console.log(text);
     Array.from(text).forEach((letter) => {
         let letterChar = document.createElement('div');
         letterChar.classList.add('screenSaverLetter');
-        letterChar.style.fontSize = Math.round((Math.random() * 200) + 200) + '%';
+        letterChar.style.fontSize = Math.round((Math.random() * 200) + 400) + '%';
         if (letter === ' ') { letterChar.style.marginRight = '30px'; }
-        let n = Math.round(Math.random() * 4);
-        letterChar.style.animation = 'text-flicker-in-glow ' + n + 's linear both';
+        let n = ((Math.random() * 1.5) + 2.0).toFixed(2);
+        let m = Math.round((Math.random() * 25) + 230);
+        let o = (Math.random() * 0.45)+ 0.55;
+        let t = Math.round(Math.random() * 4);
+        let d = (Math.random() * Math.random() * 0.9).toFixed(2);
+        letterChar.style.color = `rgba(${m}, ${m}, ${m}, ${o})`;
+        letterChar.style.animation = `text-flicker-in-glow ${n}s ${timing[t]} ${d}s both`;
         letterChar.textContent = letter;
         letterContainer.appendChild(letterChar);
     });
