@@ -1034,6 +1034,7 @@ function equipListeners() {
     document.querySelector('#stockPane-togglePaneSettings').addEventListener('click', showStockSettings);
 
     document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
+    document.querySelector('body').addEventListener('keydown', resetScreenSaverInterval);
 
     document.querySelector('#mainInterface').addEventListener('dblclick', toggleMainInterfacePosition);
 
@@ -1084,6 +1085,9 @@ function setOrder(e) {
     saveSettings();
     e.target.classList.add('selected');
     updateStockPane();
+}
+function saveAll() {
+
 }
 
 function saveSettings() {
@@ -1590,12 +1594,12 @@ function createScreensaverQuote(text) {
         let wordN = (Math.random() * 0.7) + 2.0;
         let wordD = Math.random() * 0.2;
         let wordT = Math.round(Math.random() * 3);
-        console.log('wordN: ' + wordN + ' - wordD: ' + wordD);
+
         Array.from(word).forEach((letter) => {
             let letterChar = document.createElement('div');
             letterChar.classList.add('screenSaverLetter');
             if (numberLetters > 150) {
-                letterChar.style.fontSize = Math.round((Math.random() * 200) + (400 * sizeFactor)) + '%';
+                letterChar.style.fontSize = Math.round(((Math.random() * 200) + 400) * sizeFactor) + '%';
             } else {
                 letterChar.style.fontSize = Math.round((Math.random() * 200) + (400)) + '%';
             }

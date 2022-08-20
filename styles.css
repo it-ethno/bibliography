@@ -519,6 +519,13 @@ td {
 
 .settingsItem {
   margin: 10px 0px;
+  font-family: 'DM Mono';
+  font-size: 90%;
+}
+
+.settingsSectionHeader {
+  font-family: 'DM Mono';
+  font-size: 20px;
 }
 
 .settingsSet {
