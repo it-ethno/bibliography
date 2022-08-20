@@ -162,6 +162,27 @@ td {
   color:rgba(100, 100, 100, 0.5);
 }
 
+.dbDetails {
+  font-size: 90%;
+}
+
+.dbItem {
+  color:rgba(70, 70, 70, 0.9);
+  padding: 20px;
+  background-color: rgba(230, 230, 230, 1);
+  text-align: center;
+  border-radius: 10px;
+  font-family: 'DM Mono';
+}
+
+.dbItemIcon {
+  font-size: 200%;
+}
+
+.dbName {
+  font-size: 130%;
+}
+
 .detailAction {
   cursor: pointer;
 }
@@ -246,6 +267,22 @@ td {
   transition: top 1s ease, right 1s ease, bottom 1s ease, left 1s ease;
 }
 
+.fullscreenDialogTop {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  z-index: 2;
+  color: rgba(250, 250, 250, 1);
+  font-family: 'Fredericka the Great';
+  transition: top 1s ease, right 1s ease, bottom 1s ease, left 1s ease;
+  padding: 50px;
+}
+
 .fullscreenDialogInner {
   padding: 50px;
   background-color: rgba(240, 240, 240, 0.95);
@@ -268,6 +305,10 @@ td {
 
 .fullscreenWarning {
 
+}
+.fullwindowInnerDiv {
+  display: flex;
+  margin-top: 30px;
 }
 
 .headerAction {
@@ -379,6 +420,25 @@ td {
   font-size: 80%;
 }
 
+.paneSettingsDialog {
+  padding: 15px;
+  background-color: rgba(70, 70, 70, 0.9);
+  color: rgba(250, 250, 250, 1);
+  position: fixed;
+  border-radius: 10px;
+  font-family: 'DM Mono';
+  font-size: 85%;
+  z-index: 10;
+}
+
+.paneSettingsH3 {
+  color: rgba(250, 250, 250, 1);
+}
+
+.paneSettingsH4 {
+  color: rgba(250, 250, 250, 1);
+}
+
 .quoteItem {
   padding: 10px;
   border-radius: 10px;
@@ -430,6 +490,20 @@ td {
 
 .screenSaverLetter { 
   font-family: 'Open Sans';
+}
+
+.screenSaverWord {
+  margin-right: 30px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.screenSaverWords {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
 }
 
 .selected {

@@ -490,6 +490,7 @@ class Publisher {
         this.tags = options.tags || [];
 
         this.places.push(place);
+        this.places = Array.from(new Set(this.places));
 
         publishers.set(this.name, this);
         localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
@@ -1007,9 +1008,11 @@ function equipListeners() {
     document.querySelectorAll('.maximizePaneToggler').forEach( (node) => { node.addEventListener('click', maximizePane); });
     document.querySelector('#settingsToggler').addEventListener('click', toggleSettings);
     document.querySelector('#closeSettings').addEventListener('click', toggleSettings);
+    
     document.querySelector('#mainInput').addEventListener('keydown', observeMainInput);
     document.querySelector('#mainInput').addEventListener('focus', mainInputFocus);
     document.querySelector('#mainInput').addEventListener('blur', mainInputBlur);
+
     document.querySelector('#directExportLink').addEventListener('click', exportLocalDataToJsonFile);
     document.querySelector('#localPurgeBtn').addEventListener('click', purgeLocalStorage);
     document.querySelector('#importFileInput').addEventListener('change', importDataFile);
@@ -1030,6 +1033,16 @@ function equipListeners() {
     document.querySelector('#stockPane-configureDBs').addEventListener('click', showDBSetup);
     document.querySelector('#stockPane-togglePaneSettings').addEventListener('click', showStockSettings);
 
+    document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
+
+    document.querySelector('#mainInterface').addEventListener('dblclick', toggleMainInterfacePosition);
+
+}
+
+function toggleMainInterfacePosition(e) {
+    let mi = document.querySelector('#mainInterface');
+    let coords = mi.getBoundingClientRect();
+    console.log(coords);
 }
 
 function setListType(e) {
@@ -1155,12 +1168,122 @@ function endFullscreenStock() {
     stockPane.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
 }
 
-function showStockSettings() {
+function showStockSettings(e) {
     console.log('HI! from showStockSettings!');
+    if (!document.querySelector('#stockPaneSettingsDialog')) {
+        let coords = e.target.getBoundingClientRect();
+        console.log(coords);
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('paneSettingsDialog');
+        newDiv.id = 'stockPaneSettingsDialog';
+        
+        if (coords.top > 150) {
+            newDiv.style.top = coords.top - 100 + 'px';
+        } else {
+            newDiv.style.top = coords.top + 5 + 'px';
+        }
+        
+        newDiv.style.left = coords.left - 235 + 'px';
+
+        let newHeader = document.createElement('h3');
+        newHeader.textContent = 'Stock Pane Settings';
+        newHeader.classList.add('paneSettingsH3');
+        newDiv.appendChild(newHeader);
+
+        let tableSettingsHeader = document.createElement('h4');
+        tableSettingsHeader.textContent = 'Table View';
+        tableSettingsHeader.classList.add('paneSettingsH4');
+        newDiv.appendChild(tableSettingsHeader);
+
+        let tableCols = ['subtitle', 'year', 'author', 'place', 'publisher', 'signatures', 'tags', 'notes', 'quotes'];
+
+        tableCols.forEach((col) => {
+            let newitemDiv = document.createElement('div');
+            newitemDiv.classList.add('paneSettingsItem');
+            
+            let newCheck = document.createElement('input');
+            newCheck.type = 'checkbox';
+            newCheck.id = 'stockPaneTable-' + col;
+            newitemDiv.appendChild(newCheck);
+
+            let newLabel = document.createElement('label');
+            newLabel.for = 'stockPaneTable-' + col;
+            newLabel.textContent = 'Show ' + col + ' column';
+            newLabel.classList.add('labelInlineRight');
+            newitemDiv.appendChild(newLabel);
+            newDiv.appendChild(newitemDiv);
+        });
+
+        document.querySelector('body').appendChild(newDiv);
+    } else {
+        document.querySelector('#stockPaneSettingsDialog').remove();
+    }
+    
 }
 
 function showDBSetup() {
     console.log('HI! from showDBSetup!');
+    let newDiv = document.createElement('div');
+    newDiv.id = 'stockDBSetup';
+    newDiv.classList.add('fullscreenDialogTop');
+    newDiv.style.backgroundColor = 'rgba(250, 250, 250, 0.9)';
+
+    newHeader = document.createElement('h1');
+    newHeader.textContent = 'Data Storage Setup';
+    newDiv.appendChild(newHeader);
+
+    newInnerDiv = document.createElement('div');
+    newInnerDiv.classList.add('fullwindowInnerDiv');
+    newDiv.appendChild(newInnerDiv);
+
+    newDBItem = document.createElement('div');
+    newDBItem.classList.add('dbItem');
+    newInnerDiv.appendChild(newDBItem);
+
+    newDBIcon = document.createElement('i');
+    newDBIcon.classList.add('fa-solid');
+    newDBIcon.classList.add('fa-database');
+    newDBIcon.classList.add('dbItemIcon');
+    newDBItem.appendChild(newDBIcon);
+
+    newName = document.createElement('div');
+    newName.classList.add('dbName');
+    newName.textContent = 'Local Storage';
+    newDBItem.appendChild(newName);
+
+    newBrowserDetails = document.createElement('div');
+    newBrowserDetails.classList.add('dbDetails');
+    newBrowserDetails.textContent = getBrowserName();
+    newDBItem.appendChild(newBrowserDetails);
+
+    newSize = document.createElement('div');
+    newSize.classList.add('dbDetails');
+    let lcsizeBytes = new Blob(Object.values(localStorage)).size; 
+    let kbSize = ((lcsizeBytes * 2) / 1024).toFixed(2) + 'kb';
+    newSize.textContent = kbSize;
+    newDBItem.appendChild(newSize);
+
+    document.querySelector('body').appendChild(newDiv);
+}
+
+function getBrowserName() {
+    let userAgent = navigator.userAgent;
+    let browserName;
+         
+    if(userAgent.match(/chrome|chromium|crios/i)){
+            browserName = "Chrome";
+    } else if (userAgent.match(/firefox|fxios/i)){
+            browserName = "Firefox";
+    }  else if (userAgent.match(/safari/i)){
+            browserName = "Safari";
+    } else if (userAgent.match(/opr\//i)){
+            browserName = "Opera";
+    } else if (userAgent.match(/edg/i)){
+            browserName = "Edge";
+    } else {
+            browserName="No browser detection";
+    }
+    return browserName;
 }
 
 function startBookSlideshow(e) {
@@ -1405,10 +1528,14 @@ function createBooksFromFile(e) {
     
 }
 
-function toggleFullScreenSaver() {
+function requestFull() {
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
+        document.documentElement.requestFullscreen().catch((err) => console.log(err.message));
     }
+}
+
+function toggleFullScreenSaver() {
+    /* requestFull(); */
     
     let num = Math.round(Math.random() * (quotes.size - 1));
     let cites = Array.from(quotes);
@@ -1424,31 +1551,18 @@ function toggleFullScreenSaver() {
     letterContainer.classList.add('screensaver-lettercontainer');
 
     let text = cites[num][1].quote_text;
-    let timing = ['ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear'];
-
-    console.log(text);
-    Array.from(text).forEach((letter) => {
-        let letterChar = document.createElement('div');
-        letterChar.classList.add('screenSaverLetter');
-        letterChar.style.fontSize = Math.round((Math.random() * 200) + 400) + '%';
-        if (letter === ' ') { letterChar.style.marginRight = '30px'; }
-        let n = ((Math.random() * 1.5) + 2.0).toFixed(2);
-        let m = Math.round((Math.random() * 25) + 230);
-        let o = (Math.random() * 0.45)+ 0.55;
-        let t = Math.round(Math.random() * 4);
-        let d = (Math.random() * Math.random() * 0.9).toFixed(2);
-        letterChar.style.color = `rgba(${m}, ${m}, ${m}, ${o})`;
-        letterChar.style.animation = `text-flicker-in-glow ${n}s ${timing[t]} ${d}s both`;
-        letterChar.textContent = letter;
-        letterContainer.appendChild(letterChar);
-    });
+    
+    letterContainer.appendChild(createScreensaverQuote(text));
 
     screensaver.appendChild(letterContainer);
 
     document.querySelector('body').appendChild(screensaver);
-    document.querySelector('body').addEventListener('keydown', (e) => {
+    /* document.querySelector('body').addEventListener('keydown', (e) => {
         if (e.code === 'Space') { toggleFullScreenSaver(); }
-    });
+    }); */
+
+    document.querySelector('body').removeEventListener('mousemove', resetScreenSaverInterval);
+    document.querySelector('body').addEventListener('mousemove', exitFullscreenSaver);
     /*
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
@@ -1457,6 +1571,65 @@ function toggleFullScreenSaver() {
     }
     */
 
+}
+
+function createScreensaverQuote(text) {
+    let wordsDiv = document.createElement('div');
+    wordsDiv.classList.add('screenSaverWords');
+    
+    let words = text.split(' ');
+    let numberLetters = text.length;
+
+    let timing = ['ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear'];
+    let sizeFactor = 150 / numberLetters;
+
+    words.forEach((word) => {
+        let wordDiv = document.createElement('div');
+        wordDiv.classList.add('screenSaverWord');
+        
+        let wordN = (Math.random() * 0.7) + 2.0;
+        let wordD = Math.random() * 0.2;
+        let wordT = Math.round(Math.random() * 3);
+        console.log('wordN: ' + wordN + ' - wordD: ' + wordD);
+        Array.from(word).forEach((letter) => {
+            let letterChar = document.createElement('div');
+            letterChar.classList.add('screenSaverLetter');
+            if (numberLetters > 150) {
+                letterChar.style.fontSize = Math.round((Math.random() * 200) + (400 * sizeFactor)) + '%';
+            } else {
+                letterChar.style.fontSize = Math.round((Math.random() * 200) + (400)) + '%';
+            }
+            let n = (wordN + (Math.random() * 0.15)).toFixed(2);
+            let m = Math.round((Math.random() * 25) + 230);
+            let o = (Math.random() * 0.45)+ 0.55;
+            let t = wordT + Math.round(Math.random());
+            let d = (wordD + (Math.random() * 0.1)).toFixed(2);
+            console.log('n:' + n + ' - d: ' + d);
+            letterChar.style.color = `rgba(${m}, ${m}, ${m}, ${o})`;
+            letterChar.style.animation = `text-flicker-in-glow ${n}s ${timing[t]} ${d}s both`;
+            letterChar.textContent = letter;
+            wordDiv.appendChild(letterChar);
+            
+        });
+
+        wordsDiv.appendChild(wordDiv);
+    });
+
+    return wordsDiv;
+}
+
+function exitFullscreenSaver() {
+    document.querySelector('body').removeEventListener('mousemove', exitFullscreenSaver);
+    document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
+    if (document.fullscreenElement) { document.exitFullscreen(); }
+    document.querySelector('.screensaver').remove();
+    resetScreenSaverInterval();
+}
+
+function resetScreenSaverInterval() {
+    clearInterval(screensaver);
+    screensaver = setInterval(toggleFullScreenSaver, 30000);
+    console.log('HI! from reset!');
 }
 
 function initializeApp() {
