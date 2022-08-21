@@ -15,6 +15,8 @@ let settings = {
     isFirstStart: true,
     autoSaveInterval: 60,
     sortOrderStock: 'alpha',
+    sortOrderAuthors: 'alpha',
+    sortOrderExport: 'alpha',
     displayStock: 'table'
 };
 
@@ -32,14 +34,49 @@ let lastSave = new Date();
 
 let imageReload = setInterval(loadRandomBackgroundImage, 60000 * settings.backgroundInterval);
 let autoSave = setInterval(exportLocalDataToJsonFile, 60000 * settings.autoSaveInterval);
-let screensaver = setInterval(toggleFullScreenSaver, 30000);
+let screensaver = setInterval(toggleFullScreenSaver, 120000);
 
 let authorsPane = document.querySelector('#authors');
 let exportPane = document.querySelector('#export');
 let stockPane = document.querySelector('#stock');
 
 
+/*********************/
 /* Class Definitions */
+/*********************/
+
+class Author {
+    uid;
+    prename;
+    surname;
+    titles;
+    date_birth;
+    date_death;
+    bio;
+    notes;
+    tags;
+    professorships;
+    place;
+    date_added;
+
+    constructor(surname, prename, options = {}) {
+        this.uid = options.uid || uid();
+        this.titles = options.titles || [];
+        this.date_birth = options.date_birth || '';
+        this.date_death = options.date_death || '';
+        this.bio = options.bio || '';
+        this.notes = options.notes || [];
+        this.professorships = options.professorships || [];
+        this.place = options.place || '';
+        this.surname = surname;
+        this.prename = prename;
+        this.date_added = options.date_added || new Date();
+        this.tags = options.tags || [];
+
+        authors.set(this.surname + ', ' + this.prename, this);
+        localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));    
+    }
+}
 
 class Book {
     uid;
@@ -423,36 +460,26 @@ class Book {
     }
 }
 
-class Author {
+class Collection {
     uid;
-    prename;
-    surname;
+    title;
+    books;
     titles;
-    date_birth;
-    date_death;
-    bio;
-    notes;
     tags;
-    professorships;
-    place;
-    date_added;
-
-    constructor(surname, prename, options = {}) {
+    notes;
+    authors;
+    
+    constructor(title, options = {}) {
         this.uid = options.uid || uid();
+        this.title = title;
+        this.books = options.books || [];
         this.titles = options.titles || [];
-        this.date_birth = options.date_birth || '';
-        this.date_death = options.date_death || '';
-        this.bio = options.bio || '';
-        this.notes = options.notes || [];
-        this.professorships = options.professorships || [];
-        this.place = options.place || '';
-        this.surname = surname;
-        this.prename = prename;
-        this.date_added = options.date_added || new Date();
         this.tags = options.tags || [];
+        this.notes = options.notes || [];
+        this.authors = options.authors || [];
 
-        authors.set(this.surname + ', ' + this.prename, this);
-        localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));    
+        collections.set(this.title, this);
+        localStorage.setItem('collections', JSON.stringify(Object.fromEntries(collections)));
     }
 }
 
@@ -469,6 +496,27 @@ class Library {
         this.uid = uid();
     }
 
+}
+
+class Note {
+    uid;
+    title;
+    note_text;
+    tags;
+    parent_id;
+    date_added;
+
+    constructor(text, options = {}) {
+        this.uid = options.uid || uid();
+        this.note_text = text;
+        this.title = options.title || '';
+        this.parent_id = options.parent_id || '';
+        this.tags = options.tags || [];
+        this.date_added = options.date_added || new Date();
+
+        notes.set(this.uid, this);
+        localStorage.setItem('notes', JSON.stringify(Object.fromEntries(notes)));
+    }
 }
 
 class Publisher {
@@ -521,27 +569,6 @@ class Quote {
     }
 }
 
-class Note {
-    uid;
-    title;
-    note_text;
-    tags;
-    parent_id;
-    date_added;
-
-    constructor(text, options = {}) {
-        this.uid = options.uid || uid();
-        this.note_text = text;
-        this.title = options.title || '';
-        this.parent_id = options.parent_id || '';
-        this.tags = options.tags || [];
-        this.date_added = options.date_added || new Date();
-
-        notes.set(this.uid, this);
-        localStorage.setItem('notes', JSON.stringify(Object.fromEntries(notes)));
-    }
-}
-
 class Signature {
     uid;
     label;
@@ -578,36 +605,449 @@ class Tag {
     }
 }
 
-class Collection {
-    uid;
-    title;
-    books;
-    titles;
-    tags;
-    notes;
-    authors;
-    
-    constructor(title, options = {}) {
-        this.uid = options.uid || uid();
-        this.title = title;
-        this.books = options.books || [];
-        this.titles = options.titles || [];
-        this.tags = options.tags || [];
-        this.notes = options.notes || [];
-        this.authors = options.authors || [];
 
-        collections.set(this.title, this);
-        localStorage.setItem('collections', JSON.stringify(Object.fromEntries(collections)));
+/*******************/
+/* Functional Code */
+/*******************/
+
+/* Universal Id Function used with every instance of every class in the instance field uid */
+const uid = () => { return (Date.now().toString(32) + Math.random().toString(16).replace(/\./g, '')).substring(0, 20); }
+
+/* Entry Point */
+initializeApp();
+
+function createBooksFromFile(e) {
+    let importData = JSON.parse(e.target.result);
+    console.log(importData);
+
+    let importedBooks = new Map(Object.entries(JSON.parse(importData[0])));
+    console.log(importedBooks);
+    Array.from(importedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
+
+    let importedAuthors = new Map(Object.entries(JSON.parse(importData[1])));
+    Array.from(importedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
+    console.log(importedAuthors);
+
+    let importedPublishers = new Map(Object.entries(JSON.parse(importData[2])));
+    Array.from(importedPublishers).forEach((pub) => { publishers.set(pub[0], new Publisher(pub[0], pub[1].place, pub[1])); });
+    console.log(importedPublishers);
+    
+    let importedQuotes = new Map(Object.entries(JSON.parse(importData[3])));
+    Array.from(importedQuotes).forEach((quote) => { quotes.set(quote[0], new Quote(quote[1].quote_text, quote[1])); });
+    console.log(importedQuotes);
+
+    let importedNotes = new Map(Object.entries(JSON.parse(importData[4])));
+    Array.from(importedNotes).forEach((note) => { notes.set(note[0], new Note(note[1].note_text, note[1])); });
+    console.log(importedNotes);
+
+    let importedTags = new Map(Object.entries(JSON.parse(importData[5])));
+    Array.from(importedTags).forEach((tag) => { tags.set(tag[0], new Tag(tag[1].label, tag[1])); });
+    console.log(importedTags);
+
+    let importedSignatures = new Map(Object.entries(JSON.parse(importData[6])));
+    Array.from(importedSignatures).forEach((sign) => { signatures.set(sign[0], new Signature(sign[1].label, sign[1])); });
+    console.log(importedSignatures);
+
+    console.log('JSON Data successfully imported! ' + books.size + ' Books added.');
+    updateDisplay();
+    
+}
+
+function createNewCollection(e) {
+    let name = document.querySelector('#stockPane-newCollectionInput').value;
+    let c = new Collection(name, { titles: Array.from(transientSelection) });
+    document.querySelector('#stockPane-newCollectionModal').remove();
+    showMessage('A new collection named "' + name + '" has been created!');
+}
+
+function createScreensaverQuote(text) {
+    let wordsDiv = document.createElement('div');
+    wordsDiv.classList.add('screenSaverWords');
+    
+    let words = text.split(' ');
+    let numberLetters = text.length;
+
+    let timing = ['ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear'];
+    let sizeFactor = 150 / numberLetters;
+
+    words.forEach((word) => {
+        let wordDiv = document.createElement('div');
+        wordDiv.classList.add('screenSaverWord');
+        
+        let wordN = (Math.random() * 0.7) + 2.0;
+        let wordD = Math.random() * 0.2;
+        let wordT = Math.round(Math.random() * 3);
+
+        Array.from(word).forEach((letter) => {
+            let letterChar = document.createElement('div');
+            letterChar.classList.add('screenSaverLetter');
+            if (numberLetters > 150) {
+                letterChar.style.fontSize = Math.round(((Math.random() * 200) + 400) * sizeFactor) + '%';
+            } else {
+                letterChar.style.fontSize = Math.round((Math.random() * 200) + (400)) + '%';
+            }
+            let n = (wordN + (Math.random() * 0.15)).toFixed(2);
+            let m = Math.round((Math.random() * 25) + 230);
+            let o = (Math.random() * 0.40)+ 0.60;
+            let t = wordT + Math.round(Math.random());
+            let d = (wordD + (Math.random() * 0.1)).toFixed(2);
+            console.log('n:' + n + ' - d: ' + d);
+            letterChar.style.color = `rgba(${m}, ${m}, ${m}, ${o})`;
+            letterChar.style.animation = `text-flicker-in-glow ${n}s ${timing[t]} ${d}s both`;
+            letterChar.textContent = letter;
+            wordDiv.appendChild(letterChar);
+            
+        });
+
+        wordsDiv.appendChild(wordDiv);
+    });
+
+    return wordsDiv;
+}
+
+function deleteBook(e) {
+    e.preventDefault();
+    books.delete(e.target.id.substring(7));
+    saveBooksToLocalStorage();
+    updateDisplay();
+}
+
+function endFullscreenStock() {
+    console.log('HI! from endFullscreen!');
+    document.exitFullscreen();
+
+    let maxIcon = document.querySelector('#maximizeToggler-stockPane');
+    let fullIcon = document.querySelector('#fullscreenToggler-stockPane');
+    let stockPane = document.querySelector('#stockPane');
+
+    maxIcon.classList.remove('fa-compress');
+    maxIcon.classList.add('fa-expand');
+    maxIcon.removeEventListener('click', minimizePane);
+    maxIcon.addEventListener('click', maximizePane);
+
+    fullIcon.classList.remove('fa-minimize');
+    fullIcon.classList.add('fa-maximize');
+    fullIcon.removeEventListener('click', endFullscreenStock);
+    fullIcon.addEventListener('click', showFullscreenStock);
+
+    stockPane.style.top = '';
+    stockPane.style.right = '20%';
+    stockPane.style.bottom = '0px';
+    stockPane.style.left = '20%';
+    stockPane.style.height = '';
+    stockPane.style.width = '';
+    stockPane.style.borderRadius = '15px 15px 0 0';
+    stockPane.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+}
+
+function equipListeners() {
+    document.querySelectorAll('.paneToggler').forEach( (node) => { node.addEventListener('click', togglePane); });
+    document.querySelectorAll('.configuratorToggler').forEach( (node) => { node.addEventListener('click', toggleConfigurator); });
+    document.querySelectorAll('.maximizePaneToggler').forEach( (node) => { node.addEventListener('click', maximizePane); });
+    document.querySelector('#settingsToggler').addEventListener('click', toggleSettings);
+    document.querySelector('#closeSettings').addEventListener('click', toggleSettings);
+    
+    document.querySelector('#mainInput').addEventListener('keydown', observeMainInput);
+    document.querySelector('#mainInput').addEventListener('focus', mainInputFocus);
+    document.querySelector('#mainInput').addEventListener('blur', mainInputBlur);
+
+    document.querySelector('#directExportLink').addEventListener('click', exportLocalDataToJsonFile);
+    document.querySelector('#localPurgeBtn').addEventListener('click', purgeLocalStorage);
+    document.querySelector('#importFileInput').addEventListener('change', importDataFile);
+    document.querySelector('#screensaverBtn').addEventListener('click', toggleFullScreenSaver);
+    document.querySelector('#detailToggleFull').addEventListener('click', maximizeMainContent);
+
+    document.querySelector('#authorsPane-sortAlpha').addEventListener('click', setOrder);
+    document.querySelector('#authorsPane-sortAlphaReverse').addEventListener('click', setOrder);
+    document.querySelector('#authorsPane-sortOrderAdded').addEventListener('click', setOrder);
+    document.querySelector('#authorsPane-sortOrderAddedReverse').addEventListener('click', setOrder);
+    document.querySelector('#authorsPane-listCardlets').addEventListener('click', setListType);
+    document.querySelector('#authorsPane-listTable').addEventListener('click', setListType);
+
+    document.querySelector('#exportPane-sortAlpha').addEventListener('click', setOrder);
+    document.querySelector('#exportPane-sortAlphaReverse').addEventListener('click', setOrder);
+    document.querySelector('#exportPane-sortOrderAdded').addEventListener('click', setOrder);
+    document.querySelector('#exportPane-sortOrderAddedReverse').addEventListener('click', setOrder);
+    document.querySelector('#exportPane-listCardlets').addEventListener('click', setListType);
+    document.querySelector('#exportPane-listTable').addEventListener('click', setListType);
+
+    document.querySelector('#stockPane-createCollection').addEventListener('click', showNewCollectionForm);
+    document.querySelector('#stockPane-watchSlideshow').addEventListener('click', startBookSlideshow);
+    document.querySelector('#stockPane-exportItems').addEventListener('click', exportSelectedTitles);
+    document.querySelector('#stockPane-deleteItems').addEventListener('click', showSerialDeleteWarning);
+
+    document.querySelector('#stockPane-sortAlpha').addEventListener('click', setOrder);
+    document.querySelector('#stockPane-sortAlphaReverse').addEventListener('click', setOrder);
+    document.querySelector('#stockPane-sortOrderAdded').addEventListener('click', setOrder);
+    document.querySelector('#stockPane-sortOrderAddedReverse').addEventListener('click', setOrder);
+    
+    document.querySelector('#stockPane-listCardlets').addEventListener('click', setListType);
+    document.querySelector('#stockPane-listTable').addEventListener('click', setListType);
+
+    document.querySelector('#fullscreenToggler-stockPane').addEventListener('click', showFullscreenStock);
+    document.querySelector('#stockPane-configureDBs').addEventListener('click', showDBSetup);
+    document.querySelector('#stockPane-togglePaneSettings').addEventListener('click', showStockSettings);
+
+    document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
+    document.querySelector('body').addEventListener('keydown', resetScreenSaverInterval);
+
+    document.querySelector('#mainInterface').addEventListener('dblclick', toggleMainInterfacePosition);
+
+}
+
+function exitFullscreenSaver() {
+    document.querySelector('body').removeEventListener('mousemove', exitFullscreenSaver);
+    document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
+    if (document.fullscreenElement) { document.exitFullscreen(); }
+    document.querySelector('.screensaver').remove();
+    resetScreenSaverInterval();
+}
+
+function exportLocalDataToJsonFile() {
+    let exportData = [];
+    let booksStr = JSON.stringify(Object.fromEntries(books));
+    let authorsStr = JSON.stringify(Object.fromEntries(authors));
+    let pubsStr = JSON.stringify(Object.fromEntries(publishers));
+    let quotesStr = JSON.stringify(Object.fromEntries(quotes));
+    let notesStr = JSON.stringify(Object.fromEntries(notes));
+    let tagsStr = JSON.stringify(Object.fromEntries(tags));
+    let signStr = JSON.stringify(Object.fromEntries(signatures));
+
+    exportData.push(booksStr);
+    exportData.push(authorsStr);
+    exportData.push(pubsStr);
+    exportData.push(quotesStr);
+    exportData.push(notesStr);
+    exportData.push(tagsStr);
+    exportData.push(signStr);
+
+    let expStr = JSON.stringify(exportData);
+
+    rightNow = new Date();
+    filename = 'books-' + (rightNow.getMonth()+1) + '-' + rightNow.getDate() + '-' + rightNow.getFullYear() + '--' + rightNow.getHours() + '-' + rightNow.getMinutes() + '.json';
+    booksUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(expStr);
+    let ghostLink = document.createElement('a');
+    ghostLink.setAttribute('href', booksUri);
+    ghostLink.setAttribute('download', filename);
+    ghostLink.click();
+}
+
+function exportSelectedTitles(e) {
+    if (transientSelection.size > 0) {
+
+    } else {
+        showMessage('The export could not be started, because there were no titles selected!');
     }
 }
 
+function getBrowserName() {
+    let userAgent = navigator.userAgent;
+    let browserName;
+         
+    if(userAgent.match(/chrome|chromium|crios/i)){
+            browserName = "Chrome";
+    } else if (userAgent.match(/firefox|fxios/i)){
+            browserName = "Firefox";
+    }  else if (userAgent.match(/safari/i)){
+            browserName = "Safari";
+    } else if (userAgent.match(/opr\//i)){
+            browserName = "Opera";
+    } else if (userAgent.match(/edg/i)){
+            browserName = "Edge";
+    } else {
+            browserName="No browser detection";
+    }
+    return browserName;
+}
 
-/* Functional Code */
+function handleSettingsChange(e) {
+    switch(e.target.id) {
 
-const uid = () => { return (Date.now().toString(32) + Math.random().toString(16).replace(/\./g, '')).substring(0, 20); }
+    }
+}
 
+function importDataFile(e) {
+    let files = e.target.files;
+    let reader = new FileReader();
+    reader.onload = createBooksFromFile;
+    reader.readAsText(files[0]);
+}
 
-initializeApp();
+function initializeApp() {
+    initializeLocalStorage();
+    equipListeners();
+    updateDisplay();
+    
+    showLastAdditions();
+}
+
+function initializeLocalStorage() {
+    if (!localStorage.getItem('settings')) {
+        populateLocalStorage();
+    } else {
+        loadLocalStorage();
+    }
+}
+
+function loadLocalStorage() {
+    settings = JSON.parse(localStorage.getItem('settings'));
+    
+    /* Some attributes of the settings object need to be transformed to their original form after persisting them! */
+    /* settings.useBackground = settings.useBackground === 'true';
+    settings.useFixedBackground = settings.useFixedBackground === 'true';
+    settings.useTransparency = settings.useTransparency === 'true';
+    settings.useAcademicMode = settings.useAcademicMode === 'true';
+    settings.useLocalStorage = settings.useLocalStorage === 'true';
+    settings.isFirstStart = settings.isFirstStart === 'true';
+    */
+    /* The JSON stringify method stripped our class instances of their methods so we have to re-construct them! */
+    persistedBooks = new Map(Object.entries(JSON.parse(localStorage.getItem('books'))));
+    persistedAuthors = new Map(Object.entries(JSON.parse(localStorage.getItem('authors'))));
+    persistedPublishers = new Map(Object.entries(JSON.parse(localStorage.getItem('publishers'))));
+    persistedQuotes = new Map(Object.entries(JSON.parse(localStorage.getItem('quotes'))));
+    persistedNotes = new Map(Object.entries(JSON.parse(localStorage.getItem('notes'))));
+    persistedSignatures = new Map(Object.entries(JSON.parse(localStorage.getItem('signatures'))));
+    persistedTags = new Map(Object.entries(JSON.parse(localStorage.getItem('tags'))));
+    persistedCollections = new Map(Object.entries(JSON.parse(localStorage.getItem('collections'))));
+
+    books = new Map();
+    authors = new Map();
+    publishers = new Map();
+    quotes = new Map();
+    notes = new Map();
+    signatures = new Map();
+    tags = new Map();
+    collections = new Map();
+
+    Array.from(persistedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
+    Array.from(persistedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
+    Array.from(persistedPublishers).forEach((publisher) => { publishers.set(publisher[0], new Publisher(publisher[1].name, publisher[1].places[0], publisher[1])); });
+    Array.from(persistedQuotes).forEach((quote) => { quotes.set(quote[0], new Quote(quote[1].quote_text, quote[1])); });
+    Array.from(persistedNotes).forEach((note) => { notes.set(note[0], new Note(note[1].note_text, note[1])); });
+    Array.from(persistedSignatures).forEach((signature) => { signatures.set(signature[0], new Signature(signature[1].label, signature[1])); });
+    Array.from(persistedTags).forEach((tag) => { tags.set(tag[0], new Tag(tag[1].label, tag[1])); });
+    Array.from(persistedCollections).forEach((collection) => { collections.set(collection[0], new Collection(collection[1].title, collection[1])); });
+    /* End Instances Reconstruction */
+
+}
+
+function loadRandomBackgroundImage() {
+    document.querySelector('#alltainer').style.backgroundImage = "url('./images/background_" + Math.round((Math.random() * 15) + 1) + ".jpg')";
+}
+
+function mainInputBlur() {    
+    let mainInputClue = document.querySelector('#mainInputClue');
+    mainInputClue.classList.remove('shake-horizontal');
+    mainInputClue.style.color = 'rgba(100, 100, 100, 0.5)';
+}
+
+function mainInputFocus() {
+    let mainInputClue = document.querySelector('#mainInputClue');
+    mainInputClue.style.color = 'rgba(30, 30, 30, 1.0)';
+    mainInputClue.classList.add('shake-horizontal');
+}
+
+function maximizeMainContent(e) {
+    let main = document.querySelector('#mainFocusContent');
+    let coords = main.getBoundingClientRect();
+    console.log(coords);
+
+    main.style.position = 'fixed';
+    main.style.zIndex = '2';
+    main.style.top = '0px';
+    main.style.right = '0px';
+    main.style.bottom = '0px';
+    main.style.left = '0px';
+    main.style.width = '100%';
+    main.style.height = '100%';
+    e.target.classList.remove('fa-expand');
+    e.target.classList.add('fa-compress');
+    e.target.removeEventListener('click', maximizeMainContent);
+    e.target.addEventListener('click', minimizeMainContent);
+     
+}
+
+function maximizePane(e) {
+    e.stopImmediatePropagation();
+    let target = document.querySelector('#' + e.target.id.substring(16));
+    e.target.classList.remove('fa-expand');
+    e.target.classList.add('fa-compress');
+    e.target.removeEventListener('click', maximizePane);
+    e.target.addEventListener('click', minimizePane);
+
+    target.style.top = '0px';
+    target.style.right = '0px';
+    target.style.bottom = '0px';
+    target.style.left = '0px';
+    target.style.height = '100%';
+    target.style.width = '100%';
+    target.style.borderRadius = '15px';
+    target.style.backgroundColor = 'rgba(240, 240, 240, 0.98)';
+    target.style.zIndex = '10';
+}
+
+function minimizeMainContent(e) {
+    let main = document.querySelector('#mainFocusContent');
+    main.style.position = 'relative';
+    main.style.top = '';
+    main.style.right = '';
+    main.style.bottom = '';
+    main.style.left = '';
+    main.style.width = '60%';
+    main.style.height = '50%';
+    e.target.classList.remove('fa-compress');
+    e.target.classList.add('fa-expand');
+    e.target.removeEventListener('click', minimizeMainContent);
+    e.target.addEventListener('click', maximizeMainContent);    
+}
+
+function minimizePane(e) {
+    let target = document.querySelector('#' + e.target.id.substring(16));
+    e.target.classList.remove('fa-compress');
+    e.target.classList.add('fa-expand');
+    e.target.removeEventListener('click', minimizePane);
+    e.target.addEventListener('click', maximizePane);
+    target.style.zIndex = '1';
+    switch(target.id) {
+        case 'authorsPane':
+            target.style.top = '0px';
+            target.style.right = '';
+            target.style.bottom = '0px';
+            target.style.left = '0px';
+            target.style.height = '';
+            target.style.width = '20%';
+            target.style.borderRadius = '0 15px 15px 0';
+            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+            break;
+        case 'stockPane':
+            target.style.top = '';
+            target.style.right = '20%';
+            target.style.bottom = '0px';
+            target.style.left = '20%';
+            target.style.height = '';
+            target.style.width = '';
+            target.style.borderRadius = '15px 15px 0 0';
+            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+            break;
+        case 'exportPane':
+            target.style.top = '0px';
+            target.style.right = '0px';
+            target.style.bottom = '0px';
+            target.style.left = '';
+            target.style.height = '';
+            target.style.width = '20%';
+            target.style.borderRadius = '15px 0 0 15px';
+            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+            break;
+    }
+}
+
+function observeMainInput(e) {
+    if (e.keyCode === 13) {
+        parseMainInput();
+    }
+    /* TODO Parse input and reflect current progress in Standard Format String below mainInput (green coloring) */
+}
 
 function parseMainInput() {
     let input = document.querySelector('#mainInput').value;
@@ -641,21 +1081,496 @@ function parseMainInput() {
 
 }
 
-function updateDisplay() {
-    updateAuthorsPane();
-    updateStockPane();
-    updateExportPane();
-    showLastAdditions();
+function populateLocalStorage() {
+    localStorage.setItem('settings', JSON.stringify(settings));
+    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
+    localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
+    localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
+    localStorage.setItem('quotes', JSON.stringify(Object.fromEntries(quotes)));
+    localStorage.setItem('notes', JSON.stringify(Object.fromEntries(notes)));
+    localStorage.setItem('signatures', JSON.stringify(Object.fromEntries(signatures)));
+    localStorage.setItem('tags', JSON.stringify(Object.fromEntries(tags)));
+    localStorage.setItem('collections', JSON.stringify(Object.fromEntries(collections)));
 }
 
-function updateAuthorsPane() {
-    authorsPane.innerHTML = '';
-    Array.from(authors.keys()).forEach(author => {
+function prepareForDetailsView() {
+    let mainInterface = document.querySelector('#mainInterface');
+    let mainTitle = document.querySelector('#mainTitle');
+    let settings = document.querySelector('#settingsToggler');
+    let latestAdds = document.querySelector('#latestAdditions');
+    let details = document.querySelector('#detailView');
+
+    mainInterface.style.marginTop = '0px';
+    mainInterface.style.padding = '10px';
+    
+    settings.style.marginTop = '0px';
+
+    mainTitle.style.opacity = '0';
+    mainTitle.style.height = '0';
+    mainTitle.style.visibility = 'collapse';
+
+    latestAdds.style.opacity = '0';
+    latestAdds.style.visibility = 'collapse';
+    
+    
+    details.style.opacity = '1';
+    details.style.visibility = 'visible';
+}
+
+function purgeLocalStorage() {
+    books = new Map();
+    authors = new Map();
+    publishers = new Map();
+
+    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
+    localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
+    localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
+    updateDisplay();
+}
+
+function requestFull() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch((err) => console.log(err.message));
+    }
+}
+
+function resetScreenSaverInterval() {
+    clearInterval(screensaver);
+    screensaver = setInterval(toggleFullScreenSaver, 120000);
+    console.log('HI! from reset!');
+}
+
+function resetSettings() {
+    settings = {
+        language: 'en',
+        useBackground: true,
+        backgroundInterval: 5,
+        useFixedBackground: false,
+        fixedBackground: '',
+        useTransparency: true,
+        useAcademicMode: true,
+        inputFormat: '',
+        outputFormat: '',
+        serverURL: '',
+        useLocalStorage: true,
+        isFirstStart: true,
+        autoSaveInterval: 60,
+        sortOrderStock: 'alpha',
+        displayStock: 'table',
+        sortOrderAuthors: 'alpha',
+        sortOrderExport: 'alpha'
+    };
+    saveSettings();
+}
+
+function saveAll() {
+
+}
+
+function saveBooksToLocalStorage() {
+    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
+}
+
+function saveSettings() {
+    localStorage.setItem('settings', JSON.stringify(settings));
+}
+
+function serialDeleteBooks(e) {
+    let n = transientSelection.size;
+    Array.from(transientSelection).forEach((book) => { books.delete(book); });
+    showMessage(n + ' books have been deleted');
+}
+
+function setAuthorsOrderIcon () {
+    let orderIcons = document.querySelectorAll('.authorsOrderIcon');
+    orderIcons.forEach((icon) => { icon.classList.remove('selected'); });
+    switch (settings.sortOrderAuthors) {
+        case 'alpha':
+            document.querySelector('#authorsPane-sortAlpha').classList.add('selected');
+            break;
+        case 'alpha-reverse':
+            document.querySelector('#authorsPane-sortAlphaReverse').classList.add('selected');
+            break;
+        case 'added':
+            document.querySelector('#authorsPane-sortOrderAdded').classList.add('selected');
+            break;
+        case 'added-reverse':
+            document.querySelector('#authorsPane-sortOrderAddedReverse').classList.add('selected');
+            break;
+    }
+    saveSettings();
+}
+
+function setExportOrderIcon() {
+    let orderIcons = document.querySelectorAll('.exportOrderIcon');
+    orderIcons.forEach((icon) => { icon.classList.remove('selected'); });
+    switch (settings.sortOrderExport) {
+        case 'alpha':
+            document.querySelector('#exportPane-sortAlpha').classList.add('selected');
+            break;
+        case 'alpha-reverse':
+            document.querySelector('#exportPane-sortAlphaReverse').classList.add('selected');
+            break;
+        case 'added':
+            document.querySelector('#exportPane-sortOrderAdded').classList.add('selected');
+            break;
+        case 'added-reverse':
+            document.querySelector('#exportPane-sortOrderAddedReverse').classList.add('selected');
+            break;
+    }
+    saveSettings();
+}
+
+function setListType(e) {
+    let typeIcons = document.querySelectorAll('.listTypeIcon');
+    typeIcons.forEach((icon) => { icon.classList.remove('selected'); });
+
+    switch (e.target.id) {
+        case 'stockPane-listCardlets':
+            settings.displayStock = 'cardlets';
+            break;
+        case 'stockPane-listTable':
+            settings.displayStock = 'table';
+            break;
+    }
+
+    e.target.classList.add('selected');
+    saveSettings();
+    updateStockPane();
+}
+
+function setOrder(e) {
+    let orderIcons;
+    let targetPane;
+    if (e.target.id.indexOf('stockPane') > -1) {
+        orderIcons = document.querySelectorAll('.orderIcon');
+        console.log('index of stock found!');
+        targetPane = 'Stock';
+    } else if (e.target.id.indexOf('authorsPane') > -1) {
+        orderIcons = document.querySelectorAll('.authorsOrderIcon');
+        console.log('index of authors found!');
+        targetPane = 'Authors';
+    } else if (e.target.id.indexOf('exportPane') > -1) {
+        orderIcons = document.querySelectorAll('.exportOrderIcon');
+        console.log('index of export found!');
+        targetPane = 'Export';
+    } else {
+        orderIcons = [];
+    }
+
+    orderIcons.forEach((icon) => { icon.classList.remove('selected'); });
+    e.target.classList.add('selected');
+
+    let orderType = e.target.id.slice(e.target.id.indexOf('-')+1);
+
+    switch (orderType) {
+        case 'sortAlpha':
+            settings['sortOrder'+targetPane] = 'alpha';
+            break;
+        case 'sortAlphaReverse':
+            settings['sortOrder'+targetPane] = 'alpha-reverse';
+            break;
+        case 'sortOrderAdded':
+            settings['sortOrder'+targetPane] = 'added';
+            break;
+        case 'sortOrderAddedReverse':
+            settings['sortOrder'+targetPane] = 'added-reverse';
+            break;
+    }
+    saveSettings();
+    
+    switch (targetPane) {
+        case 'Stock':
+            updateStockPane();
+            break;
+        case 'Authors':
+            updateAuthorsPane();
+            break;
+        case 'Export':
+            updateExportPane();
+            break;
+    }
+    
+}
+
+function setStockOrderIcon() {
+    let orderIcons = document.querySelectorAll('.orderIcon');
+    orderIcons.forEach((icon) => { icon.classList.remove('selected'); });
+    switch (settings.sortOrderStock) {
+        case 'alpha':
+            document.querySelector('#stockPane-sortAlpha').classList.add('selected');
+            break;
+        case 'alpha-reverse':
+            document.querySelector('#stockPane-sortAlphaReverse').classList.add('selected');
+            break;
+        case 'added':
+            document.querySelector('#stockPane-sortOrderAdded').classList.add('selected');
+            break;
+        case 'added-reverse':
+            document.querySelector('#stockPane-sortOrderAddedReverse').classList.add('selected');
+            break;
+    }
+}
+
+function showDBSetup() {
+    console.log('HI! from showDBSetup!');
+    let newDiv = document.createElement('div');
+    newDiv.id = 'stockDBSetup';
+    newDiv.classList.add('fullscreenDialogTop');
+    newDiv.style.backgroundColor = 'rgba(250, 250, 250, 0.9)';
+
+    newHeader = document.createElement('h1');
+    newHeader.textContent = 'Data Storage Setup';
+    newDiv.appendChild(newHeader);
+
+    newInnerDiv = document.createElement('div');
+    newInnerDiv.classList.add('fullwindowInnerDiv');
+    newDiv.appendChild(newInnerDiv);
+
+    newDBItem = document.createElement('div');
+    newDBItem.classList.add('dbItem');
+    newInnerDiv.appendChild(newDBItem);
+
+    newDBIcon = document.createElement('i');
+    newDBIcon.classList.add('fa-solid');
+    newDBIcon.classList.add('fa-database');
+    newDBIcon.classList.add('dbItemIcon');
+    newDBItem.appendChild(newDBIcon);
+
+    newName = document.createElement('div');
+    newName.classList.add('dbName');
+    newName.textContent = 'Local Storage';
+    newDBItem.appendChild(newName);
+
+    newBrowserDetails = document.createElement('div');
+    newBrowserDetails.classList.add('dbDetails');
+    newBrowserDetails.textContent = getBrowserName();
+    newDBItem.appendChild(newBrowserDetails);
+
+    newSize = document.createElement('div');
+    newSize.classList.add('dbDetails');
+    let lcsizeBytes = new Blob(Object.values(localStorage)).size; 
+    let kbSize = ((lcsizeBytes * 2) / 1024).toFixed(2) + 'kb';
+    newSize.textContent = kbSize;
+    newDBItem.appendChild(newSize);
+
+    document.querySelector('body').appendChild(newDiv);
+}
+
+function showFullscreenStock() {
+    console.log('HI! from showFullscreenStock!');
+    document.documentElement.requestFullscreen();
+
+    let maxIcon = document.querySelector('#maximizeToggler-stockPane');
+    let fullIcon = document.querySelector('#fullscreenToggler-stockPane');
+    let stockPane = document.querySelector('#stockPane');
+
+    maxIcon.classList.remove('fa-expand');
+    maxIcon.classList.add('fa-compress');
+    maxIcon.removeEventListener('click', maximizePane);
+    maxIcon.addEventListener('click', minimizePane);
+
+    fullIcon.classList.remove('fa-maximize');
+    fullIcon.classList.add('fa-minimize');
+    fullIcon.removeEventListener('click', showFullscreenStock);
+    fullIcon.addEventListener('click', endFullscreenStock);
+
+    stockPane.style.top = '0px';
+    stockPane.style.right = '0px';
+    stockPane.style.bottom = '0px';
+    stockPane.style.left = '0px';
+    stockPane.style.height = '100%';
+    stockPane.style.width = '100%';
+    stockPane.style.borderRadius = '15px';
+    stockPane.style.backgroundColor = 'rgba(240, 240, 240, 0.98)';
+    stockPane.style.zIndex = '10';
+}
+
+function showLastAdditions() {
+    let latestAdds = document.querySelector('#latestAdditions');
+    latestAdds.innerHTML = '';
+    let newHeader = document.createElement('h2');
+    newHeader.textContent = 'Last Book Additions';
+    latestAdds.appendChild(newHeader);
+    let latest5 = Array.from(books).reverse().slice(0, 5);
+    latest5.forEach((book) => {
         let newDiv = document.createElement('div');
-        newDiv.classList.add('authorsPaneItem');
-        newDiv.textContent = author;
-        authorsPane.appendChild(newDiv);
-    });
+        newDiv.classList.add('lastAdditionsItem');
+        newDiv.textContent = book[1].author_surname + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place + ': ' + book[1].publisher_name + '.';
+        latestAdds.appendChild(newDiv);
+    })
+}
+
+function showMessage(message) {
+    let date = new Date().toLocaleTimeString().replaceAll(':', '-');
+    let newDiv = document.createElement('div');
+    newDiv.classList.add('screenMessage');
+    newDiv.id = 'message-' + date;
+    newDiv.style.left = (window.innerWidth / 2 - 150) + 'px';
+    let innerDiv = document.createElement('div');
+    innerDiv.textContent = message;
+    newDiv.appendChild(innerDiv);
+
+    let closeBtn = document.createElement('i');
+    closeBtn.classList.add('fa-solid');
+    closeBtn.classList.add('fa-square-xmark');
+    closeBtn.addEventListener('click', () => { document.querySelector('#message-' + date). remove(); });
+    newDiv.appendChild(closeBtn);
+
+    document.querySelector('body').appendChild(newDiv);
+}
+
+function showNewCollectionForm(e) {
+    if (transientSelection.size > 0) {
+        let coords = e.target.getBoundingClientRect();
+
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('modalDialog');
+        newDiv.id = 'stockPane-newCollectionModal';
+        newDiv.style.top = coords.top + 30 + 'px';
+        newDiv.style.left = coords.left - 50 + 'px';
+
+        let newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.placeholder = 'A Name for your new Collection';
+        newInput.id = 'stockPane-newCollectionInput';
+        newDiv.appendChild(newInput);
+
+        let newBtn = document.createElement('button');
+        newBtn.type = 'button';
+        newBtn.textContent = 'Create';
+        newBtn.addEventListener('click', createNewCollection);
+        newDiv.appendChild(newBtn);
+        
+        document.querySelector('body').appendChild(newDiv);
+    } else {
+        showMessage('A Collection could not be created, because there were no titles selected!');
+    }
+
+}
+
+function showNewTagInput(e) {
+
+}
+
+function showSerialDeleteWarning(e) {
+    if (transientSelection.size > 0) {
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('fullscreenDialog');
+        newDiv.id = 'stockPane-serialDeleteDialog';
+
+        let newInnerDiv = document.createElement('div');
+        newInnerDiv.classList.add('fullscreenDialogInner');
+        newDiv.appendChild(newInnerDiv);
+
+        let newH = document.createElement('h1');
+        newH.classList.add('fullscreenWarning');
+        newH.textContent = 'WARNING!';
+        newInnerDiv.appendChild(newH);
+
+        let newDesc = document.createElement('p');
+        newDesc.classList.add('fullscreenDescription');
+        newDesc.textContent = 'You are about to DELETE ' + transientSelection.size + ' titles FOREVER!';
+        newInnerDiv.appendChild(newDesc);
+
+        let newH2 = document.createElement('h2');
+        newH2.classList.add('fullscreenRequest');
+        newH2.textContent = 'Are you really sure you wanna do this???';
+        newInnerDiv.appendChild(newH2);
+
+        let newCount = document.createElement('p');
+        newCount.textContent = 'Titles to be deleted';
+        newCount.classList.add('fullscreenListHeader');
+        newCount.classList.add('fullscreenUnderline');
+        newInnerDiv.appendChild(newCount);
+
+        let newList = document.createElement('ol');
+        newList.classList.add('fullscreenList');
+        newInnerDiv.appendChild(newList);
+
+        Array.from(transientSelection).forEach((item) => {
+            let newItem = document.createElement('li');
+            newItem.textContent = item;
+            newList.appendChild(newItem);
+        });
+
+        let newBtnCancel = document.createElement('button');
+        newBtnCancel.textContent = 'Forget it - Do not do it!';
+        newBtnCancel.classList.add('fullscreenBtnCancel');
+        newBtnCancel.addEventListener('click', () => { document.querySelector('#stockPane-serialDeleteDialog').remove(); });
+        newDiv.appendChild(newBtnCancel);
+
+        let newBtnOk = document.createElement('button');
+        newBtnOk.textContent = 'OK - DO IT!';
+        newBtnOk.classList.add('fullscreenBtnOk');
+        newBtnOk.addEventListener('click', serialDeleteBooks);
+        newDiv.appendChild(newBtnOk);
+
+        document.querySelector('body').appendChild(newDiv);
+    } else {
+        showMessage('The fire-dumpster could not be activated, because there were no titles selected!');
+    }
+}
+
+function showStockSettings(e) {
+    console.log('HI! from showStockSettings!');
+    if (!document.querySelector('#stockPaneSettingsDialog')) {
+        let coords = e.target.getBoundingClientRect();
+        console.log(coords);
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('paneSettingsDialog');
+        newDiv.id = 'stockPaneSettingsDialog';
+        
+        if (coords.top > 150) {
+            newDiv.style.top = coords.top - 100 + 'px';
+        } else {
+            newDiv.style.top = coords.top + 5 + 'px';
+        }
+        
+        newDiv.style.left = coords.left - 235 + 'px';
+
+        let newHeader = document.createElement('h3');
+        newHeader.textContent = 'Stock Pane Settings';
+        newHeader.classList.add('paneSettingsH3');
+        newDiv.appendChild(newHeader);
+
+        let tableSettingsHeader = document.createElement('h4');
+        tableSettingsHeader.textContent = 'Table View';
+        tableSettingsHeader.classList.add('paneSettingsH4');
+        newDiv.appendChild(tableSettingsHeader);
+
+        let tableCols = ['subtitle', 'year', 'author', 'place', 'publisher', 'signatures', 'tags', 'notes', 'quotes'];
+
+        tableCols.forEach((col) => {
+            let newitemDiv = document.createElement('div');
+            newitemDiv.classList.add('paneSettingsItem');
+            
+            let newCheck = document.createElement('input');
+            newCheck.type = 'checkbox';
+            newCheck.id = 'stockPaneTable-' + col;
+            newitemDiv.appendChild(newCheck);
+
+            let newLabel = document.createElement('label');
+            newLabel.for = 'stockPaneTable-' + col;
+            newLabel.textContent = 'Show ' + col + ' column';
+            newLabel.classList.add('labelInlineRight');
+            newitemDiv.appendChild(newLabel);
+            newDiv.appendChild(newitemDiv);
+        });
+
+        document.querySelector('body').appendChild(newDiv);
+    } else {
+        document.querySelector('#stockPaneSettingsDialog').remove();
+    }
+    
+}
+
+function startBookSlideshow(e) {
+    if (transientSelection.size > 0) {
+
+    } else {
+        showMessage('The book slideshow could not be started, because there were no titles selected!');
+    }
 }
 
 function toggleAllCheckboxes(e) {
@@ -682,6 +1597,145 @@ function toggleCheckbox(e) {
         transientSelection.delete(e.target.id.substring(9));
     }
     updateExportPane();
+}
+
+function toggleConfigurator() {
+    let configurator = document.querySelector('#formatConfigurator');
+    configurator.style.visibility === 'visible' ? configurator.style.visibility = 'hidden' : configurator.style.visibility = 'visible';
+}
+
+function toggleFullScreenSaver() {
+    /* requestFull(); */
+    
+    let num = Math.round(Math.random() * (quotes.size - 1));
+    let cites = Array.from(quotes);
+
+    if (document.querySelector('.screensaver')) {
+        document.querySelector('.screensaver').remove();
+    }
+
+    let screensaver = document.createElement('div');
+    screensaver.classList.add('screensaver');
+    
+    let letterContainer = document.createElement('div');
+    letterContainer.classList.add('screensaver-lettercontainer');
+
+    let text = cites[num][1].quote_text;
+    
+    letterContainer.appendChild(createScreensaverQuote(text));
+
+    screensaver.appendChild(letterContainer);
+
+    document.querySelector('body').appendChild(screensaver);
+    /* document.querySelector('body').addEventListener('keydown', (e) => {
+        if (e.code === 'Space') { toggleFullScreenSaver(); }
+    }); */
+
+    document.querySelector('body').removeEventListener('mousemove', resetScreenSaverInterval);
+    document.querySelector('body').addEventListener('mousemove', exitFullscreenSaver);
+    /*
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
+    */
+
+}
+
+function toggleMainInterfacePosition(e) {
+    let mi = document.querySelector('#mainInterface');
+    let coords = mi.getBoundingClientRect();
+    console.log(coords);
+}
+
+function togglePane(e) {
+    let targetNode = document.querySelector('#' + e.target.id.substring(12));
+    targetNode.style.visibility === 'visible' ? targetNode.style.visibility = 'hidden' : targetNode.style.visibility = 'visible';
+    (targetNode.style.opacity === '0' || targetNode.style.opacity === '') ? targetNode.style.opacity = '1' : targetNode.style.opacity = '0';
+}
+
+function toggleSettings() {
+    let settings = document.querySelector('#settings');
+    settings.style.visibility === 'visible' ? settings.style.visibility = 'hidden' : settings.style.visibility = 'visible';
+    document.querySelector('#numbersPurge').innerHTML = 'Clicking the purge button will delete <em>' + books.size + ' books</em>, <em>' + authors.size + ' authors</em>, and <em>' + publishers.size + ' publishers</em>!!!';
+}
+
+function updateAuthorsPane() {
+    authorsPane.innerHTML = '';
+    setAuthorsOrderIcon();
+    let sortedAuthors;
+
+    switch (settings.sortOrderAuthors) {
+        case 'alpha':
+            sortedAuthors = Array.from(authors).sort((a, b) => a[0].localeCompare(b[0]));
+            break;
+        case 'alpha-reverse':
+            sortedAuthors = Array.from(authors).sort((a, b) => a[0].localeCompare(b[0])).reverse();
+            break;
+        case 'added':
+            sortedAuthors = Array.from(authors);
+            break;
+        case 'added-reverse':
+            sortedAuthors = Array.from(authors).reverse();
+            break;
+    }
+
+    sortedAuthors.forEach(author => {
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('authorsPaneItem');
+        newDiv.textContent = author[0];
+        authorsPane.appendChild(newDiv);
+    });
+}
+
+function updateDisplay() {
+    updateAuthorsPane();
+    updateStockPane();
+    updateExportPane();
+    showLastAdditions();
+}
+
+function updateExportPane() {
+    let exportList = document.querySelector('#export');
+    exportList.innerHTML = '';
+    setExportOrderIcon();
+    let sortedSelection;
+
+    switch (settings.sortOrderExport) {
+        case 'alpha':
+            sortedSelection = Array.from(transientSelection).sort((a, b) => {
+                let titleA = books.get(a);
+                let titleB = books.get(b);
+                let authorA = titleA.author_surname + ', ' + titleA.author_prename;
+                let authorB = titleB.author_surname + ', ' + titleB.author_prename;
+                return authorA.localeCompare(authorB);
+            });
+            break;
+        case 'alpha-reverse':
+            sortedSelection = Array.from(transientSelection).sort((a, b) => {
+                let titleA = books.get(a);
+                let titleB = books.get(b);
+                let authorA = titleA.author_surname + ', ' + titleA.author_prename;
+                let authorB = titleB.author_surname + ', ' + titleB.author_prename;
+                return authorA.localeCompare(authorB);
+            }).reverse();
+            break;
+        case 'added':
+            sortedSelection = Array.from(transientSelection);
+            break;
+        case 'added-reverse':
+            sortedSelection = Array.from(transientSelection).reverse();
+            break;
+    }
+
+    sortedSelection.forEach((item) => {
+        let book = books.get(item);
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('exportListItem');
+        newDiv.innerHTML = book.author_surname + ', ' + book.author_prename + '. ' + book.year + '. ' + book.title + '. ' + book.place + ': ' + book.publisher_name + '.';
+        exportList.appendChild(newDiv);
+    });
 }
 
 function updateStockPane() {
@@ -739,7 +1793,6 @@ function updateStockPane() {
 
     let sortedBooks;
     
-
     switch (settings.sortOrderStock) {
         case 'alpha':
             sortedBooks = Array.from(books).sort((a, b) => a[1].title.localeCompare(b[1].title));
@@ -806,913 +1859,4 @@ function updateStockPane() {
         bookRow.appendChild(bookActions);
         table.appendChild(bookRow);
     });
-}
-
-function setStockOrderIcon() {
-    let orderIcons = document.querySelectorAll('.orderIcon');
-    orderIcons.forEach((icon) => { icon.classList.remove('selected'); });
-    switch (settings.sortOrderStock) {
-        case 'alpha':
-            document.querySelector('#stockPane-sortAlpha').classList.add('selected');
-            break;
-        case 'alpha-reverse':
-            document.querySelector('#stockPane-sortAlphaReverse').classList.add('selected');
-            break;
-        case 'added':
-            document.querySelector('#stockPane-sortOrderAdded').classList.add('selected');
-            break;
-        case 'added-reverse':
-            document.querySelector('#stockPane-sortOrderAddedReverse').classList.add('selected');
-            break;
-    }
-}
-
-function prepareForDetailsView() {
-    let mainInterface = document.querySelector('#mainInterface');
-    let mainTitle = document.querySelector('#mainTitle');
-    let settings = document.querySelector('#settingsToggler');
-    let latestAdds = document.querySelector('#latestAdditions');
-    let details = document.querySelector('#detailView');
-
-    mainInterface.style.marginTop = '0px';
-    mainInterface.style.padding = '10px';
-    
-    settings.style.marginTop = '0px';
-
-    mainTitle.style.opacity = '0';
-    mainTitle.style.height = '0';
-    mainTitle.style.visibility = 'collapse';
-
-    latestAdds.style.opacity = '0';
-    latestAdds.style.visibility = 'collapse';
-    
-    
-    details.style.opacity = '1';
-    details.style.visibility = 'visible';
-}
-
-function deleteBook(e) {
-    e.preventDefault();
-    books.delete(e.target.id.substring(7));
-    saveBooksToLocalStorage();
-    updateDisplay();
-}
-
-function saveBooksToLocalStorage() {
-    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
-}
-
-function updateExportPane() {
-    let exportList = document.querySelector('#export');
-    exportList.innerHTML = '';
-
-    transientSelection.forEach((item) => {
-        let book = books.get(item);
-        let newDiv = document.createElement('div');
-        newDiv.classList.add('exportListItem');
-        newDiv.innerHTML = book.author_surname + ', ' + book.author_prename + '. ' + book.year + '. ' + book.title + '. ' + book.place + ': ' + book.publisher_name + '.';
-        exportList.appendChild(newDiv);
-    });
-}
-
-function maximizeMainContent(e) {
-    let main = document.querySelector('#mainFocusContent');
-    let coords = main.getBoundingClientRect();
-    console.log(coords);
-
-    main.style.position = 'fixed';
-    main.style.zIndex = '2';
-    main.style.top = '0px';
-    main.style.right = '0px';
-    main.style.bottom = '0px';
-    main.style.left = '0px';
-    main.style.width = '100%';
-    main.style.height = '100%';
-    e.target.classList.remove('fa-expand');
-    e.target.classList.add('fa-compress');
-    e.target.removeEventListener('click', maximizeMainContent);
-    e.target.addEventListener('click', minimizeMainContent);
-     
-}
-
-function minimizeMainContent(e) {
-    let main = document.querySelector('#mainFocusContent');
-    main.style.position = 'relative';
-    main.style.top = '';
-    main.style.right = '';
-    main.style.bottom = '';
-    main.style.left = '';
-    main.style.width = '60%';
-    main.style.height = '50%';
-    e.target.classList.remove('fa-compress');
-    e.target.classList.add('fa-expand');
-    e.target.removeEventListener('click', minimizeMainContent);
-    e.target.addEventListener('click', maximizeMainContent);    
-}
-
-function maximizePane(e) {
-    e.stopImmediatePropagation();
-    let target = document.querySelector('#' + e.target.id.substring(16));
-    e.target.classList.remove('fa-expand');
-    e.target.classList.add('fa-compress');
-    e.target.removeEventListener('click', maximizePane);
-    e.target.addEventListener('click', minimizePane);
-
-    target.style.top = '0px';
-    target.style.right = '0px';
-    target.style.bottom = '0px';
-    target.style.left = '0px';
-    target.style.height = '100%';
-    target.style.width = '100%';
-    target.style.borderRadius = '15px';
-    target.style.backgroundColor = 'rgba(240, 240, 240, 0.98)';
-    target.style.zIndex = '10';
-}
-
-function minimizePane(e) {
-    let target = document.querySelector('#' + e.target.id.substring(16));
-    e.target.classList.remove('fa-compress');
-    e.target.classList.add('fa-expand');
-    e.target.removeEventListener('click', minimizePane);
-    e.target.addEventListener('click', maximizePane);
-    target.style.zIndex = '1';
-    switch(target.id) {
-        case 'authorsPane':
-            target.style.top = '0px';
-            target.style.right = '';
-            target.style.bottom = '0px';
-            target.style.left = '0px';
-            target.style.height = '';
-            target.style.width = '20%';
-            target.style.borderRadius = '0 15px 15px 0';
-            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
-            break;
-        case 'stockPane':
-            target.style.top = '';
-            target.style.right = '20%';
-            target.style.bottom = '0px';
-            target.style.left = '20%';
-            target.style.height = '';
-            target.style.width = '';
-            target.style.borderRadius = '15px 15px 0 0';
-            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
-            break;
-        case 'exportPane':
-            target.style.top = '0px';
-            target.style.right = '0px';
-            target.style.bottom = '0px';
-            target.style.left = '';
-            target.style.height = '';
-            target.style.width = '20%';
-            target.style.borderRadius = '15px 0 0 15px';
-            target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
-            break;
-    }
-}
-
-function showLastAdditions() {
-    let latestAdds = document.querySelector('#latestAdditions');
-    latestAdds.innerHTML = '';
-    let newHeader = document.createElement('h2');
-    newHeader.textContent = 'Last Book Additions';
-    latestAdds.appendChild(newHeader);
-    let latest5 = Array.from(books).reverse().slice(0, 5);
-    latest5.forEach((book) => {
-        let newDiv = document.createElement('div');
-        newDiv.classList.add('lastAdditionsItem');
-        newDiv.textContent = book[1].author_surname + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place + ': ' + book[1].publisher_name + '.';
-        latestAdds.appendChild(newDiv);
-    })
-}
-
-function observeMainInput(e) {
-    if (e.keyCode === 13) {
-        parseMainInput();
-    }
-    /* TODO Parse input and reflect current progress in Standard Format String below mainInput (green coloring) */
-}
-
-function loadRandomBackgroundImage() {
-    document.querySelector('#alltainer').style.backgroundImage = "url('./images/background_" + Math.round((Math.random() * 15) + 1) + ".jpg')";
-}
-
-function togglePane(e) {
-    let targetNode = document.querySelector('#' + e.target.id.substring(12));
-    targetNode.style.visibility === 'visible' ? targetNode.style.visibility = 'hidden' : targetNode.style.visibility = 'visible';
-    (targetNode.style.opacity === '0' || targetNode.style.opacity === '') ? targetNode.style.opacity = '1' : targetNode.style.opacity = '0';
-}
-
-function equipListeners() {
-    document.querySelectorAll('.paneToggler').forEach( (node) => { node.addEventListener('click', togglePane); });
-    document.querySelectorAll('.configuratorToggler').forEach( (node) => { node.addEventListener('click', toggleConfigurator); });
-    document.querySelectorAll('.maximizePaneToggler').forEach( (node) => { node.addEventListener('click', maximizePane); });
-    document.querySelector('#settingsToggler').addEventListener('click', toggleSettings);
-    document.querySelector('#closeSettings').addEventListener('click', toggleSettings);
-    
-    document.querySelector('#mainInput').addEventListener('keydown', observeMainInput);
-    document.querySelector('#mainInput').addEventListener('focus', mainInputFocus);
-    document.querySelector('#mainInput').addEventListener('blur', mainInputBlur);
-
-    document.querySelector('#directExportLink').addEventListener('click', exportLocalDataToJsonFile);
-    document.querySelector('#localPurgeBtn').addEventListener('click', purgeLocalStorage);
-    document.querySelector('#importFileInput').addEventListener('change', importDataFile);
-    document.querySelector('#screensaverBtn').addEventListener('click', toggleFullScreenSaver);
-    document.querySelector('#detailToggleFull').addEventListener('click', maximizeMainContent);
-
-    document.querySelector('#stockPane-createCollection').addEventListener('click', showNewCollectionForm);
-    document.querySelector('#stockPane-watchSlideshow').addEventListener('click', startBookSlideshow);
-    document.querySelector('#stockPane-exportItems').addEventListener('click', exportSelectedTitles);
-    document.querySelector('#stockPane-deleteItems').addEventListener('click', showSerialDeleteWarning);
-    document.querySelector('#stockPane-sortAlpha').addEventListener('click', setOrder);
-    document.querySelector('#stockPane-sortAlphaReverse').addEventListener('click', setOrder);
-    document.querySelector('#stockPane-sortOrderAdded').addEventListener('click', setOrder);
-    document.querySelector('#stockPane-sortOrderAddedReverse').addEventListener('click', setOrder);
-    document.querySelector('#stockPane-listCardlets').addEventListener('click', setListType);
-    document.querySelector('#stockPane-listTable').addEventListener('click', setListType);
-    document.querySelector('#fullscreenToggler-stockPane').addEventListener('click', showFullscreenStock);
-    document.querySelector('#stockPane-configureDBs').addEventListener('click', showDBSetup);
-    document.querySelector('#stockPane-togglePaneSettings').addEventListener('click', showStockSettings);
-
-    document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
-    document.querySelector('body').addEventListener('keydown', resetScreenSaverInterval);
-
-    document.querySelector('#mainInterface').addEventListener('dblclick', toggleMainInterfacePosition);
-
-}
-
-function toggleMainInterfacePosition(e) {
-    let mi = document.querySelector('#mainInterface');
-    let coords = mi.getBoundingClientRect();
-    console.log(coords);
-}
-
-function setListType(e) {
-    let typeIcons = document.querySelectorAll('.listTypeIcon');
-    typeIcons.forEach((icon) => { icon.classList.remove('selected'); });
-
-    switch (e.target.id) {
-        case 'stockPane-listCardlets':
-            settings.displayStock = 'cardlets';
-            break;
-        case 'stockPane-listTable':
-            settings.displayStock = 'table';
-            break;
-    }
-
-    e.target.classList.add('selected');
-    saveSettings();
-    updateStockPane();
-}
-
-function setOrder(e) {
-    let orderIcons = document.querySelectorAll('.orderIcon');
-    orderIcons.forEach((icon) => { icon.classList.remove('selected'); });
-
-    switch (e.target.id) {
-        case 'stockPane-sortAlpha':
-            settings.sortOrderStock = 'alpha';
-            break;
-        case 'stockPane-sortAlphaReverse':
-            settings.sortOrderStock = 'alpha-reverse';
-            break;
-        case 'stockPane-sortOrderAdded':
-            settings.sortOrderStock = 'added';
-            break;
-        case 'stockPane-sortOrderAddedReverse':
-            settings.sortOrderStock = 'added-reverse';
-            break;
-    }
-    saveSettings();
-    e.target.classList.add('selected');
-    updateStockPane();
-}
-function saveAll() {
-
-}
-
-function saveSettings() {
-    localStorage.setItem('settings', JSON.stringify(settings));
-}
-
-function resetSettings() {
-    settings = {
-        language: 'en',
-        useBackground: true,
-        backgroundInterval: 5,
-        useFixedBackground: false,
-        fixedBackground: '',
-        useTransparency: true,
-        useAcademicMode: true,
-        inputFormat: '',
-        outputFormat: '',
-        serverURL: '',
-        useLocalStorage: true,
-        isFirstStart: true,
-        autoSaveInterval: 60,
-        sortOrderStock: 'alpha',
-        displayStock: 'table'
-    };
-    saveSettings();
-}
-
-function showFullscreenStock() {
-    console.log('HI! from showFullscreenStock!');
-    document.documentElement.requestFullscreen();
-
-    let maxIcon = document.querySelector('#maximizeToggler-stockPane');
-    let fullIcon = document.querySelector('#fullscreenToggler-stockPane');
-    let stockPane = document.querySelector('#stockPane');
-
-    maxIcon.classList.remove('fa-expand');
-    maxIcon.classList.add('fa-compress');
-    maxIcon.removeEventListener('click', maximizePane);
-    maxIcon.addEventListener('click', minimizePane);
-
-    fullIcon.classList.remove('fa-maximize');
-    fullIcon.classList.add('fa-minimize');
-    fullIcon.removeEventListener('click', showFullscreenStock);
-    fullIcon.addEventListener('click', endFullscreenStock);
-
-    stockPane.style.top = '0px';
-    stockPane.style.right = '0px';
-    stockPane.style.bottom = '0px';
-    stockPane.style.left = '0px';
-    stockPane.style.height = '100%';
-    stockPane.style.width = '100%';
-    stockPane.style.borderRadius = '15px';
-    stockPane.style.backgroundColor = 'rgba(240, 240, 240, 0.98)';
-    stockPane.style.zIndex = '10';
-}
-
-function endFullscreenStock() {
-    console.log('HI! from endFullscreen!');
-    document.exitFullscreen();
-
-    let maxIcon = document.querySelector('#maximizeToggler-stockPane');
-    let fullIcon = document.querySelector('#fullscreenToggler-stockPane');
-    let stockPane = document.querySelector('#stockPane');
-
-    maxIcon.classList.remove('fa-compress');
-    maxIcon.classList.add('fa-expand');
-    maxIcon.removeEventListener('click', minimizePane);
-    maxIcon.addEventListener('click', maximizePane);
-
-    fullIcon.classList.remove('fa-minimize');
-    fullIcon.classList.add('fa-maximize');
-    fullIcon.removeEventListener('click', endFullscreenStock);
-    fullIcon.addEventListener('click', showFullscreenStock);
-
-    stockPane.style.top = '';
-    stockPane.style.right = '20%';
-    stockPane.style.bottom = '0px';
-    stockPane.style.left = '20%';
-    stockPane.style.height = '';
-    stockPane.style.width = '';
-    stockPane.style.borderRadius = '15px 15px 0 0';
-    stockPane.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
-}
-
-function showStockSettings(e) {
-    console.log('HI! from showStockSettings!');
-    if (!document.querySelector('#stockPaneSettingsDialog')) {
-        let coords = e.target.getBoundingClientRect();
-        console.log(coords);
-        let newDiv = document.createElement('div');
-        newDiv.classList.add('paneSettingsDialog');
-        newDiv.id = 'stockPaneSettingsDialog';
-        
-        if (coords.top > 150) {
-            newDiv.style.top = coords.top - 100 + 'px';
-        } else {
-            newDiv.style.top = coords.top + 5 + 'px';
-        }
-        
-        newDiv.style.left = coords.left - 235 + 'px';
-
-        let newHeader = document.createElement('h3');
-        newHeader.textContent = 'Stock Pane Settings';
-        newHeader.classList.add('paneSettingsH3');
-        newDiv.appendChild(newHeader);
-
-        let tableSettingsHeader = document.createElement('h4');
-        tableSettingsHeader.textContent = 'Table View';
-        tableSettingsHeader.classList.add('paneSettingsH4');
-        newDiv.appendChild(tableSettingsHeader);
-
-        let tableCols = ['subtitle', 'year', 'author', 'place', 'publisher', 'signatures', 'tags', 'notes', 'quotes'];
-
-        tableCols.forEach((col) => {
-            let newitemDiv = document.createElement('div');
-            newitemDiv.classList.add('paneSettingsItem');
-            
-            let newCheck = document.createElement('input');
-            newCheck.type = 'checkbox';
-            newCheck.id = 'stockPaneTable-' + col;
-            newitemDiv.appendChild(newCheck);
-
-            let newLabel = document.createElement('label');
-            newLabel.for = 'stockPaneTable-' + col;
-            newLabel.textContent = 'Show ' + col + ' column';
-            newLabel.classList.add('labelInlineRight');
-            newitemDiv.appendChild(newLabel);
-            newDiv.appendChild(newitemDiv);
-        });
-
-        document.querySelector('body').appendChild(newDiv);
-    } else {
-        document.querySelector('#stockPaneSettingsDialog').remove();
-    }
-    
-}
-
-function showDBSetup() {
-    console.log('HI! from showDBSetup!');
-    let newDiv = document.createElement('div');
-    newDiv.id = 'stockDBSetup';
-    newDiv.classList.add('fullscreenDialogTop');
-    newDiv.style.backgroundColor = 'rgba(250, 250, 250, 0.9)';
-
-    newHeader = document.createElement('h1');
-    newHeader.textContent = 'Data Storage Setup';
-    newDiv.appendChild(newHeader);
-
-    newInnerDiv = document.createElement('div');
-    newInnerDiv.classList.add('fullwindowInnerDiv');
-    newDiv.appendChild(newInnerDiv);
-
-    newDBItem = document.createElement('div');
-    newDBItem.classList.add('dbItem');
-    newInnerDiv.appendChild(newDBItem);
-
-    newDBIcon = document.createElement('i');
-    newDBIcon.classList.add('fa-solid');
-    newDBIcon.classList.add('fa-database');
-    newDBIcon.classList.add('dbItemIcon');
-    newDBItem.appendChild(newDBIcon);
-
-    newName = document.createElement('div');
-    newName.classList.add('dbName');
-    newName.textContent = 'Local Storage';
-    newDBItem.appendChild(newName);
-
-    newBrowserDetails = document.createElement('div');
-    newBrowserDetails.classList.add('dbDetails');
-    newBrowserDetails.textContent = getBrowserName();
-    newDBItem.appendChild(newBrowserDetails);
-
-    newSize = document.createElement('div');
-    newSize.classList.add('dbDetails');
-    let lcsizeBytes = new Blob(Object.values(localStorage)).size; 
-    let kbSize = ((lcsizeBytes * 2) / 1024).toFixed(2) + 'kb';
-    newSize.textContent = kbSize;
-    newDBItem.appendChild(newSize);
-
-    document.querySelector('body').appendChild(newDiv);
-}
-
-function getBrowserName() {
-    let userAgent = navigator.userAgent;
-    let browserName;
-         
-    if(userAgent.match(/chrome|chromium|crios/i)){
-            browserName = "Chrome";
-    } else if (userAgent.match(/firefox|fxios/i)){
-            browserName = "Firefox";
-    }  else if (userAgent.match(/safari/i)){
-            browserName = "Safari";
-    } else if (userAgent.match(/opr\//i)){
-            browserName = "Opera";
-    } else if (userAgent.match(/edg/i)){
-            browserName = "Edge";
-    } else {
-            browserName="No browser detection";
-    }
-    return browserName;
-}
-
-function startBookSlideshow(e) {
-    if (transientSelection.size > 0) {
-
-    } else {
-        showMessage('The book slideshow could not be started, because there were no titles selected!');
-    }
-}
-
-function exportSelectedTitles(e) {
-    if (transientSelection.size > 0) {
-
-    } else {
-        showMessage('The export could not be started, because there were no titles selected!');
-    }
-}
-
-function showSerialDeleteWarning(e) {
-    if (transientSelection.size > 0) {
-        let newDiv = document.createElement('div');
-        newDiv.classList.add('fullscreenDialog');
-        newDiv.id = 'stockPane-serialDeleteDialog';
-
-        let newInnerDiv = document.createElement('div');
-        newInnerDiv.classList.add('fullscreenDialogInner');
-        newDiv.appendChild(newInnerDiv);
-
-        let newH = document.createElement('h1');
-        newH.classList.add('fullscreenWarning');
-        newH.textContent = 'WARNING!';
-        newInnerDiv.appendChild(newH);
-
-        let newDesc = document.createElement('p');
-        newDesc.classList.add('fullscreenDescription');
-        newDesc.textContent = 'You are about to DELETE ' + transientSelection.size + ' titles FOREVER!';
-        newInnerDiv.appendChild(newDesc);
-
-        let newH2 = document.createElement('h2');
-        newH2.classList.add('fullscreenRequest');
-        newH2.textContent = 'Are you really sure you wanna do this???';
-        newInnerDiv.appendChild(newH2);
-
-        let newCount = document.createElement('p');
-        newCount.textContent = 'Titles to be deleted';
-        newCount.classList.add('fullscreenListHeader');
-        newCount.classList.add('fullscreenUnderline');
-        newInnerDiv.appendChild(newCount);
-
-        let newList = document.createElement('ol');
-        newList.classList.add('fullscreenList');
-        newInnerDiv.appendChild(newList);
-
-        Array.from(transientSelection).forEach((item) => {
-            let newItem = document.createElement('li');
-            newItem.textContent = item;
-            newList.appendChild(newItem);
-        });
-
-        let newBtnCancel = document.createElement('button');
-        newBtnCancel.textContent = 'Forget it - Do not do it!';
-        newBtnCancel.classList.add('fullscreenBtnCancel');
-        newBtnCancel.addEventListener('click', () => { document.querySelector('#stockPane-serialDeleteDialog').remove(); });
-        newDiv.appendChild(newBtnCancel);
-
-        let newBtnOk = document.createElement('button');
-        newBtnOk.textContent = 'OK - DO IT!';
-        newBtnOk.classList.add('fullscreenBtnOk');
-        newBtnOk.addEventListener('click', serialDeleteBooks);
-        newDiv.appendChild(newBtnOk);
-
-        document.querySelector('body').appendChild(newDiv);
-    } else {
-        showMessage('The fire-dumpster could not be activated, because there were no titles selected!');
-    }
-}
-
-function showMessage(message) {
-    let date = new Date().toLocaleTimeString().replaceAll(':', '-');
-    let newDiv = document.createElement('div');
-    newDiv.classList.add('screenMessage');
-    newDiv.id = 'message-' + date;
-    newDiv.style.left = (window.innerWidth / 2 - 150) + 'px';
-    let innerDiv = document.createElement('div');
-    innerDiv.textContent = message;
-    newDiv.appendChild(innerDiv);
-
-    let closeBtn = document.createElement('i');
-    closeBtn.classList.add('fa-solid');
-    closeBtn.classList.add('fa-square-xmark');
-    closeBtn.addEventListener('click', () => { document.querySelector('#message-' + date). remove(); });
-    newDiv.appendChild(closeBtn);
-
-    document.querySelector('body').appendChild(newDiv);
-}
-
-function serialDeleteBooks(e) {
-    let n = transientSelection.size;
-    Array.from(transientSelection).forEach((book) => { books.delete(book); });
-    showMessage(n + ' books have been deleted');
-}
-
-function showNewCollectionForm(e) {
-    if (transientSelection.size > 0) {
-        let coords = e.target.getBoundingClientRect();
-
-        let newDiv = document.createElement('div');
-        newDiv.classList.add('modalDialog');
-        newDiv.id = 'stockPane-newCollectionModal';
-        newDiv.style.top = coords.top + 30 + 'px';
-        newDiv.style.left = coords.left - 50 + 'px';
-
-        let newInput = document.createElement('input');
-        newInput.type = 'text';
-        newInput.placeholder = 'A Name for your new Collection';
-        newInput.id = 'stockPane-newCollectionInput';
-        newDiv.appendChild(newInput);
-
-        let newBtn = document.createElement('button');
-        newBtn.type = 'button';
-        newBtn.textContent = 'Create';
-        newBtn.addEventListener('click', createNewCollection);
-        newDiv.appendChild(newBtn);
-        
-        document.querySelector('body').appendChild(newDiv);
-    } else {
-        showMessage('A Collection could not be created, because there were no titles selected!');
-    }
-
-}
-
-function createNewCollection(e) {
-    let name = document.querySelector('#stockPane-newCollectionInput').value;
-    let c = new Collection(name, { titles: Array.from(transientSelection) });
-    document.querySelector('#stockPane-newCollectionModal').remove();
-    showMessage('A new collection named "' + name + '" has been created!');
-}
-
-function showNewTagInput(e) {
-
-}
-
-function mainInputFocus() {
-    let mainInputClue = document.querySelector('#mainInputClue');
-    mainInputClue.style.color = 'rgba(30, 30, 30, 1.0)';
-    mainInputClue.classList.add('shake-horizontal');
-}
-
-function mainInputBlur() {    
-    let mainInputClue = document.querySelector('#mainInputClue');
-    mainInputClue.classList.remove('shake-horizontal');
-    mainInputClue.style.color = 'rgba(100, 100, 100, 0.5)';
-}
-
-function toggleSettings() {
-    let settings = document.querySelector('#settings');
-    settings.style.visibility === 'visible' ? settings.style.visibility = 'hidden' : settings.style.visibility = 'visible';
-    document.querySelector('#numbersPurge').innerHTML = 'Clicking the purge button will delete <em>' + books.size + ' books</em>, <em>' + authors.size + ' authors</em>, and <em>' + publishers.size + ' publishers</em>!!!';
-}
-
-function toggleConfigurator() {
-    let configurator = document.querySelector('#formatConfigurator');
-    configurator.style.visibility === 'visible' ? configurator.style.visibility = 'hidden' : configurator.style.visibility = 'visible';
-}
-
-function handleSettingsChange(e) {
-    switch(e.target.id) {
-
-    }
-}
-
-function exportLocalDataToJsonFile() {
-    let exportData = [];
-    let booksStr = JSON.stringify(Object.fromEntries(books));
-    let authorsStr = JSON.stringify(Object.fromEntries(authors));
-    let pubsStr = JSON.stringify(Object.fromEntries(publishers));
-    let quotesStr = JSON.stringify(Object.fromEntries(quotes));
-    let notesStr = JSON.stringify(Object.fromEntries(notes));
-    let tagsStr = JSON.stringify(Object.fromEntries(tags));
-    let signStr = JSON.stringify(Object.fromEntries(signatures));
-
-    exportData.push(booksStr);
-    exportData.push(authorsStr);
-    exportData.push(pubsStr);
-    exportData.push(quotesStr);
-    exportData.push(notesStr);
-    exportData.push(tagsStr);
-    exportData.push(signStr);
-
-    let expStr = JSON.stringify(exportData);
-
-    rightNow = new Date();
-    filename = 'books-' + (rightNow.getMonth()+1) + '-' + rightNow.getDate() + '-' + rightNow.getFullYear() + '--' + rightNow.getHours() + '-' + rightNow.getMinutes() + '.json';
-    booksUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(expStr);
-    let ghostLink = document.createElement('a');
-    ghostLink.setAttribute('href', booksUri);
-    ghostLink.setAttribute('download', filename);
-    ghostLink.click();
-}
-
-function importDataFile(e) {
-    let files = e.target.files;
-    let reader = new FileReader();
-    reader.onload = createBooksFromFile;
-    reader.readAsText(files[0]);
-}
-
-function createBooksFromFile(e) {
-    let importData = JSON.parse(e.target.result);
-    console.log(importData);
-
-    let importedBooks = new Map(Object.entries(JSON.parse(importData[0])));
-    console.log(importedBooks);
-    Array.from(importedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
-
-    let importedAuthors = new Map(Object.entries(JSON.parse(importData[1])));
-    Array.from(importedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
-    console.log(importedAuthors);
-
-    let importedPublishers = new Map(Object.entries(JSON.parse(importData[2])));
-    Array.from(importedPublishers).forEach((pub) => { publishers.set(pub[0], new Publisher(pub[0], pub[1].place, pub[1])); });
-    console.log(importedPublishers);
-    
-    let importedQuotes = new Map(Object.entries(JSON.parse(importData[3])));
-    Array.from(importedQuotes).forEach((quote) => { quotes.set(quote[0], new Quote(quote[1].quote_text, quote[1])); });
-    console.log(importedQuotes);
-
-    let importedNotes = new Map(Object.entries(JSON.parse(importData[4])));
-    Array.from(importedNotes).forEach((note) => { notes.set(note[0], new Note(note[1].note_text, note[1])); });
-    console.log(importedNotes);
-
-    let importedTags = new Map(Object.entries(JSON.parse(importData[5])));
-    Array.from(importedTags).forEach((tag) => { tags.set(tag[0], new Tag(tag[1].label, tag[1])); });
-    console.log(importedTags);
-
-    let importedSignatures = new Map(Object.entries(JSON.parse(importData[6])));
-    Array.from(importedSignatures).forEach((sign) => { signatures.set(sign[0], new Signature(sign[1].label, sign[1])); });
-    console.log(importedSignatures);
-
-    console.log('JSON Data successfully imported! ' + books.size + ' Books added.');
-    updateDisplay();
-    
-}
-
-function requestFull() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch((err) => console.log(err.message));
-    }
-}
-
-function toggleFullScreenSaver() {
-    /* requestFull(); */
-    
-    let num = Math.round(Math.random() * (quotes.size - 1));
-    let cites = Array.from(quotes);
-
-    if (document.querySelector('.screensaver')) {
-        document.querySelector('.screensaver').remove();
-    }
-
-    let screensaver = document.createElement('div');
-    screensaver.classList.add('screensaver');
-    
-    let letterContainer = document.createElement('div');
-    letterContainer.classList.add('screensaver-lettercontainer');
-
-    let text = cites[num][1].quote_text;
-    
-    letterContainer.appendChild(createScreensaverQuote(text));
-
-    screensaver.appendChild(letterContainer);
-
-    document.querySelector('body').appendChild(screensaver);
-    /* document.querySelector('body').addEventListener('keydown', (e) => {
-        if (e.code === 'Space') { toggleFullScreenSaver(); }
-    }); */
-
-    document.querySelector('body').removeEventListener('mousemove', resetScreenSaverInterval);
-    document.querySelector('body').addEventListener('mousemove', exitFullscreenSaver);
-    /*
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-    } else if (document.exitFullscreen) {
-        document.exitFullscreen();
-    }
-    */
-
-}
-
-function createScreensaverQuote(text) {
-    let wordsDiv = document.createElement('div');
-    wordsDiv.classList.add('screenSaverWords');
-    
-    let words = text.split(' ');
-    let numberLetters = text.length;
-
-    let timing = ['ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear'];
-    let sizeFactor = 150 / numberLetters;
-
-    words.forEach((word) => {
-        let wordDiv = document.createElement('div');
-        wordDiv.classList.add('screenSaverWord');
-        
-        let wordN = (Math.random() * 0.7) + 2.0;
-        let wordD = Math.random() * 0.2;
-        let wordT = Math.round(Math.random() * 3);
-
-        Array.from(word).forEach((letter) => {
-            let letterChar = document.createElement('div');
-            letterChar.classList.add('screenSaverLetter');
-            if (numberLetters > 150) {
-                letterChar.style.fontSize = Math.round(((Math.random() * 200) + 400) * sizeFactor) + '%';
-            } else {
-                letterChar.style.fontSize = Math.round((Math.random() * 200) + (400)) + '%';
-            }
-            let n = (wordN + (Math.random() * 0.15)).toFixed(2);
-            let m = Math.round((Math.random() * 25) + 230);
-            let o = (Math.random() * 0.45)+ 0.55;
-            let t = wordT + Math.round(Math.random());
-            let d = (wordD + (Math.random() * 0.1)).toFixed(2);
-            console.log('n:' + n + ' - d: ' + d);
-            letterChar.style.color = `rgba(${m}, ${m}, ${m}, ${o})`;
-            letterChar.style.animation = `text-flicker-in-glow ${n}s ${timing[t]} ${d}s both`;
-            letterChar.textContent = letter;
-            wordDiv.appendChild(letterChar);
-            
-        });
-
-        wordsDiv.appendChild(wordDiv);
-    });
-
-    return wordsDiv;
-}
-
-function exitFullscreenSaver() {
-    document.querySelector('body').removeEventListener('mousemove', exitFullscreenSaver);
-    document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
-    if (document.fullscreenElement) { document.exitFullscreen(); }
-    document.querySelector('.screensaver').remove();
-    resetScreenSaverInterval();
-}
-
-function resetScreenSaverInterval() {
-    clearInterval(screensaver);
-    screensaver = setInterval(toggleFullScreenSaver, 30000);
-    console.log('HI! from reset!');
-}
-
-function initializeApp() {
-    initializeLocalStorage();
-
-    equipListeners();
-    updateDisplay();
-    showLastAdditions();
-}
-
-function initializeLocalStorage() {
-    if (!localStorage.getItem('settings')) {
-        populateLocalStorage();
-    } else {
-        loadLocalStorage();
-    }
-}
-
-function populateLocalStorage() {
-    localStorage.setItem('settings', JSON.stringify(settings));
-    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
-    localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
-    localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
-    localStorage.setItem('quotes', JSON.stringify(Object.fromEntries(quotes)));
-    localStorage.setItem('notes', JSON.stringify(Object.fromEntries(notes)));
-    localStorage.setItem('signatures', JSON.stringify(Object.fromEntries(signatures)));
-    localStorage.setItem('tags', JSON.stringify(Object.fromEntries(tags)));
-    localStorage.setItem('collections', JSON.stringify(Object.fromEntries(collections)));
-}
-
-function loadLocalStorage() {
-    settings = JSON.parse(localStorage.getItem('settings'));
-    
-    /* Some attributes of the settings object need to be transformed to their original form after persisting them! */
-    /* settings.useBackground = settings.useBackground === 'true';
-    settings.useFixedBackground = settings.useFixedBackground === 'true';
-    settings.useTransparency = settings.useTransparency === 'true';
-    settings.useAcademicMode = settings.useAcademicMode === 'true';
-    settings.useLocalStorage = settings.useLocalStorage === 'true';
-    settings.isFirstStart = settings.isFirstStart === 'true';
-    */
-    /* The JSON stringify method stripped our class instances of their methods so we have to re-construct them! */
-    persistedBooks = new Map(Object.entries(JSON.parse(localStorage.getItem('books'))));
-    persistedAuthors = new Map(Object.entries(JSON.parse(localStorage.getItem('authors'))));
-    persistedPublishers = new Map(Object.entries(JSON.parse(localStorage.getItem('publishers'))));
-    persistedQuotes = new Map(Object.entries(JSON.parse(localStorage.getItem('quotes'))));
-    persistedNotes = new Map(Object.entries(JSON.parse(localStorage.getItem('notes'))));
-    persistedSignatures = new Map(Object.entries(JSON.parse(localStorage.getItem('signatures'))));
-    persistedTags = new Map(Object.entries(JSON.parse(localStorage.getItem('tags'))));
-    persistedCollections = new Map(Object.entries(JSON.parse(localStorage.getItem('collections'))));
-
-    books = new Map();
-    authors = new Map();
-    publishers = new Map();
-    quotes = new Map();
-    notes = new Map();
-    signatures = new Map();
-    tags = new Map();
-    collections = new Map();
-
-    Array.from(persistedBooks).forEach((book) => { books.set(book[0], new Book(book[0], book[1])); });
-    Array.from(persistedAuthors).forEach((author) => { authors.set(author[0], new Author(author[1].surname, author[1].prename, author[1])); });
-    Array.from(persistedPublishers).forEach((publisher) => { publishers.set(publisher[0], new Publisher(publisher[1].name, publisher[1].places[0], publisher[1])); });
-    Array.from(persistedQuotes).forEach((quote) => { quotes.set(quote[0], new Quote(quote[1].quote_text, quote[1])); });
-    Array.from(persistedNotes).forEach((note) => { notes.set(note[0], new Note(note[1].note_text, note[1])); });
-    Array.from(persistedSignatures).forEach((signature) => { signatures.set(signature[0], new Signature(signature[1].label, signature[1])); });
-    Array.from(persistedTags).forEach((tag) => { tags.set(tag[0], new Tag(tag[1].label, tag[1])); });
-    Array.from(persistedCollections).forEach((collection) => { collections.set(collection[0], new Collection(collection[1].title, collection[1])); });
-    /* End Instances Reconstruction */
-
-}
-
-function purgeLocalStorage() {
-    books = new Map();
-    authors = new Map();
-    publishers = new Map();
-
-    localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
-    localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
-    localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
-    updateDisplay();
 }
