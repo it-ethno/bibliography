@@ -1,4 +1,6 @@
+/********************/
 /* Global Variables */
+/********************/
 
 let settings = {
     language: 'en',
@@ -616,6 +618,7 @@ const uid = () => { return (Date.now().toString(32) + Math.random().toString(16)
 /* Entry Point */
 initializeApp();
 
+
 function createBooksFromFile(e) {
     let importData = JSON.parse(e.target.result);
     console.log(importData);
@@ -691,7 +694,7 @@ function createScreensaverQuote(text) {
             let o = (Math.random() * 0.40)+ 0.60;
             let t = wordT + Math.round(Math.random());
             let d = (wordD + (Math.random() * 0.1)).toFixed(2);
-            console.log('n:' + n + ' - d: ' + d);
+            
             letterChar.style.color = `rgba(${m}, ${m}, ${m}, ${o})`;
             letterChar.style.animation = `text-flicker-in-glow ${n}s ${timing[t]} ${d}s both`;
             letterChar.textContent = letter;
@@ -1313,46 +1316,231 @@ function setStockOrderIcon() {
 }
 
 function showDBSetup() {
-    console.log('HI! from showDBSetup!');
     let newDiv = document.createElement('div');
     newDiv.id = 'stockDBSetup';
     newDiv.classList.add('fullscreenDialogTop');
     newDiv.style.backgroundColor = 'rgba(250, 250, 250, 0.9)';
 
-    newHeader = document.createElement('h1');
+    let newHeader = document.createElement('h1');
     newHeader.textContent = 'Data Storage Setup';
+    newHeader.classList.add('dbSettingsHeader');
     newDiv.appendChild(newHeader);
 
-    newInnerDiv = document.createElement('div');
+    let newInnerDiv = document.createElement('div');
     newInnerDiv.classList.add('fullwindowInnerDiv');
     newDiv.appendChild(newInnerDiv);
 
-    newDBItem = document.createElement('div');
-    newDBItem.classList.add('dbItem');
-    newInnerDiv.appendChild(newDBItem);
+    let newKnown = document.createElement('h2');
+    newKnown.textContent = 'Known Sources';
+    newKnown.classList.add('dbOptionsHeader');
+    newKnown.style.marginTop = '0px';
+    newInnerDiv.appendChild(newKnown);
 
-    newDBIcon = document.createElement('i');
+    let newDataSources = document.createElement('div');
+    newDataSources.classList.add('dbDataSources');
+    newInnerDiv.appendChild(newDataSources);
+
+    let newDBItem = document.createElement('div');
+    newDBItem.classList.add('dbItem');
+    newDataSources.appendChild(newDBItem);
+    
+    let newDBInfo = document.createElement('div');
+    newDBInfo.classList.add('dbInfo');
+    newDBItem.appendChild(newDBInfo);
+
+    let newDBIcon = document.createElement('i');
     newDBIcon.classList.add('fa-solid');
     newDBIcon.classList.add('fa-database');
     newDBIcon.classList.add('dbItemIcon');
-    newDBItem.appendChild(newDBIcon);
+    newDBInfo.appendChild(newDBIcon);
 
-    newName = document.createElement('div');
+    let newName = document.createElement('div');
     newName.classList.add('dbName');
     newName.textContent = 'Local Storage';
-    newDBItem.appendChild(newName);
+    newDBInfo.appendChild(newName);
 
-    newBrowserDetails = document.createElement('div');
+    let newBrowserDetails = document.createElement('div');
     newBrowserDetails.classList.add('dbDetails');
     newBrowserDetails.textContent = getBrowserName();
-    newDBItem.appendChild(newBrowserDetails);
+    newDBInfo.appendChild(newBrowserDetails);
 
-    newSize = document.createElement('div');
+    let newSize = document.createElement('div');
     newSize.classList.add('dbDetails');
     let lcsizeBytes = new Blob(Object.values(localStorage)).size; 
-    let kbSize = ((lcsizeBytes * 2) / 1024).toFixed(2) + 'kb';
+    let kbSize = ((lcsizeBytes * 2) / 1024).toFixed(2) + 'kb / ~10.240kb';
     newSize.textContent = kbSize;
-    newDBItem.appendChild(newSize);
+    newDBInfo.appendChild(newSize);
+
+    let newDescription = document.createElement('div');
+    newDescription.classList.add('dbDescription');
+    newDescription.textContent = 'Local Storage is specific to a single browser installation. You should always use the auto save feature, when using this type of storage!';
+    newDBInfo.appendChild(newDescription);
+
+    let newActions = document.createElement('div');
+    newActions.classList.add('dbActions');
+
+    let newImport = document.createElement('i');
+    newImport.classList.add('fa-solid');
+    newImport.classList.add('fa-file-import');    
+    newImport.classList.add('dbActionIcon');
+    newImport.title = 'Import data from a file';
+    newActions.appendChild(newImport);
+
+    let newExport = document.createElement('i');
+    newExport.classList.add('fa-solid');
+    newExport.classList.add('fa-file-export');    
+    newExport.classList.add('dbActionIcon');
+    newExport.title = 'Export data to a file';
+    newActions.appendChild(newExport);
+
+    newDBItem.appendChild(newActions);
+
+    let newOptionsArrow = document.createElement('i');
+    newOptionsArrow.classList.add('fa-solid');
+    newOptionsArrow.classList.add('fa-arrow-down');
+    newOptionsArrow.classList.add('dbOptionsArrow');
+    newInnerDiv.appendChild(newOptionsArrow);
+
+    let newOptionsHeader = document.createElement('h2');
+    newOptionsHeader.classList.add('dbOptionsHeader');
+    newOptionsHeader.textContent = 'Options Available';
+    newInnerDiv.appendChild(newOptionsHeader);
+
+    let newOptionsAvailable = document.createElement('div');
+    newOptionsAvailable.classList.add('dbOptionsAvailable');
+    newInnerDiv.appendChild(newOptionsAvailable);
+
+
+    let newOptionInstall = document.createElement('div');
+    newOptionInstall.classList.add('dbItem');
+    newOptionsAvailable.appendChild(newOptionInstall);
+
+    let newInstallInfo = document.createElement('div');
+    newInstallInfo.classList.add('dbInfo');
+    newOptionInstall.appendChild(newInstallInfo);
+
+    let newInstallIcon = document.createElement('i');
+    newInstallIcon.classList.add('fa-solid');
+    newInstallIcon.classList.add('fa-download');
+    newInstallIcon.classList.add('dbItemIcon');
+    newInstallInfo.appendChild(newInstallIcon);
+
+    let newInstallName = document.createElement('div');
+    newInstallName.classList.add('dbOptionName');
+    newInstallName.textContent = 'Install Bibliography locally';
+    newInstallInfo.appendChild(newInstallName);
+
+    let newInstallDesc = document.createElement('div');
+    newInstallDesc.classList.add('dbDescription');
+    newInstallDesc.textContent = 'You can install the whole Bibliography app locally. This will give you your own save data storage independent from any browser or server';
+    newInstallInfo.appendChild(newInstallDesc);
+
+    let newInstallActions = document.createElement('div');
+    newInstallActions.classList.add('dbActions');
+
+    let newInstallCheck = document.createElement('i');
+    newInstallCheck.classList.add('fa-solid');
+    newInstallCheck.classList.add('fa-check');    
+    newInstallCheck.classList.add('dbActionIcon');
+    newInstallCheck.title = 'Install Bibliography locally';
+    newInstallActions.appendChild(newInstallCheck);
+
+    let newInstallQuest = document.createElement('i');
+    newInstallQuest.classList.add('fa-solid');
+    newInstallQuest.classList.add('fa-circle-question');    
+    newInstallQuest.classList.add('dbActionIcon');
+    newInstallQuest.title = 'Detailed information on installing Bibliography';
+    newInstallActions.appendChild(newInstallQuest);
+
+    newOptionInstall.appendChild(newInstallActions);
+
+
+    let newOptionUpgrade = document.createElement('div');
+    newOptionUpgrade.classList.add('dbItem');
+    newOptionsAvailable.appendChild(newOptionUpgrade);
+
+    let newUpgradeInfo = document.createElement('div');
+    newUpgradeInfo.classList.add('dbInfo');
+    newOptionUpgrade.appendChild(newUpgradeInfo);
+
+    let newUpgradeIcon = document.createElement('i');
+    newUpgradeIcon.classList.add('fa-solid');
+    newUpgradeIcon.classList.add('fa-database');
+    newUpgradeIcon.classList.add('dbItemIcon');
+    newUpgradeInfo.appendChild(newUpgradeIcon);
+
+    let newUpgradeName = document.createElement('div');
+    newUpgradeName.classList.add('dbOptionName');
+    newUpgradeName.textContent = 'Upgrade Local Storage to IndexedDB';
+    newUpgradeInfo.appendChild(newUpgradeName);
+
+    let newUpgradeDesc = document.createElement('div');
+    newUpgradeDesc.classList.add('dbDescription');
+    newUpgradeDesc.textContent = 'Your Local Storage can be upgraded to an IndexedDB. This will give you more memory and activate some additional features.';
+    newUpgradeInfo.appendChild(newUpgradeDesc);
+
+    let newUpgradeActions = document.createElement('div');
+    newUpgradeActions.classList.add('dbActions');
+
+    let newUpgradeCheck = document.createElement('i');
+    newUpgradeCheck.classList.add('fa-solid');
+    newUpgradeCheck.classList.add('fa-check');    
+    newUpgradeCheck.classList.add('dbActionIcon');
+    newUpgradeCheck.title = 'Upgrade the data storage inside this browser to IndexedDB';
+    newUpgradeActions.appendChild(newUpgradeCheck);
+
+    let newUpgradeQuest = document.createElement('i');
+    newUpgradeQuest.classList.add('fa-solid');
+    newUpgradeQuest.classList.add('fa-circle-question');    
+    newUpgradeQuest.classList.add('dbActionIcon');
+    newUpgradeQuest.title = 'Detailed information on storage inside the browser';
+    newUpgradeActions.appendChild(newUpgradeQuest);
+
+    newOptionUpgrade.appendChild(newUpgradeActions);
+
+
+    let newOptionAddServer = document.createElement('div');
+    newOptionAddServer.classList.add('dbItem');
+    newOptionsAvailable.appendChild(newOptionAddServer);
+
+    let newAddInfo = document.createElement('div');
+    newAddInfo.classList.add('dbInfo');
+    newOptionAddServer.appendChild(newAddInfo);
+
+    let newAddIcon = document.createElement('i');
+    newAddIcon.classList.add('fa-solid');
+    newAddIcon.classList.add('fa-server');
+    newAddIcon.classList.add('dbItemIcon');
+    newAddInfo.appendChild(newAddIcon);
+
+    let newAddName = document.createElement('div');
+    newAddName.classList.add('dbOptionName');
+    newAddName.textContent = 'Add a new Server';
+    newAddInfo.appendChild(newAddName);
+
+    let newAddDesc = document.createElement('div');
+    newAddDesc.classList.add('dbDescription');
+    newAddDesc.textContent = 'Your can add a new local or remote bibliography server for data storage. This can be anonymous or with user credentials.';
+    newAddInfo.appendChild(newAddDesc);
+
+    let newAddActions = document.createElement('div');
+    newAddActions.classList.add('dbActions');
+
+    let newAddPlus = document.createElement('i');
+    newAddPlus.classList.add('fa-solid');
+    newAddPlus.classList.add('fa-square-plus');    
+    newAddPlus.classList.add('dbActionIcon');
+    newAddPlus.title = 'Add a new Server';
+    newAddActions.appendChild(newAddPlus);
+
+    let newAddQuest = document.createElement('i');
+    newAddQuest.classList.add('fa-solid');
+    newAddQuest.classList.add('fa-circle-question');    
+    newAddQuest.classList.add('dbActionIcon');
+    newAddQuest.title = 'Detailed information on bibliography servers';
+    newAddActions.appendChild(newAddQuest);
+
+    newOptionAddServer.appendChild(newAddActions);
 
     document.querySelector('body').appendChild(newDiv);
 }

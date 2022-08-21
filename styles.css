@@ -183,17 +183,38 @@ td {
   color:rgba(100, 100, 100, 0.5);
 }
 
+.dbActionIcon {
+  margin-right: 10px;
+}
+
+.dbActions {
+  background-color: rgba(100, 100, 100, 0.8);
+  border-radius: 0 0 10px 10px;
+  padding: 10px 20px;
+  color: rgba(250, 250, 250, 1);
+  display: flex;
+}
+
+.dbDescription {
+  font-size: 70%;
+  margin-top: 10px;
+}
+
 .dbDetails {
   font-size: 90%;
 }
 
-.dbItem {
+.dbInfo {
   color:rgba(70, 70, 70, 0.9);
   padding: 20px;
   background-color: rgba(230, 230, 230, 1);
   text-align: center;
-  border-radius: 10px;
+  border-radius: 10px 10px 0 0;
   font-family: 'DM Mono';
+}
+
+.dbItem {
+  width: 250px;
 }
 
 .dbItemIcon {
@@ -202,6 +223,35 @@ td {
 
 .dbName {
   font-size: 130%;
+}
+
+.dbOptionName {
+  font-size: 100%;
+  margin-top: 10px;
+}
+
+.dbOptionsArrow {
+  font-size: 200%;
+  color: rgba(70, 70, 70, 0.9);
+  margin-top: 20px;
+}
+
+.dbOptionsAvailable {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  align-content: stretch;
+}
+
+.dbOptionsHeader {
+  color: rgb(131, 181, 25);
+  font-family: 'DM Mono';
+  margin-top: 20px;
+}
+
+.dbSettingsHeader {
+  font-family: 'DM Mono';
+  font-size: 180%;
 }
 
 .detailAction {
@@ -301,7 +351,7 @@ td {
   color: rgba(250, 250, 250, 1);
   font-family: 'Fredericka the Great';
   transition: top 1s ease, right 1s ease, bottom 1s ease, left 1s ease;
-  padding: 50px;
+  padding: 30px;
 }
 
 .fullscreenDialogInner {
@@ -329,7 +379,10 @@ td {
 }
 .fullwindowInnerDiv {
   display: flex;
-  margin-top: 30px;
+  flex-direction: column;
+  margin-top: 20px;
+  align-items: center;
+  justify-content: center;
 }
 
 .headerAction {
