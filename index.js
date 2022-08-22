@@ -82,7 +82,6 @@ class Author {
     }
 
     showDetails = () => {
-        console.log('HI! from showDetails!');
         showAuthorDetailsDisplay();
         this.fillBooksArray();
         document.querySelector('#authorName').innerHTML = this.prename + ' ' + this.surname;
@@ -114,12 +113,16 @@ class Author {
 
         let quotesDisplay = document.querySelector('#authorQuotesList');
         quotesDisplay.innerHTML = '';
-        authorQuotes.forEach((quote) => {
+        if (authorQuotes.length > 0) {
+            authorQuotes.forEach((quote) => {
             let newDiv = document.createElement('div');
             newDiv.classList.add('quoteItem');
             newDiv.innerHTML = '&quot;' + quote + '&quot;';
             quotesDisplay.appendChild(newDiv);
         });
+        } else {
+            quotesDisplay.innerHTML = 'No quotes yet';
+        }
 
     }
 
@@ -217,6 +220,7 @@ class Book {
 
     showDetails = () => {
         prepareForDetailsView();
+        document.querySelector('#detailView').setAttribute('data-title', this.title);
         document.querySelector('#detailTitle').innerHTML = '&laquo; ' + this.title + ' &raquo;';
         if (this.subtitle !== '') {
             document.querySelector('#detailSubtitle').innerHTML = '&raquo; ' + this.subtitle + ' &laquo;';
@@ -275,6 +279,7 @@ class Book {
         quotePlus.addEventListener('click', this.addQuoteForm);
         document.querySelector('#quotesHeader').appendChild(quotePlus);        
         
+        this.repairQuotesList();
 
         if (this.signatures.length > 0) {
             this.signatures.forEach((sign) => {
@@ -304,8 +309,11 @@ class Book {
             this.quotes.forEach((quote) => {
                 let quoteObj = quotes.get(quote);
                 let newDiv = document.createElement('div');
+                newDiv.id = 'quote-' + quoteObj.uid;
                 newDiv.classList.add('quoteItem');
                 newDiv.innerHTML = '&quot;' + quoteObj.quote_text + '&quot; <span class="quotePage">(page ' + quoteObj.page + ')</span>';
+                newDiv.addEventListener('mouseenter', showQuoteActions);
+                newDiv.addEventListener('mouseleave', hideQuoteActions);
                 quotesList.appendChild(newDiv);
             });
         } else {
@@ -323,6 +331,8 @@ class Book {
         } else {
             tagsList.textContent = 'No Tags yet';
         }
+
+
     }
 
     addSignatureForm = (e) => {
@@ -520,11 +530,22 @@ class Book {
         let title = document.querySelector('#addQuoteTitleInput-' + this.uid).value;
         let text = document.querySelector('#addQuoteTextArea-' + this.uid).value;
         let page = document.querySelector('#addQuotePageInput-' + this.uid).value;
-        let newQuote = new Quote(text, { title: title, page: page });
+        let newQuote = new Quote(text, { title: title, page: page, book_title: this.title, book_id: this.uid });
         this.quotes.push(newQuote.uid);
         this.save();
         document.querySelector('#quoteForm-' + this.uid).remove();
         this.showDetails();
+    }
+
+    repairQuotesList = () => {
+        let quotesSet = new Set(this.quotes);
+        quotesSet.forEach((quote) => {
+            if (!quotes.get(quote)) {
+                quotesSet.delete(quote);
+            }
+        });
+        this.quotes = Array.from(quotesSet);
+        this.save();
     }
 
     save = () => {
@@ -622,6 +643,7 @@ class Publisher {
 class Quote {
     uid;
     book_id;
+    book_title;
     page;
     quote_text;
     notes;
@@ -633,6 +655,7 @@ class Quote {
         this.quote_text = quote;
         this.page = options.page || 'unknown';
         this.book_id = options.book_id || 'unknown';
+        this.book_title = options.book_title || '';
         this.date_added = options.date_added || Date.now();
         this.tags = options.tags || [];
         this.notes = options.notes || [];
@@ -640,6 +663,55 @@ class Quote {
         quotes.set(this.uid, this);
         localStorage.setItem('quotes', JSON.stringify(Object.fromEntries(quotes)));
 
+    }
+
+    delete = () => {
+        console.log('HI! from quote delete!');
+        quotes.delete(this.uid);
+        this.save();
+        showMessage('Quote has been deleted!');
+        let book = document.querySelector('#detailView').getAttribute('data-title');
+        books.get(book).showDetails();
+    }
+
+    save = () => {
+        localStorage.setItem('quotes', JSON.stringify(Object.fromEntries(quotes)));
+    }
+
+    saveModalEdit = () => {
+        console.log('HI! from saveEdit!');
+        this.quote_text = document.querySelector('#quoteEditInput-' + this.uid).value;
+        this.save();
+        document.querySelector('#quoteEdit-' + this.uid).remove();
+        showMessage('Quote successfully edited!');
+        let book = document.querySelector('#detailView').getAttribute('data-title');
+        books.get(book).showDetails();
+    }
+
+    showEditModal = (e) => {
+        let coords = e.currentTarget.getBoundingClientRect();
+
+        console.log('HI! from showEdit!');
+        console.log(coords);
+
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('modalEdit');
+        newDiv.id = 'quoteEdit-' + this.uid;
+        newDiv.style.left = coords.left - 250 + 'px';
+        newDiv.style.top = coords.top + 'px';
+
+        let newText = document.createElement('textarea');
+        newText.value = this.quote_text;
+        newText.id = 'quoteEditInput-' + this.uid;
+        newText.classList.add('modalEditTextArea');
+        newDiv.appendChild(newText);
+
+        let saveBtn = document.createElement('button');
+        saveBtn.textContent = 'Save';
+        saveBtn.addEventListener('click', this.saveModalEdit);
+        newDiv.appendChild(saveBtn);
+
+        document.querySelector('body').appendChild(newDiv);
     }
 }
 
@@ -939,6 +1011,10 @@ function handleSettingsChange(e) {
     switch(e.target.id) {
 
     }
+}
+
+function hideQuoteActions(e) {
+    e.currentTarget.querySelector('.quoteActions').remove();
 }
 
 function importDataFile(e) {
@@ -1720,6 +1796,26 @@ function showNewCollectionForm(e) {
 
 function showNewTagInput(e) {
 
+}
+
+function showQuoteActions(e) {
+    let newDiv = document.createElement('div');
+    newDiv.classList.add('quoteActions');
+    let quoteId = e.currentTarget.id.substring(6);
+    console.log(quoteId);
+    let quote = quotes.get(quoteId);
+    console.log(quote);
+    let newEdit = document.createElement('i');
+    newEdit.classList.add('fa-solid', 'fa-pen', 'quoteAction');
+    newEdit.addEventListener('click', quote.showEditModal);
+    newDiv.appendChild(newEdit);
+
+    let newTrash = document.createElement('i');
+    newTrash.classList.add('fa-solid', 'fa-trash-can', 'quoteAction');
+    newTrash.addEventListener('click', quote.delete);
+    newDiv.appendChild(newTrash);
+
+    e.currentTarget.appendChild(newDiv);
 }
 
 function showSerialDeleteWarning(e) {
