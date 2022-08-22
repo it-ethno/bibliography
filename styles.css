@@ -130,6 +130,13 @@ td {
   width: 120px;
 }
 
+.authorBookItem {
+  padding: 10px 20px;
+  font-size: 85%;
+  border-bottom: 1px solid rgba(200, 200, 200, 0.7);
+  cursor: pointer;
+}
+
 .authorsPaneItem {
   padding: 5px 20px;
   border-bottom: 1px solid rgba(150, 150, 150, 1.0);
@@ -255,6 +262,10 @@ td {
 }
 
 .detailAction {
+  cursor: pointer;
+}
+
+.detailAuthorLink {
   cursor: pointer;
 }
 
@@ -717,6 +728,33 @@ td {
   transition: background-image 3s ease 3s;
 }
 
+#authorBooks {
+  margin-top: 20px;
+  font-size: 120%;
+}
+
+#authorDates {
+
+}
+
+#authorDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+#authorName {
+  font-size: 200%;
+}
+
+#authorNotes {
+  margin-top: 30px;
+}
+
+#authorPlace {
+
+}
+
 #authors {
   padding: 0px 0px;
   color: rgba(50, 50, 50, 1.0);
@@ -734,6 +772,18 @@ td {
   border-radius: 0 15px 15px 0;
   visibility: hidden;
   transition: opacity 0.8s ease, visibility 0.9s ease, top 1s ease, right 1s ease, bottom 1s ease, left 1s ease, height 1s ease, width 1s ease;
+}
+
+#authorTagsAndQuotes {
+  margin-left: auto;
+  min-width: 30%;
+  max-width: 300px;
+  padding-left: 30px;
+  border-left: 1px solid rgba(200, 200, 200, 0.7);
+}
+
+#authorView {
+  visibility: hidden;
 }
 
 #bookDetails {

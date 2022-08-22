@@ -60,6 +60,7 @@ class Author {
     professorships;
     place;
     date_added;
+    books;
 
     constructor(surname, prename, options = {}) {
         this.uid = options.uid || uid();
@@ -74,8 +75,72 @@ class Author {
         this.prename = prename;
         this.date_added = options.date_added || new Date();
         this.tags = options.tags || [];
+        this.books = options.books || [];
 
         authors.set(this.surname + ', ' + this.prename, this);
+        localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));    
+    }
+
+    showDetails = () => {
+        console.log('HI! from showDetails!');
+        showAuthorDetailsDisplay();
+        this.fillBooksArray();
+        document.querySelector('#authorName').innerHTML = this.prename + ' ' + this.surname;
+        if (this.date_birth !== '' && this.date_death !== '') {
+            document.querySelector('#authorDates').innerHTML = this.date_birth + ' - ' + this.date_death;
+        } else if (this.date_birth !== '' && this.date_death === '') {
+            document.querySelector('#authorDates').innerHTML = 'Born ' + this.date_birth;
+        } else if (this.date_birth === '' && this.date_birth !== '') {
+            document.querySelector('#authorDates').innerHTML = 'Died ' + this.date_death;
+        } else {
+            document.querySelector('#authorDates').innerHTML = 'Life dates unknown';
+        }
+        let titlesDisplay = document.querySelector('#authorsBooksList');
+        titlesDisplay.innerHTML = '';
+
+        let authorQuotes = [];
+        this.books.forEach((book) => {
+            let newDiv = document.createElement('div');
+            let gotBook = books.get(book);
+            newDiv.classList.add('authorBookItem');
+            newDiv.innerHTML = gotBook.year + ' - ' + gotBook.title;
+            newDiv.addEventListener('click', gotBook.showDetails);
+            titlesDisplay.appendChild(newDiv);
+
+            gotBook.quotes.forEach((quote) => {
+                authorQuotes.push(quotes.get(quote).quote_text);
+            });
+        });
+
+        let quotesDisplay = document.querySelector('#authorQuotesList');
+        quotesDisplay.innerHTML = '';
+        authorQuotes.forEach((quote) => {
+            let newDiv = document.createElement('div');
+            newDiv.classList.add('quoteItem');
+            newDiv.innerHTML = '&quot;' + quote + '&quot;';
+            quotesDisplay.appendChild(newDiv);
+        });
+
+    }
+
+    fillBooksArray = () => {
+        console.log('HI! from fillBooks!');
+        let authoredBooks = Array.from(books.values()).filter((book) => {
+            if (book.author_prename === this.prename && book.author_surname === this.surname) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+        console.log(authoredBooks);
+        authoredBooks.forEach((book) => {
+            this.books.push(book.title);
+        });
+        this.books = Array.from(new Set(this.books));
+        this.save();
+    }
+
+    save = () => {
         localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));    
     }
 }
@@ -159,7 +224,14 @@ class Book {
             document.querySelector('#detailSubtitle').innerHTML = '';
         }
         document.querySelector('#detailYear').textContent = this.year;
-        document.querySelector('#detailAuthor').textContent = 'by ' + this.author_prename + ' ' + this.author_surname;
+       
+        let newAuthor = document.createElement('div');
+        newAuthor.id = 'detailAuthor';
+        newAuthor.classList.add('detailAuthorLink');
+        newAuthor.addEventListener('click', authors.get(this.author_surname + ', ' + this.author_prename).showDetails);
+        newAuthor.textContent = 'by ' + this.author_prename + ' ' + this.author_surname;
+        document.querySelector('#detailAuthor').replaceWith(newAuthor);
+        
         document.querySelector('#detailPublisher').textContent = this.publisher_name;
         document.querySelector('#detailPlace').textContent = this.place;
         
@@ -1103,6 +1175,8 @@ function prepareForDetailsView() {
     let latestAdds = document.querySelector('#latestAdditions');
     let details = document.querySelector('#detailView');
 
+    document.querySelector('#authorView').style.display = 'none';
+
     mainInterface.style.marginTop = '0px';
     mainInterface.style.padding = '10px';
     
@@ -1115,9 +1189,9 @@ function prepareForDetailsView() {
     latestAdds.style.opacity = '0';
     latestAdds.style.visibility = 'collapse';
     
-    
     details.style.opacity = '1';
     details.style.visibility = 'visible';
+    details.style.display = 'block flex';
 }
 
 function purgeLocalStorage() {
@@ -1313,6 +1387,13 @@ function setStockOrderIcon() {
             document.querySelector('#stockPane-sortOrderAddedReverse').classList.add('selected');
             break;
     }
+}
+
+function showAuthorDetailsDisplay() {
+    document.querySelector('#detailView').style.display = 'none';
+    document.querySelector('#latestAdditions').style.display = 'none';
+    document.querySelector('#authorView').style.visibility = 'visible';
+    document.querySelector('#authorView').style.display = 'block flex';    
 }
 
 function showDBSetup() {
@@ -1872,6 +1953,7 @@ function updateAuthorsPane() {
     sortedAuthors.forEach(author => {
         let newDiv = document.createElement('div');
         newDiv.classList.add('authorsPaneItem');
+        newDiv.addEventListener('click', author[1].showDetails);
         newDiv.textContent = author[0];
         authorsPane.appendChild(newDiv);
     });
