@@ -98,15 +98,21 @@ class Author {
         titlesDisplay.innerHTML = '';
 
         let authorQuotes = [];
-        this.books.forEach((book) => {
+        let sortedBooksYear = [];
+        this.books.forEach((book) => { 
+            sortedBooksYear.push(books.get(book));
+        });
+        sortedBooksYear = sortedBooksYear.sort((a, b) => a.year - b.year);
+
+        sortedBooksYear.forEach((book) => {
             let newDiv = document.createElement('div');
-            let gotBook = books.get(book);
+            
             newDiv.classList.add('authorBookItem');
-            newDiv.innerHTML = gotBook.year + ' - ' + gotBook.title;
-            newDiv.addEventListener('click', gotBook.showDetails);
+            newDiv.innerHTML = book.year + ' - ' + book.title;
+            newDiv.addEventListener('click', book.showDetails);
             titlesDisplay.appendChild(newDiv);
 
-            gotBook.quotes.forEach((quote) => {
+            book.quotes.forEach((quote) => {
                 authorQuotes.push(quotes.get(quote).quote_text);
             });
         });
@@ -127,7 +133,6 @@ class Author {
     }
 
     fillBooksArray = () => {
-        console.log('HI! from fillBooks!');
         let authoredBooks = Array.from(books.values()).filter((book) => {
             if (book.author_prename === this.prename && book.author_surname === this.surname) {
                 return true;
@@ -135,7 +140,7 @@ class Author {
                 return false;
             }
         });
-        console.log(authoredBooks);
+        
         authoredBooks.forEach((book) => {
             this.books.push(book.title);
         });
@@ -666,7 +671,6 @@ class Quote {
     }
 
     delete = () => {
-        console.log('HI! from quote delete!');
         quotes.delete(this.uid);
         this.save();
         showMessage('Quote has been deleted!');
@@ -679,7 +683,6 @@ class Quote {
     }
 
     saveModalEdit = () => {
-        console.log('HI! from saveEdit!');
         this.quote_text = document.querySelector('#quoteEditInput-' + this.uid).value;
         this.save();
         document.querySelector('#quoteEdit-' + this.uid).remove();
@@ -691,14 +694,11 @@ class Quote {
     showEditModal = (e) => {
         let coords = e.currentTarget.getBoundingClientRect();
 
-        console.log('HI! from showEdit!');
-        console.log(coords);
-
         let newDiv = document.createElement('div');
         newDiv.classList.add('modalEdit');
         newDiv.id = 'quoteEdit-' + this.uid;
         newDiv.style.left = coords.left - 250 + 'px';
-        newDiv.style.top = coords.top + 'px';
+        newDiv.style.top = coords.top + 20 + 'px';
 
         let newText = document.createElement('textarea');
         newText.value = this.quote_text;
@@ -718,6 +718,8 @@ class Quote {
 class Signature {
     uid;
     label;
+    library_name;
+    library_id;
     notes;
     tags;
     date_added;
@@ -725,6 +727,8 @@ class Signature {
     constructor(label, options = {}) {
         this.uid = options.uid || uid();
         this.label = label;
+        this.library_name = options.library_name || '';
+        this.library_id = options.library_id || '';
         this.notes = options.notes || [];
         this.tags = options.tags || [];
         this.date_added = options.date_added || new Date();
@@ -762,6 +766,42 @@ const uid = () => { return (Date.now().toString(32) + Math.random().toString(16)
 /* Entry Point */
 initializeApp();
 
+function changeInType(e) {
+    switch (e.target.value) {
+        case 'journal':
+            break;
+        case 'wiki':
+            break;
+        case 'anthology':
+            break;
+        case 'dictionay':
+            break;
+        case 'encyclopedia':
+            break;
+        
+    }
+}
+
+function changeTitleType(e) {
+    switch (e.target.value) {
+        case 'article':
+            document.querySelector('#newFormInSection').style.display = 'block flex';
+            document.querySelector('#newFormPubSection').style.display = 'none';
+            break;
+        case 'book':
+            document.querySelector('#newFormInSection').style.display = 'none';
+            document.querySelector('#newFormPubSection').style.display = 'block flex';
+            break;
+        case 'blogentry':
+            break;
+        case 'online':
+            break;
+        case 'podcast':
+            break;
+        case 'video':
+            break;
+    }
+}
 
 function createBooksFromFile(e) {
     let importData = JSON.parse(e.target.result);
@@ -938,8 +978,11 @@ function equipListeners() {
     document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
     document.querySelector('body').addEventListener('keydown', resetScreenSaverInterval);
 
-    document.querySelector('#mainInterface').addEventListener('dblclick', toggleMainInterfacePosition);
+    document.querySelector('#mainInterface').addEventListener('dblclick', putMainInterfaceBack);
+    document.querySelector('#exportPane-exportPDF').addEventListener('click', exportPDF);
+    document.querySelector('#newFormPlus').addEventListener('click', showNewTitleForm);
 
+    document.querySelector('#newType').addEventListener('click', changeTitleType);
 }
 
 function exitFullscreenSaver() {
@@ -977,6 +1020,23 @@ function exportLocalDataToJsonFile() {
     ghostLink.setAttribute('href', booksUri);
     ghostLink.setAttribute('download', filename);
     ghostLink.click();
+}
+
+function exportPDF() {
+    console.log('HI! from export!');
+    let ex = document.querySelector('#export').cloneNode(true);
+
+    let doc = document.createElement('div');
+    doc.classList.add('exportDoc');
+
+    let h = document.createElement('h1');
+    h.textContent = 'Bibliography';
+    h.classList.add('exportHeader');
+    doc.appendChild(h);
+    doc.appendChild(ex);
+    
+    let worker = html2pdf().from(doc).save('bibliography.pdf');
+    
 }
 
 function exportSelectedTitles(e) {
@@ -1101,7 +1161,6 @@ function mainInputFocus() {
 function maximizeMainContent(e) {
     let main = document.querySelector('#mainFocusContent');
     let coords = main.getBoundingClientRect();
-    console.log(coords);
 
     main.style.position = 'fixed';
     main.style.zIndex = '2';
@@ -1279,6 +1338,31 @@ function purgeLocalStorage() {
     localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
     localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
     updateDisplay();
+}
+
+function putMainInterfaceBack() {
+    let mainInterface = document.querySelector('#mainInterface');
+    let mainTitle = document.querySelector('#mainTitle');
+    let settings = document.querySelector('#settingsToggler');
+    let latestAdds = document.querySelector('#latestAdditions');
+    let details = document.querySelector('#detailView');
+
+    mainInterface.style.marginTop = '15vh';
+    mainInterface.style.padding = '20px';
+    
+    settings.style.marginTop = '15px';
+
+    mainTitle.style.opacity = '1';
+    mainTitle.style.height = 'auto';
+    mainTitle.style.visibility = 'visible';
+
+    latestAdds.style.opacity = '1';
+    latestAdds.style.visibility = 'visible';
+    
+    details.style.opacity = '0';
+    details.style.visibility = 'hidden';
+    details.style.display = 'none';
+
 }
 
 function requestFull() {
@@ -1524,7 +1608,7 @@ function showDBSetup() {
     let newSize = document.createElement('div');
     newSize.classList.add('dbDetails');
     let lcsizeBytes = new Blob(Object.values(localStorage)).size; 
-    let kbSize = ((lcsizeBytes * 2) / 1024).toFixed(2) + 'kb / ~10.240kb';
+    let kbSize = ((lcsizeBytes * 2) / 1024).toFixed(0) + 'kb / ~10.240kb';
     newSize.textContent = kbSize;
     newDBInfo.appendChild(newSize);
 
@@ -1798,13 +1882,20 @@ function showNewTagInput(e) {
 
 }
 
+function showNewTitleForm() {
+    let formDis = document.querySelector('#newBookView');
+    document.querySelector('#detailView').style.display = 'none';
+    document.querySelector('#authorView').style.display = 'none';
+    document.querySelector('#latestAdditions').style.display = 'none';
+    formDis.style.display = 'block flex';
+}
+
 function showQuoteActions(e) {
     let newDiv = document.createElement('div');
     newDiv.classList.add('quoteActions');
     let quoteId = e.currentTarget.id.substring(6);
-    console.log(quoteId);
     let quote = quotes.get(quoteId);
-    console.log(quote);
+    
     let newEdit = document.createElement('i');
     newEdit.classList.add('fa-solid', 'fa-pen', 'quoteAction');
     newEdit.addEventListener('click', quote.showEditModal);

@@ -18,6 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap" rel="stylesheet">
 
     <script src="https://kit.fontawesome.com/8b7dd93a81.js" crossorigin="anonymous"></script>
+    <script src="./lib/html2pdf.bundle.min.js"></script>
 
   </head>
   <body>
@@ -29,7 +30,7 @@
           <i id="paneToggler-authorsPane" class="fa-solid fa-people-group paneToggler action" style="margin-right: 10px;" title="Open/Close Authors Tab"></i>
           <input id="mainInput" type="text" placeholder="Enter a new bibliographic reference (or a known one to display details)" />
           <i id="paneToggler-exportPane" class="fa-solid fa-file-export paneToggler action" style="margin-left:10px;" title="Open/Close Export Tab"></i>
-          <div id="mainInputClue" class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher. <i class="fa-solid fa-circle-plus action coveredAction" title="Show a form for a new book"></i></div>
+          <div id="mainInputClue" class="input_clue">Standard Format: Surname, Prename. Year. Title. Place: Publisher. <i id="newFormPlus" class="fa-solid fa-circle-plus action coveredAction" title="Show a form for a new book"></i></div>
           <i id="paneToggler-stockPane" class="fa-solid fa-database paneToggler action" style="margin-top:10px;" title="Open/Close Stock"></i>
         </div>
       </div>
@@ -86,6 +87,136 @@
               </div>
             </div>
           </div>
+          <div id="newBookView">
+            <div id="newBookFormDiv">
+              <form id="newBookForm">
+                <h1 class="newTitle">Create a new title</h1>
+                <div class="newSection">
+                  <div class="newFormItem">
+                    <label for="newType">Type of Publication</label>
+                    <select id="newType" name="newType" value="book">
+                      <option value="article">Article</option>
+                      <option value="blogentry">Blog Entry</option>
+                      <option value="book" selected>Book</option>
+                      <option value="online">Online Publication</option>
+                      <option value="podcast">Podcast</option>
+                      <option value="video">Video</option>
+                    </select>                  
+                  </div>
+                  <fieldset>
+                    <legend>Title</legend>
+                    <div class="newFormItem">
+                      <label for="newTitle" class="labelBlock labelNewForm">Title</label>
+                      <input id="newTitle" name="newTitle" class="newInputFull sciReq newInput" type="text" placeholder="The title of your new book">
+                    </div>
+                    <div class="newFormItem">
+                      <label for="newSubtitle" class="labelBlock labelNewForm">Subtitle</label>
+                      <input id="newSubtitle" name="newSubtitle" class="newInputFull newInput" type="text" placeholder="The subtitle of your new book">
+                    </div>
+                  </fieldset>
+                </div>
+                <div class="newSection">
+                  <fieldset>
+                    <legend>Author(s)</legend>
+                    <div class="newFormRow">
+                      <div class="newFormItemInline">
+                        <label for="newAuthorSurname" class="labelBlock labelNewForm">Surname</label>
+                        <input id="newAuthorSurname" name="newAuthorSurname" class="sciReq newInput" placeholder="">
+                      </div>
+                      <div class="newFormItemInline">
+                        <label for="newAuthorPrename" class="labelBlock labelNewForm">Prename</label>
+                        <input id="newAuthorPrename" name="newAuthorPrename" class="sciReq newInput" placeholder="">
+                      </div>
+                      <div class="newFormItemInline">
+                        <i id="newFormAddAuthor" class="fa-solid fa-square-plus" title="Add another author"></i>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+                <div id="newFormInSection" class="newSection">
+                  <fieldset>
+                    <legend>In:</legend>
+                    <div class="newFormItem">
+                      <label class="labelNewForm">Type of including publication</label>
+                      <select id="newInType" name="newInType">
+                        <option value="anthology">Anthology</option>
+                        <option value="dictionary">Dictionary</option>
+                        <option value="encyclopedia">Encyclopedia</option>
+                        <option value="journal">Journal</option>
+                        <option value="wiki">Wiki</option>
+                      </select>
+                    </div>
+                    <div class="newFormItem">
+                      <label for="newInTitle" class="labelBlock labelNewForm">Title</label>
+                      <input id="newInTitle" name="newInTitle" class="newInputFull sciReq newInput" type="text" placeholder="The title of the including publication">
+                    </div>
+                    <div class="newFormItem">
+                      <label for="newInSubtitle" class="labelBlock labelNewForm">Subtitle</label>
+                      <input id="newInSubtitle" name="newInSubtitle" class="newInputFull newInput" type="text" placeholder="The subtitle of the including publication">
+                    </div>
+                    <div class="newFormRow">
+                      <div class="newFormItemInline">
+                        <label for="newInAuthorSurname" class="labelBlock labelNewForm">Surname</label>
+                        <input id="newInAuthorSurname" name="newInAuthorSurname" class="sciReq newInput" placeholder="">
+                      </div>
+                      <div class="newFormItemInline">
+                        <label for="newInAuthorPrename" class="labelBlock labelNewForm">Prename</label>
+                        <input id="newInAuthorPrename" name="newInAuthorPrename" class="sciReq newInput" placeholder="">
+                      </div>
+                      <div class="newFormItemInline">
+                        <i id="newFormAddAuthor" class="fa-solid fa-square-plus" title="Add another author"></i>
+                      </div>
+                    </div>
+                    <div class="newFormRow">
+                      <div class="newFormItemInline">
+                        <label for="newPublisherName" class="labelBlock labelNewForm">Publishing House</label>
+                        <input id="newPublisherName" name="newPublisherName" class="sciReq newInput" placeholder="">
+                      </div>
+                      <div class="newFormItemInline">
+                        <label for="newPlace" class="labelBlock labelNewForm">Place</label>
+                        <input id="newPlace" name="newPlace" class="sciReq newInput" placeholder="">
+                      </div>
+                    </div>
+                    <div class="newFormItem">
+                      <label for="newYear" class="labelBlock labelNewForm">Year</label>
+                      <input id="newYear" name="newYear" type="text" class="sciReq newInput" placeholder="The year of publication">
+                    </div>
+                  </fieldset>
+                </div>
+                <div id="newFormPubSection" class="newSection">
+                  <fieldset>
+                    <legend>Publication</legend>
+                    <div class="newFormRow">
+                      <div class="newFormItemInline">
+                        <label for="newPublisherName" class="labelBlock labelNewForm">Publishing House</label>
+                        <input id="newPublisherName" name="newPublisherName" class="sciReq newInput" placeholder="">
+                      </div>
+                      <div class="newFormItemInline">
+                        <label for="newPlace" class="labelBlock labelNewForm">Place</label>
+                        <input id="newPlace" name="newPlace" class="sciReq newInput" placeholder="">
+                      </div>
+                    </div>
+                    <div class="newFormItem">
+                      <label for="newYear" class="labelBlock labelNewForm">Year</label>
+                      <input id="newYear" name="newYear" type="text" class="sciReq newInput" placeholder="The year of publication">
+                    </div>
+                  </fieldset>
+                </div>
+                <div class="newSection">
+                  <button type="button">Create Title</button>
+                  <button type="reset">Reset Form</button>
+                </div>
+              </form>
+            </div>
+            <div id="newFormHelp">
+              <div class="newFormHelpItem">
+                Choose Article for any type of contribution to a larger entity like an anthology or a journal.
+              </div>
+              <div class="newFormHelpItem">
+                Form fields with slightly red background are needed for scientific accuracy. You can save your new title anyway, but the app will remind you to fill in any gaps of needed information later.
+              </div>
+            </div>
+          </div> 
           <i id="detailToggleFull" class="fa-solid fa-expand detailToggle"></i>
         </div>
       </div>
