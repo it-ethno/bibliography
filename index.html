@@ -288,10 +288,22 @@
     </div>
 
     <div id="settings">
+      <div id="settingsSections">
+        <h1 class="settingsSectionsHeader">Settings</h1>
+        <div id="settingsSectionsList">
+          <div id="sectionsList-display" class="settingsSectionsItem settingsSectionsItemSelected"><i class="fa-solid fa-display"></i> Common & Display</div>
+          <div id="sectionsList-formats" class="settingsSectionsItem"><i class="fa-solid fa-ruler-combined"></i> String Formats</div>
+          <div id="sectionsList-export" class="settingsSectionsItem"><i class="fa-solid fa-file-export"></i> Export</div>
+          <div id="sectionsList-storage" class="settingsSectionsItem"><i class="fa-solid fa-database"></i> Storage</div>
+          <div id="sectionsList-management" class="settingsSectionsItem"><i class="fa-solid fa-hotel"></i> Management</div>
+          <i id="closeSettings" class="fa-solid fa-rectangle-xmark action"></i>
+
+        </div>
+      </div>
       <div id="settingsList">
-        <h1>Settings</h1>
-        <h2 class="settingsSectionHeader">Display</h2>
-        <div class="settingsSet">
+        <div id="settingsListDisplay" class="settingsSectionDiv settingsSectionDivSelected">
+          <h2 class="settingsListHeader">Common & Display</h2>
+
           <div class="settingsItem">
             <label for="languageSelect">Language</label>
             <select id="languageSelect" name="languageSelect" value="en">
@@ -300,14 +312,109 @@
             </select>
           </div>
           <div class="settingsItem">
-            <input id="useBackground" type="checkbox" checked><label for="useBackground" class="labelInlineRight">Use Image Background</label>
+            <input id="useScientific" type="checkbox" checked><label for="useScientific" class="labelInlineRight" title="When Scientific Mode is active, you are regularly questioned to fill in the gaps in your data needed for scientific referencing">Use scientific mode</label>
           </div>
           <div class="settingsItem">
-            <input id="useFixedBackground" type="checkbox"><label for="useFixedBackground" class="labelInlineRight">Use Fixed Image Background</label>
+            <input id="useAutoSave" type="checkbox" checked><label for="useAutoSave" class="labelInlineRight" title="Automatically backup all data to a JSON file">Use auto save</label>
+          </div>
+          <div class="settingsItem">
+            <select id="autoSaveInterval" name="autoSaveInterval" value="60">
+              <option value="5">Every 5 Minutes</option>
+              <option value="10">Every 10 Minutes</option>
+              <option value="20">Every 20 Minutes</option>
+              <option value="30">Every 30 Minutes</option>
+              <option value="45">Every 45 Minutes</option>
+              <option value="60" selected>Every 60 Minutes</option>
+            </select>
+            <label for="autoSaveInterval">Save interval</label>
+          </div>
+          <div class="settingsItem">
+            <input id="saveTransient" type="checkbox"><label for="saveTransient" class="labelInlineRight" title="Remember the selection in the Stock pane after a reload">Save Transient Selection</label>
+          </div>
+          <div class="settingsItem">
+            <input id="showOrderButtons" type="checkbox" checked><label for="showOrderButtons" class="labelInlineRight" title="Show the 4 order buttons in the panes">Show order buttons in panes</label>
+          </div>
+          <div class="settingsItem">
+            <input id="showFormOnEmpty" type="checkbox" checked><label for="showFormOnEmpty" class="labelInlineRight" title="Bring up the form for a new title when hitting Return without any contents in the main input">Show new title form on empty Return (in main input)</label>
+          </div>
+          <div class="settingsItem">
+            <input id="useTransparency" type="checkbox" checked><label for="useTransparency" class="labelInlineRight" title="Use transparency for the background of the main content">Use Transparency</label>
+          </div>
+
+          <h3 class="settingsListSubheader">Background</h3>
+          <div class="settingsItem">
+            <input id="useBackground" type="checkbox" checked><label for="useBackground" class="labelInlineRight" title="Display a fullscreen image background">Use image background</label>
+          </div>
+          <div class="settingsItem">
+            <input id="useFixedBackground" type="checkbox"><label for="useFixedBackground" class="labelInlineRight" title="Use a single image inside the images folder as static background">Use fixed image background</label>
+          </div>
+          <div class="settingsItem">
+            <input id="useDynamicBackground" type="checkbox"><label for="useDynamicBackground" class="labelInlineRight" title="Dynamically fetch new background images from Unsplash">Use dynamic image background (requires an Unsplash Api Key)</label>
+          </div>
+
+
+          <h3 class="settingsListSubheader">Startpage</h3>
+          <div class="settingsItem">
+            <input id="startWithCollapsed" type="checkbox"><label for="startWithCollapsed" class="labelInlineRight">Start with collapsed main input</label>
+          </div>
+          <div class="settingsItem">
+            <input id="showLastAdditions" type="checkbox" checked><label for="showLastAdditions" class="labelInlineRight">Show last additions</label>
+          </div>
+          <div class="settingsItem">
+            <input id="showGaps" type="checkbox" checked><label for="showGaps" class="labelInlineRight">Show scientific gaps</label>
+          </div>
+          <div class="settingsItem">
+            <input id="showLastQuotes" type="checkbox" checked><label for="showLastQuotes" class="labelInlineRight">Show last quotes</label>
+          </div>
+          <div class="settingsItem">
+            <input id="showLastNotes" type="checkbox" checked><label for="showLastNotes" class="labelInlineRight">Show last notes</label>
+          </div>
+
+          <h3 class="settingsListSubheader">Screensaver</h3>
+          <div class="settingsItem">
+            <input id="useScreensaver" type="checkbox" checked><label for="useScreensaver" class="labelInlineRight">Use screensaver</label>
+          </div>
+          <div class="settingsItem">
+            <input id="useQuotes" type="checkbox" checked><label for="useQuotes" class="labelInlineRight">Use quotes</label>
+          </div>
+          <div class="settingsItem">
+            <input id="useNotes" type="checkbox"><label for="useNotes" class="labelInlineRight">Use notes</label>
+          </div>
+          <div class="settingsItem">
+            <select id="screensaverActivateInterval" name="screensaverActivateInterval" value="2">
+              <option value="1">1 Minute</option>
+              <option value="2" selected>2 Minutes</option>
+              <option value="5">5 Minutes</option>
+              <option value="10">10 Minutes</option>
+              <option value="15">15 Minutes</option>
+              <option value="30">30 Minutes</option>
+            </select>
+            <label for="screensaverActivateInterval">Motionless time until activation</label>
+          </div>
+          <div class="settingsItem">
+            <select id="screensaverChangeInterval" name="screensaverChangeInterval" value="1">
+              <option value="0.5">30 Seconds</option>
+              <option value="1" selected>1 Minute</option>
+              <option value="2">2 Minutes</option>
+              <option value="5">5 Minutes</option>
+              <option value="10">10 Minutes</option>
+              <option value="15">15 Minutes</option>
+            </select>
+            <label for="screensaverChangeInterval">Change interval of quotes/notes</label>
+          </div>
+          <div class="settingsItem">
+            <select id="screensaverEffect" name="screensaverEffect" value="flicker">
+              <option value="flicker" selected>Flicker Glow</option>
+              <option value="typing">Typing</option>
+            </select>
+            <label for="screensaverEffect">Display effect</label>
+          </div>
+          <div class="settingsItem">
+            <i id="screensaverBtn" class="fa-solid fa-display" title="Test the screensaver settings" style="cursor: pointer;"></i> Test Screensaver Settings
           </div>
         </div>
-        <h2 class="settingsSectionHeader">Default Formats</h2>
-        <div class="settingsSet">
+        <div id="settingsListFormats" class="settingsSectionDiv">
+          <h2 class="settingsListHeader">String Formats</h2>
           <div class="settingsItem">
             <label for="standardInput" class="labelBlock">Input</label>
             <input id="standardInput" type="text" class="inputLongText" placeholder="author.surname, author.prename. year-of-publication. title: subtitle. place-of-publication: publisher.">
@@ -319,13 +426,44 @@
             <i class="fa-solid fa-wrench configuratorToggler action"></i>
           </div>
         </div>
-        <h2 class="settingsSectionHeader">Data Storage</h2>
-        <div class="settingsSet">
+        <div id="settingsListExport" class="settingsSectionDiv">
+          <h2 class="settingsListHeader">Export</h2>
+          <h3 class="settingsListSubheader">PDF</h3>
           <div class="settingsItem">
-            <input id="useLocalStorage" type="checkbox" checked><label for="useLocalStorage" class="labelInlineRight" title="Use Local Storage to persist data over browser close">Use Local Storage</label>
+            <input id="exportPdfUseTitle" type="checkbox" checked><label for="exportPdfUseTitle" class="labelInlineRight">Use a title</label>
           </div>
           <div class="settingsItem">
-            <label for="serverURL" class="labelBlock">Server URL/IP Adress</label>
+            <select id="exportPdfFont" name="exportPdfFont" value="EB Garamond">
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="EB Garamond" selected>EB Garamond</option>
+              <option value="DM Mono">DM Mono</option>
+              <option value="Arial">Arial</option>
+            </select>
+            <label for="exportPdfFont">Font used in PDF file</label>
+          </div>
+          <h3 class="settingsListSubheader">JSON</h3>
+
+          <h3 class="settingsListSubheader">BibTex</h3>
+
+        </div>
+        <div id="settingsListStorage" class="settingsSectionDiv">
+          <h2 class="settingsListHeader">Storage</h2>
+          <h3 class="settingsListSubheader">Local Storage</h3>
+          <div class="settingsItem">
+            <input id="useLocalStorage" type="checkbox" checked><label for="useLocalStorage" class="labelInlineRight" title="Use Local Storage of the browser to persist data over closes">Use Local Storage</label>
+          </div>
+          <div class="settingsItem">
+            <input id="useIndexedDB" type="checkbox" disabled><label for="useIndexedDB" class="labelInlineRight labelDisabled" title="Use IndexedDB of the browser to persist data over closes">Use IndexedDB</label>
+          </div>
+          <h3 class="settingsListSubheader">Server Storage</h3>
+          <div class="settingsItem">
+            <input id="useServerStorage" type="checkbox" checked><label for="useServerStorage" class="labelInlineRight" title="Use the server storage infrastructure">Use server storage infrastructure</label>
+          </div>
+          <div class="settingsItem">
+            <input id="preferPersonalData" type="checkbox" checked><label for="preferPersonalData" class="labelInlineRight" title="Always prefer personal data sets over foreign data from servers">Prefer personal data sets</label>
+          </div>
+          <div class="settingsItem">
+            <label for="serverURL" class="labelBlock">Add a new Server URL/IP Address</label>
             <input id="serverURL" type="text" class="inputLongText" placeholder="something like 'https://abc.example.org/bibserver/' or '129.130.131.139'">
           </div>
           <div class="settingsItem">
@@ -337,23 +475,22 @@
             </select>
           </div>
         </div>
-        <h2 class="settingsSectionHeader">Management</h2>
-        <div class="settingsSet">
+        <div id="settingsListManagement" class="settingsSectionDiv">
+          <h2 class="settingsListHeader">Management</h2>
+          <h3 class="settingsListSubheader">Purge Local Data</h3>
           <div class="settingsItem">
             <i class="fa-solid fa-dumpster-fire"></i>
             <button id="localPurgeBtn" type="button" class="btnDanger" title="CAUTION! This purges all local data storage including ALL books, ALL authors, ALL quotes! Do you really want this?!? CAUTION!">Purge Local Data</button>
             <div style="margin-top:10px;">CAUTION! This deletes ALL local data FOREVER! Perhaps you want to <a id="directExportLink" href="#">back it up to a file</a> beforehand?</div>
             <div id="numbersPurge" style="margin-top:5px;">Clicking the purge button will delete </div>
           </div>
+          <h3 class="settingsListSubheader">Import Data</h3>
           <div class="settingsItem">
-            <label for="importFileInput">Import Data File</label>
+            <label for="importFileInput" class="labelBlock">Select Data File</label>
             <input id="importFileInput" type="file" name="files[]">
           </div>
-          <div class="settingsItem">
-            <i id="screensaverBtn" class="fa-solid fa-display"></i>
-          </div>
+
         </div>
-        <i id="closeSettings" class="fa-solid fa-rectangle-xmark action"></i>
       </div>
     </div>
     <div id="formatConfigurator">

@@ -460,6 +460,10 @@ td {
   margin-bottom: 5px;
 }
 
+.labelDisabled {
+  color: rgba(70, 70, 70, 0.5);
+}
+
 .labelInlineLeft {
   margin-right: 10px;
 }
@@ -614,7 +618,7 @@ td {
   bottom: 0px;
   right: 0px;
   border-radius: 10px 0px 10px 0px;
-  padding: 5px 5px 5px 5px;
+  padding: 5px 5px 5px 10px;
   background-color: rgba(70, 70, 70, 0.3);
   color: rgba(240, 240, 240, 1);
   font-size: 80%;
@@ -709,14 +713,60 @@ td {
 }
 
 .settingsItem {
-  margin: 10px 0px;
+  margin: 8px 0px;
   font-family: 'DM Mono';
   font-size: 90%;
+}
+
+.settingsListHeader {
+  font-family: 'DM Mono';
+  text-align: left;
+}
+
+.settingsListSubheader {
+  font-family: 'DM Mono';
+  text-align: left;
+  font-weight: 500;
+  margin-top: 20px;
+  font-size: 110%;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.settingsSectionDiv {
+  display: none;
+}
+
+.settingsSectionDivSelected {
+  display: block;
 }
 
 .settingsSectionHeader {
   font-family: 'DM Mono';
   font-size: 20px;
+  
+}
+
+.settingsSectionsHeader {
+  font-family: 'DM Mono';
+  font-size: 180%;
+  text-align: left;
+  margin-bottom: 20px;
+  margin-left: 20px;
+}
+
+.settingsSectionsItem {
+  padding: 10px 20px 10px 20px;
+  margin: 0 10px;
+  font-size: 110%;
+  border-bottom: 1px solid rgba(200, 200, 200, 0.9);
+  font-family: 'DM Mono';
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.settingsSectionsItemSelected {
+  background-color: rgba(200, 200, 200, 0.8);
 }
 
 .settingsSet {
@@ -1063,14 +1113,18 @@ td {
   right: 0px;
   bottom: 0px;
   left: 0px;
-  padding: 50px;
+  padding: 20px 40px;
   background-color: rgba(240, 240, 240, 0.95);
+  display: flex;
 }
 
 #settingsList {
-  width: 80%;
-  margin: 0 auto;
-  text-align: center;
+  text-align: left;
+  padding: 20px;
+}
+
+#settingsSectionsList {
+  width: 300px;
 }
 
 #settingsToggler {

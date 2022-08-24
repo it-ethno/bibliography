@@ -713,6 +713,10 @@ class Quote {
 
         document.querySelector('body').appendChild(newDiv);
     }
+
+    copyToClipboard = () => {
+        navigator.clipboard.writeText(this.quote_text);
+    }
 }
 
 class Signature {
@@ -983,6 +987,8 @@ function equipListeners() {
     document.querySelector('#newFormPlus').addEventListener('click', showNewTitleForm);
 
     document.querySelector('#newType').addEventListener('click', changeTitleType);
+
+    document.querySelectorAll('.settingsSectionsItem').forEach((node) => { node.addEventListener('click', showSettingsTab); });
 }
 
 function exitFullscreenSaver() {
@@ -1895,6 +1901,11 @@ function showQuoteActions(e) {
     newDiv.classList.add('quoteActions');
     let quoteId = e.currentTarget.id.substring(6);
     let quote = quotes.get(quoteId);
+
+    let newClipboard = document.createElement('i');
+    newClipboard.classList.add('fa-solid', 'fa-clipboard', 'quoteAction');
+    newClipboard.addEventListener('click', quote.copyToClipboard);
+    newDiv.appendChild(newClipboard);
     
     let newEdit = document.createElement('i');
     newEdit.classList.add('fa-solid', 'fa-pen', 'quoteAction');
@@ -1965,6 +1976,31 @@ function showSerialDeleteWarning(e) {
         document.querySelector('body').appendChild(newDiv);
     } else {
         showMessage('The fire-dumpster could not be activated, because there were no titles selected!');
+    }
+}
+
+function showSettingsTab(e) {
+    let selectedSec = document.querySelector('.settingsSectionsItemSelected');
+    selectedSec.classList.remove('settingsSectionsItemSelected');
+    e.target.classList.add('settingsSectionsItemSelected');
+    let secTabs = document.querySelectorAll('.settingsSectionDiv');
+    secTabs.forEach((node) => { node.classList.remove('settingsSectionDivSelected'); node.style.display = 'none'; });
+    switch (e.target.id) {
+        case 'sectionsList-display':
+            document.querySelector('#settingsListDisplay').style.display = 'block';
+            break;
+        case 'sectionsList-formats':
+            document.querySelector('#settingsListFormats').style.display = 'block';
+            break;
+        case 'sectionsList-export':
+            document.querySelector('#settingsListExport').style.display = 'block';
+            break;
+        case 'sectionsList-storage':
+            document.querySelector('#settingsListStorage').style.display = 'block';
+            break;
+        case 'sectionsList-management':
+            document.querySelector('#settingsListManagement').style.display = 'block';
+            break;
     }
 }
 
