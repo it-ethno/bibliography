@@ -900,6 +900,32 @@ function changeTitleType(e) {
     }
 }
 
+function constructStartPage() {
+    let sp = document.querySelector('#startPage');
+    let coords = sp.getBoundingClientRect();
+    console.log(coords);
+    sp.style.height = window.innerHeight - coords.top - 50 + 'px';
+    if (settings.startCollapsed) {
+
+    }
+    
+    if (settings.showLastAdditions) {
+        showLastAdditions();
+    }
+
+    if (settings.showGaps) {
+
+    }
+
+    if (settings.showLastQuotes) {
+        showLastQuotes();
+    }
+
+    if (settings.showLastNotes) {
+        showLastNotes();
+    }
+}
+
 function createBooksFromFile(e) {
     let importData = JSON.parse(e.target.result);
     console.log(importData);
@@ -1372,7 +1398,8 @@ function initializeApp() {
     equipListeners();
     updateDisplay();
     
-    showLastAdditions();
+    constructStartPage();
+    
 }
 
 function initializeLocalStorage() {
@@ -1474,6 +1501,8 @@ function mainInputFocus() {
 
 function maximizeMainContent(e) {
     let main = document.querySelector('#mainFocusContent');
+    let sp = document.querySelector('#startPage');
+    sp.style.height = '100%';
     let coords = main.getBoundingClientRect();
 
     main.style.position = 'fixed';
@@ -1522,7 +1551,10 @@ function minimizeMainContent(e) {
     e.target.classList.remove('fa-compress');
     e.target.classList.add('fa-expand');
     e.target.removeEventListener('click', minimizeMainContent);
-    e.target.addEventListener('click', maximizeMainContent);    
+    e.target.addEventListener('click', maximizeMainContent);
+    let sp = document.querySelector('#startPage');
+    let spCo = sp.getBoundingClientRect();
+    sp.style.height = window.innerHeight - spCo.top - 50 + 'px';    
 }
 
 function minimizePane(e) {
@@ -1625,7 +1657,8 @@ function prepareForDetailsView() {
     let details = document.querySelector('#detailView');
 
     document.querySelector('#authorView').style.display = 'none';
-
+    document.querySelector('#startPage').style.display = 'none';
+    
     mainInterface.style.marginTop = '0px';
     mainInterface.style.padding = '10px';
     
@@ -2156,11 +2189,9 @@ function showFullscreenStock() {
 }
 
 function showLastAdditions() {
-    let latestAdds = document.querySelector('#latestAdditions');
+    let latestAdds = document.querySelector('#latestAdditionsList');
     latestAdds.innerHTML = '';
-    let newHeader = document.createElement('h2');
-    newHeader.textContent = 'Last Book Additions';
-    latestAdds.appendChild(newHeader);
+
     let latest5 = Array.from(books).reverse().slice(0, 5);
     latest5.forEach((book) => {
         let newDiv = document.createElement('div');
@@ -2168,6 +2199,31 @@ function showLastAdditions() {
         newDiv.textContent = book[1].author_surname + ', ' + book[1].author_prename + '. ' + book[1].year + '. ' + book[1].title + '. ' + book[1].place + ': ' + book[1].publisher_name + '.';
         latestAdds.appendChild(newDiv);
     })
+}
+
+function showLastNotes() {
+    let lastNotes = Array.from(notes.values()).sort((a, b) => a.date_added - b.date_added).reverse().slice(0, 5);
+    let ln = document.querySelector('#latestNotesList');
+    ln.innerHTML = '';
+    lastNotes.forEach((note) => {
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('latestNotesItem');
+        newDiv.innerHTML = note.note_text;
+        ln.appendChild(newDiv);        
+    });
+}
+
+function showLastQuotes() {
+    let lastQuotes = Array.from(quotes.values()).sort((a, b) => a.date_added - b.date_added).reverse().slice(0, 5);
+    let lqDiv = document.querySelector('#latestQuotesList');
+    lqDiv.innerHTML = '';
+
+    lastQuotes.forEach((quote) => {
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('latestQuotesItem');
+        newDiv.innerHTML = '&laquo; ' + quote.quote_text + ' &raquo;';
+        lqDiv.appendChild(newDiv);
+    });
 }
 
 function showMessage(message) {
@@ -2543,7 +2599,6 @@ function updateDisplay() {
     updateAuthorsPane();
     updateStockPane();
     updateExportPane();
-    showLastAdditions();
 }
 
 function updateExportPane() {

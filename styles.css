@@ -485,8 +485,27 @@ td {
 .lastAdditionsItem {
   font-family: 'DM Mono';
   font-size: 85%;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   text-align: center;
+}
+
+.latestNotesItem {
+  padding: 10px 10px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.9);
+  width: 48%;
+  font-size: 90%;
+  font-family: 'EB Garamond';
+}
+
+.latestQuotesItem {
+  padding: 10px 10px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.9);
+  max-width: 45%;
+  width: 250px;
+  font-size: 90%;
+  font-family: 'EB Garamond';
 }
 
 .localDataListItem {
@@ -913,6 +932,10 @@ td {
 }
 
 
+#academicGaps {
+  width: 48%;
+}
+
 #alltainer {
   position: fixed;
   width: 100%;
@@ -985,6 +1008,7 @@ td {
 #authorView {
   visibility: hidden;
   font-family: 'EB Garamond';
+  display: none;
 }
 
 #bookDetails {
@@ -1025,7 +1049,7 @@ td {
   opacity: 0;
   font-family: 'EB Garamond';
   position: relative;  
-  display: flex;
+  display: none;
   transition: opacity 0.8s ease, visibility 0.8s ease, height 0.8s ease;
 }
 
@@ -1064,6 +1088,29 @@ td {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.8s ease, visibility 0.8s ease;
+  width: 48%;
+}
+
+#latestNotes {
+  width: 48%;
+}
+
+#latestNotesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+#latestQuotes {
+  width: 48%;
+}
+
+#latestQuotesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
 #mainFocusContent {
@@ -1190,6 +1237,15 @@ td {
 
 #signaturesList {
   display: flex;
+}
+
+#startPage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-around;
+  overflow-y: scroll;
+  scrollbar-width: thin;
 }
 
 #stock {
