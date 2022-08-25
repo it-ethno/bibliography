@@ -348,7 +348,7 @@ class Book {
                 let tagObj = tags.get(tag);
                 let newDiv = document.createElement('div');
                 newDiv.classList.add('tagItem');
-                newDiv.textContent = tagObj.label;
+                newDiv.textContent = '#' + tagObj.label.toLowerCase();
                 tagsList.appendChild(newDiv);
             });
         } else {
@@ -467,6 +467,8 @@ class Book {
                 let tagDiv = document.createElement('div');
                 tagDiv.classList.add('tagListItem');
                 tagDiv.textContent = tag.label;
+                tagDiv.setAttribute('data-tag-uid', tag.uid);
+                tagDiv.addEventListener('click', this.addTag);
                 knownTagsDiv.appendChild(tagDiv);
             })
             newDiv.appendChild(knownTagsDiv);
@@ -540,10 +542,19 @@ class Book {
     }
 
     addTag = (e) => {
-        let inputTag = document.querySelector('#addTagInput-' + this.uid).value;
-        console.log(inputTag);
-        let newTag = new Tag(inputTag);
-        this.tags.push(newTag.uid);
+        if (e.target.classList.contains('tagListItem')) {
+            let t = tags.get(e.target.getAttribute('data-tag-uid'));
+            this.tags.push(t.uid);
+            t.countUp();
+            t.addBook(this.uid);
+        } else {
+            let inputTag = document.querySelector('#addTagInput-' + this.uid).value;
+            let newTag = new Tag(inputTag);
+            this.tags.push(newTag.uid);
+            newTag.countUp();
+            newTag.addBook(this.uid);
+        }
+        this.tags = Array.from(new Set(this.tags));
         this.save();
         document.querySelector('#tagForm-' + this.uid).remove();
         this.showDetails();
@@ -769,15 +780,75 @@ class Tag {
     label;
     description;
     date_added;
+    uses_count;
+    uses_book;
+    uses_authors;
 
     constructor(label, options = {}) {
         this.uid = options.uid || uid();
         this.label = label;
         this.description = options.description || '';
         this.date_added = options.date_added || new Date();
+        this.uses_count = options.uses_count || 1;
+        this.uses_book = options.uses_book || [];
+        this.uses_authors = options.uses_authors || [];
 
+        this.repairCounts();
         tags.set(this.uid, this);
+        this.save();
+    }
+
+    save = () => {
         localStorage.setItem('tags', JSON.stringify(Object.fromEntries(tags)));
+    }
+
+    countUp = () => {
+        this.uses_count += 1;
+        this.save();
+    }
+
+    countDown = () => {
+        this.uses_count -= 1;
+        this.save();
+    }
+
+    addAuthor = (authorId) => {
+        this.uses_authors.push(authorId);
+        this.uses_authors = Array.from(new Set(this.uses_authors));
+    }
+
+    addBook = (bookId) => {
+        this.uses_book.push(bookId);
+        this.uses_book = Array.from(new Set(this.uses_book));
+        this.save();
+    }
+
+    removeBook = (bookId) => {
+        let bs = new Set(this.uses_book);
+        bs.delete(bookId);
+        this.uses_book = Array.from(bs);
+        this.save();
+    }
+
+    repairCounts = () => {
+        this.uses_count = 0;
+        this.uses_book = [];
+        this.uses_authors = [];
+
+        let b = Array.from(books.values());
+        let a = Array.from(authors.values());
+        b.forEach((book) => {
+            if (book.tags.indexOf(this.uid) > -1) {
+                this.addBook(book.uid);
+                this.countUp();
+            }
+        });
+        a.forEach((author) => {
+            if (author.tags.indexOf(this.uid) > -1) {
+                this.addAuthor(author.uid);
+                this.countUp();
+            }
+        });
     }
 }
 
@@ -1023,7 +1094,6 @@ function exitFullscreenSaver() {
     document.querySelector('.screensaver').remove();
     clearInterval(screensaverInterval);
     screensaverInterval = '';
-    console.log('screensaverInterval directly after clear: ' + screensaverInterval);
     screensaverInterval = setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
     document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
 }
@@ -1136,58 +1206,106 @@ function handleSettingsChange(e) {
             settings.useAltPubIcon = e.target.checked;
             if (settings.useAltPubIcon) {
                 document.querySelector('#altPubIcons').style.display = 'block flex';
+                uncheckAllAltIcons();
+                switch (settings.altPubIcon) {
+                    case '':
+                        break;
+                    case 'fa-person-military-rifle':
+                        document.querySelector('#useRifleIcon').checked = true;
+                        break;
+                    case 'fa-people-robbery':
+                        document.querySelector('#useRobberyIcon').checked = true;
+                        break;
+                    case 'fa-person-harassing':
+                        document.querySelector('#useHarassingIcon').checked = true;
+                        break;
+                    case 'fa-face-grin-hearts':
+                        document.querySelector('#useGrinIcon').checked = true;
+                        break;
+                    case 'fa-heart':
+                        document.querySelector('#useHeartIcon').checked = true;
+                        break;
+                    case 'fa-cow':
+                        document.querySelector('#useCowIcon').checked = true;
+                        break;
+                    case 'fa-hand-spock':
+                        document.querySelector('#useSpockIcon').checked = true;
+                        break;
+                }
             } else {
                 document.querySelector('#altPubIcons').style.display = 'none';
             }
+            setPubIcon();
             break;
         case 'useRifleIcon':
             if (e.target.checked) {
+                uncheckAllAltIcons();
+                e.target.checked = true;
                 settings.altPubIcon = 'fa-person-military-rifle';
             } else {
                 settings.altPubIcon = '';
             }
+            setPubIcon();
             break;
         case 'useRobberyIcon':
             if (e.target.checked) {
+                uncheckAllAltIcons();
+                e.target.checked = true;
                 settings.altPubIcon = 'fa-people-robbery';
             } else {
                 settings.altPubIcon = '';
             }
+            setPubIcon();
             break;
         case 'useHarassingIcon':
             if (e.target.checked) {
+                uncheckAllAltIcons();
+                e.target.checked = true;
                 settings.altPubIcon = 'fa-person-harassing';
             } else {
                 settings.altPubIcon = '';
-            }            
+            }
+            setPubIcon();           
             break;
         case 'useGrinIcon':
             if (e.target.checked) {
+                uncheckAllAltIcons();
+                e.target.checked = true;
                 settings.altPubIcon = 'fa-face-grin-hearts';
             } else {
                 settings.altPubIcon = '';
             }
+            setPubIcon();
             break;
         case 'useHeartIcon':
             if (e.target.checked) {
+                uncheckAllAltIcons();
+                e.target.checked = true;
                 settings.altPubIcon = 'fa-heart';
             } else {
                 settings.altPubIcon = '';
             }
+            setPubIcon();
             break;
         case 'useCowIcon':
             if (e.target.checked) {
+                uncheckAllAltIcons();
+                e.target.checked = true;
                 settings.altPubIcon = 'fa-cow';
             } else {
                 settings.altPubIcon = '';
             }
+            setPubIcon();
             break;
         case 'useSpockIcon':
             if (e.target.checked) {
+                uncheckAllAltIcons();
+                e.target.checked = true;
                 settings.altPubIcon = 'fa-hand-spock';
             } else {
                 settings.altPubIcon = '';
             }
+            setPubIcon();
             break;
         case 'useBackground':
             settings.useBackground = e.target.checked;
@@ -1581,7 +1699,7 @@ function requestFull() {
 function resetScreenSaverInterval() {
     clearInterval(screensaverInterval);
     screensaverInterval = setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
-    console.log('HI! from reset!' + screensaverInterval);
+    console.log('HI! from reset!');
 }
 
 function resetSettings() {
@@ -1735,6 +1853,21 @@ function setOrder(e) {
             break;
     }
     
+}
+
+function setPubIcon() {
+    let n = document.querySelector('#authorsPane-publisherTab');
+    n.classList.remove('fa-book-open-reader', 'fa-person-military-rifle', 'fa-people-robbery', 'fa-person-harassing', 'fa-face-grin-hearts', 'fa-heart', 'fa-cow', 'fa-hand-spock');
+
+    if (settings.useAltPubIcon) {
+        if (settings.altPubIcon !== '') {
+            n.classList.add(settings.altPubIcon);
+        } else {
+            n.classList.add('fa-book-open-reader');
+        }
+    } else {
+        n.classList.add('fa-book-open-reader');
+    }
 }
 
 function setStockOrderIcon() {
@@ -2336,7 +2469,6 @@ function toggleFullScreenSaver() {
     
     clearInterval(screensaverInterval);
     screensaverInterval = '';
-    console.log('screensaver after clear in toggle: ' + screensaverInterval);
     screensaverInterval = setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverChangeInterval));
 }
 
@@ -2350,11 +2482,14 @@ function togglePane(e) {
     let targetNode = document.querySelector('#' + e.target.id.substring(12));
     targetNode.style.visibility === 'visible' ? targetNode.style.visibility = 'hidden' : targetNode.style.visibility = 'visible';
     (targetNode.style.opacity === '0' || targetNode.style.opacity === '') ? targetNode.style.opacity = '1' : targetNode.style.opacity = '0';
+    if (settings.useAltPubIcon) {
+        setPubIcon();
+    }
 }
 
 function toggleSettings() {
-    let settings = document.querySelector('#settings');
-    settings.style.visibility === 'visible' ? settings.style.visibility = 'hidden' : settings.style.visibility = 'visible';
+    let settingsDiv = document.querySelector('#settings');
+    settingsDiv.style.visibility === 'visible' ? settingsDiv.style.visibility = 'hidden' : settingsDiv.style.visibility = 'visible';
     document.querySelector('#numbersPurge').innerHTML = 'Clicking the purge button will delete <em>' + books.size + ' books</em>, <em>' + authors.size + ' authors</em>, and <em>' + publishers.size + ' publishers</em>!!!';
     document.querySelector('#localDataList-books').textContent = books.size.toString().padStart(3, '0');
     document.querySelector('#localDataList-authors').textContent = authors.size.toString().padStart(3, '0');
@@ -2364,6 +2499,15 @@ function toggleSettings() {
     document.querySelector('#localDataList-tags').textContent = tags.size.toString().padStart(3, '0');
     document.querySelector('#localDataList-collections').textContent = collections.size.toString().padStart(3, '0');
     document.querySelector('#localDataList-signatures').textContent = signatures.size.toString().padStart(3, '0');
+
+    if (settings.useAltPubIcon) {
+        document.querySelector('#altPubIcons').style.display = 'block flex';
+    }
+}
+
+function uncheckAllAltIcons() {
+    let altChecks = document.querySelectorAll('.altPubIconCheck');
+    altChecks.forEach((check) => check.checked = false );
 }
 
 function updateAuthorsPane() {
