@@ -54,8 +54,7 @@ let lastSave = new Date();
 
 let imageReload = setInterval(loadRandomBackgroundImage, 60000 * settings.backgroundInterval);
 let autoSave = setInterval(exportLocalDataToJsonFile, 60000 * settings.autoSaveInterval);
-let screensaver;
-let screensaverChange;
+let screensaverInterval;
 
 let authorsPane = document.querySelector('#authors');
 let exportPane = document.querySelector('#export');
@@ -1022,8 +1021,10 @@ function exitFullscreenSaver() {
     document.querySelector('body').removeEventListener('mousemove', exitFullscreenSaver);
     if (document.fullscreenElement) { document.exitFullscreen(); }
     document.querySelector('.screensaver').remove();
-    window.clearInterval(screensaverChange);
-    screensaver = window.setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
+    clearInterval(screensaverInterval);
+    screensaverInterval = '';
+    console.log('screensaverInterval directly after clear: ' + screensaverInterval);
+    screensaverInterval = setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
     document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
 }
 
@@ -1292,7 +1293,7 @@ function initializeSettingsInputs() {
 }
 
 function initializeScreensaver() {
-    screensaver = window.setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
+    screensaverInterval = setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
 }
 
 function loadLocalStorage() {
@@ -1578,9 +1579,9 @@ function requestFull() {
 }
 
 function resetScreenSaverInterval() {
-    window.clearInterval(screensaver);
-    screensaver = window.setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
-    console.log('HI! from reset!' + screensaver);
+    clearInterval(screensaverInterval);
+    screensaverInterval = setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
+    console.log('HI! from reset!' + screensaverInterval);
 }
 
 function resetSettings() {
@@ -2333,9 +2334,10 @@ function toggleFullScreenSaver() {
     }
     */
     
-    window.clearInterval(screensaver);
-    console.log('screensaver after clear in toggle: ' + screensaver);
-    screensaverChange = window.setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverChangeInterval));
+    clearInterval(screensaverInterval);
+    screensaverInterval = '';
+    console.log('screensaver after clear in toggle: ' + screensaverInterval);
+    screensaverInterval = setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverChangeInterval));
 }
 
 function toggleMainInterfacePosition(e) {
