@@ -143,6 +143,10 @@ td {
   width: 120px;
 }
 
+.altIconSelect {
+  font-size: 170%;
+}
+
 .authorBookItem {
   padding: 10px 20px;
   font-size: 90%;
@@ -718,6 +722,21 @@ td {
   font-size: 90%;
 }
 
+.settingsItemIcon {
+  margin: 8px 10px;
+}
+
+.settingsItemSub {
+  padding-left: 20px;
+
+}
+
+.settingsItemSubIcons {
+  padding-left: 20px;
+  display: flex;
+  
+}
+
 .settingsListHeader {
   font-family: 'DM Mono';
   text-align: left;
@@ -883,6 +902,10 @@ td {
   background-repeat: no-repeat;
   background-size: cover;
   transition: background-image 3s ease 3s;
+}
+
+#altPubIcons {
+  display: none;
 }
 
 #authorBooks {

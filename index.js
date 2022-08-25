@@ -4,22 +4,40 @@
 
 let settings = {
     language: 'en',
+    useAcademicMode: true,
     useBackground: true,
+    useAutoSave: true,
+    autoSaveInterval: 45,
+    saveTransient: false,
+    showOrderButtons: true,
+    showFormOnEmpty: true,
+    useAltPubIcon: false,
+    altPubIcon: '',
+    useDynamicBackground: false,
+    startCollapsed: false,
+    showLastAdditions: true,
+    showGaps: true,
+    showLastQuotes: true,
+    showLastNotes: true,
     backgroundInterval: 5,
     useFixedBackground: false,
     fixedBackground: '',
     useTransparency: true,
-    useAcademicMode: true,
     inputFormat: '',
     outputFormat: '',
     serverURL: '',
     useLocalStorage: true,
     isFirstStart: true,
-    autoSaveInterval: 60,
     sortOrderStock: 'alpha',
     sortOrderAuthors: 'alpha',
     sortOrderExport: 'alpha',
-    displayStock: 'table'
+    displayStock: 'table',
+    useScreensaver: true,
+    screensaverActInterval: 2,
+    screensaverChangeInterval: 1,
+    screensaverQuotes: true,
+    screensaverNotes: false,
+    screensaverEffect: 'flicker-glow'
 };
 
 let authors = new Map();
@@ -36,7 +54,8 @@ let lastSave = new Date();
 
 let imageReload = setInterval(loadRandomBackgroundImage, 60000 * settings.backgroundInterval);
 let autoSave = setInterval(exportLocalDataToJsonFile, 60000 * settings.autoSaveInterval);
-let screensaver = setInterval(toggleFullScreenSaver, 120000);
+let screensaver;
+let screensaverChange;
 
 let authorsPane = document.querySelector('#authors');
 let exportPane = document.querySelector('#export');
@@ -579,6 +598,10 @@ class Collection {
         this.authors = options.authors || [];
 
         collections.set(this.title, this);
+        this.save();
+    }
+
+    save = () => {
         localStorage.setItem('collections', JSON.stringify(Object.fromEntries(collections)));
     }
 }
@@ -839,6 +862,9 @@ function createBooksFromFile(e) {
     Array.from(importedSignatures).forEach((sign) => { signatures.set(sign[0], new Signature(sign[1].label, sign[1])); });
     console.log(importedSignatures);
 
+    let importedCollections = new Map(Object.entries(JSON.parse(importData[7])));
+    Array.from(importedCollections).forEach((coll) => { collections.set(coll[0], new Collection(coll[1].title, coll[1])); });
+    console.log(importedCollections);
     console.log('JSON Data successfully imported! ' + books.size + ' Books added.');
     updateDisplay();
     
@@ -989,14 +1015,16 @@ function equipListeners() {
     document.querySelector('#newType').addEventListener('click', changeTitleType);
 
     document.querySelectorAll('.settingsSectionsItem').forEach((node) => { node.addEventListener('click', showSettingsTab); });
+    document.querySelectorAll('.settingsSetting').forEach((node) => { node.addEventListener('change', handleSettingsChange); });
 }
 
 function exitFullscreenSaver() {
     document.querySelector('body').removeEventListener('mousemove', exitFullscreenSaver);
-    document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
     if (document.fullscreenElement) { document.exitFullscreen(); }
     document.querySelector('.screensaver').remove();
-    resetScreenSaverInterval();
+    window.clearInterval(screensaverChange);
+    screensaver = window.setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
+    document.querySelector('body').addEventListener('mousemove', resetScreenSaverInterval);
 }
 
 function exportLocalDataToJsonFile() {
@@ -1008,6 +1036,7 @@ function exportLocalDataToJsonFile() {
     let notesStr = JSON.stringify(Object.fromEntries(notes));
     let tagsStr = JSON.stringify(Object.fromEntries(tags));
     let signStr = JSON.stringify(Object.fromEntries(signatures));
+    let CollStr = JSON.stringify(Object.fromEntries(collections));
 
     exportData.push(booksStr);
     exportData.push(authorsStr);
@@ -1016,11 +1045,12 @@ function exportLocalDataToJsonFile() {
     exportData.push(notesStr);
     exportData.push(tagsStr);
     exportData.push(signStr);
+    exportData.push(CollStr);
 
     let expStr = JSON.stringify(exportData);
 
     rightNow = new Date();
-    filename = 'books-' + (rightNow.getMonth()+1) + '-' + rightNow.getDate() + '-' + rightNow.getFullYear() + '--' + rightNow.getHours() + '-' + rightNow.getMinutes() + '.json';
+    filename = 'bibliography-data-' + (rightNow.getMonth()+1) + '-' + rightNow.getDate() + '-' + rightNow.getFullYear() + '-' + rightNow.getHours().toString().padStart(2, '0') + '-' + rightNow.getMinutes().toString().padStart(2, '0') + '.json';
     booksUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(expStr);
     let ghostLink = document.createElement('a');
     ghostLink.setAttribute('href', booksUri);
@@ -1074,9 +1104,135 @@ function getBrowserName() {
 }
 
 function handleSettingsChange(e) {
-    switch(e.target.id) {
+    console.log('HI! from handleSettingsChange!');
 
+    switch(e.target.id) {
+        case 'languageSelect':
+            settings.language = e.target.value;
+            break;
+        case 'useScientific':
+            settings.useAcademicMode = e.target.checked;
+            break;
+        case 'useAutoSave':
+            settings.useAutoSave = e.target.checked;
+            break;
+        case 'autoSaveInterval':
+            settings.autoSaveInterval = Number.parseInt(e.target.value);
+            break;
+        case 'saveTransient':
+            settings.saveTransient = e.target.checked;
+            break;
+        case 'showOrderButtons':
+            settings.showOrderButtons = e.target.checked;
+            break;
+        case 'showFormOnEmpty':
+            settings.showFormOnEmpty = e.target.checked;
+            break;
+        case 'useTransparency':
+            settings.useTransparency = e.target.checked;
+            break;
+        case 'useAlternativePublisherIcon':
+            settings.useAltPubIcon = e.target.checked;
+            if (settings.useAltPubIcon) {
+                document.querySelector('#altPubIcons').style.display = 'block flex';
+            } else {
+                document.querySelector('#altPubIcons').style.display = 'none';
+            }
+            break;
+        case 'useRifleIcon':
+            if (e.target.checked) {
+                settings.altPubIcon = 'fa-person-military-rifle';
+            } else {
+                settings.altPubIcon = '';
+            }
+            break;
+        case 'useRobberyIcon':
+            if (e.target.checked) {
+                settings.altPubIcon = 'fa-people-robbery';
+            } else {
+                settings.altPubIcon = '';
+            }
+            break;
+        case 'useHarassingIcon':
+            if (e.target.checked) {
+                settings.altPubIcon = 'fa-person-harassing';
+            } else {
+                settings.altPubIcon = '';
+            }            
+            break;
+        case 'useGrinIcon':
+            if (e.target.checked) {
+                settings.altPubIcon = 'fa-face-grin-hearts';
+            } else {
+                settings.altPubIcon = '';
+            }
+            break;
+        case 'useHeartIcon':
+            if (e.target.checked) {
+                settings.altPubIcon = 'fa-heart';
+            } else {
+                settings.altPubIcon = '';
+            }
+            break;
+        case 'useCowIcon':
+            if (e.target.checked) {
+                settings.altPubIcon = 'fa-cow';
+            } else {
+                settings.altPubIcon = '';
+            }
+            break;
+        case 'useSpockIcon':
+            if (e.target.checked) {
+                settings.altPubIcon = 'fa-hand-spock';
+            } else {
+                settings.altPubIcon = '';
+            }
+            break;
+        case 'useBackground':
+            settings.useBackground = e.target.checked;
+            break;
+        case 'useFixedBackground':
+            settings.useFixedBackground = e.target.checked;
+            break;
+        case 'useDynamicBackground':
+            settings.useDynamicBackground = e.target.checked;
+            break;
+        case 'startWithCollapsed':
+            settings.startCollapsed = e.target.checked;
+            break;
+        case 'showLastAdditions':
+            settings.showLastAdditions = e.target.checked;
+            break;
+        case 'showGaps':
+            settings.showGaps = e.target.checked;
+            break;
+        case 'showLastQuotes':
+            settings.showLastQuotes = e.target.checked;
+            break;
+        case 'showLastNotes':
+            settings.showLastNotes = e.target.checked;
+            break;
+        case 'useScreensaver':
+            settings.useScreensaver = e.target.checked;
+            break;
+        case 'useQuotes':
+            settings.screensaverQuotes = e.target.checked;
+            break;
+        case 'useNotes':
+            settings.screensaverNotes = e.target.checked;
+            break;
+        case 'screensaverActivateInterval':
+            settings.screensaverActInterval = Number.parseInt(e.target.value);
+            break;
+        case 'screensaverChangeInterval':
+            settings.screensaverChangeInterval = Number.parseFloat(e.target.value);
+            break;
+        case 'screensaverEffect':
+            settings.screensaverEffect = e.target.value;
+            break;    
     }
+
+    saveSettings();
 }
 
 function hideQuoteActions(e) {
@@ -1092,6 +1248,8 @@ function importDataFile(e) {
 
 function initializeApp() {
     initializeLocalStorage();
+    initializeSettingsInputs();
+    initializeScreensaver();
     equipListeners();
     updateDisplay();
     
@@ -1104,6 +1262,37 @@ function initializeLocalStorage() {
     } else {
         loadLocalStorage();
     }
+}
+
+function initializeSettingsInputs() {
+    document.querySelector('#languageSelect').value = settings.language;
+    document.querySelector('#useScientific').checked = settings.useAcademicMode;
+    document.querySelector('#useAutoSave').checked = settings.useAutoSave;
+    document.querySelector('#autoSaveInterval').value = settings.autoSaveInterval.toString();
+    document.querySelector('#saveTransient').checked = settings.saveTransient;
+    document.querySelector('#showOrderButtons').checked = settings.showOrderButtons;
+    document.querySelector('#showFormOnEmpty').checked = settings.showFormOnEmpty;
+    document.querySelector('#useTransparency').checked = settings.useTransparency;
+    document.querySelector('#useAlternativePublisherIcon').checked = settings.useAltPubIcon;
+    /* TODO Check the correct icon according to read settings */
+    document.querySelector('#useBackground').checked = settings.useBackground;
+    document.querySelector('#useFixedBackground').checked = settings.useFixedBackground;
+    document.querySelector('#useDynamicBackground').checked = settings.useDynamicBackground;
+    document.querySelector('#startWithCollapsed').checked = settings.startCollapsed;
+    document.querySelector('#showLastAdditions').checked = settings.showLastAdditions;
+    document.querySelector('#showGaps').checked = settings.showGaps;
+    document.querySelector('#showLastQuotes').checked = settings.showLastQuotes;
+    document.querySelector('#showLastNotes').checked = settings.showLastNotes;
+    document.querySelector('#useScreensaver').checked = settings.useScreensaver;
+    document.querySelector('#useQuotes').checked = settings.screensaverQuotes;
+    document.querySelector('#useNotes').checked = settings.screensaverNotes;
+    document.querySelector('#screensaverActivateInterval').value = settings.screensaverActInterval.toString();
+    document.querySelector('#screensaverChangeInterval').value = settings.screensaverChangeInterval.toString();
+    document.querySelector('#screensaverEffect').value = settings.screensaverEffect;
+}
+
+function initializeScreensaver() {
+    screensaver = window.setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
 }
 
 function loadLocalStorage() {
@@ -1339,10 +1528,21 @@ function purgeLocalStorage() {
     books = new Map();
     authors = new Map();
     publishers = new Map();
+    quotes = new Map();
+    notes = new Map();
+    signatures = new Map();
+    tags = new Map();
+    collections = new Map();
 
     localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
     localStorage.setItem('authors', JSON.stringify(Object.fromEntries(authors)));
     localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
+    localStorage.setItem('quotes', JSON.stringify(Object.fromEntries(publishers)));
+    localStorage.setItem('notes', JSON.stringify(Object.fromEntries(publishers)));
+    localStorage.setItem('signatures', JSON.stringify(Object.fromEntries(publishers)));
+    localStorage.setItem('tags', JSON.stringify(Object.fromEntries(publishers)));
+    localStorage.setItem('collections', JSON.stringify(Object.fromEntries(publishers)));
+
     updateDisplay();
 }
 
@@ -1378,9 +1578,9 @@ function requestFull() {
 }
 
 function resetScreenSaverInterval() {
-    clearInterval(screensaver);
-    screensaver = setInterval(toggleFullScreenSaver, 120000);
-    console.log('HI! from reset!');
+    window.clearInterval(screensaver);
+    screensaver = window.setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverActInterval));
+    console.log('HI! from reset!' + screensaver);
 }
 
 function resetSettings() {
@@ -2098,7 +2298,7 @@ function toggleConfigurator() {
 
 function toggleFullScreenSaver() {
     /* requestFull(); */
-    
+
     let num = Math.round(Math.random() * (quotes.size - 1));
     let cites = Array.from(quotes);
 
@@ -2106,8 +2306,8 @@ function toggleFullScreenSaver() {
         document.querySelector('.screensaver').remove();
     }
 
-    let screensaver = document.createElement('div');
-    screensaver.classList.add('screensaver');
+    let screensaverDiv = document.createElement('div');
+    screensaverDiv.classList.add('screensaver');
     
     let letterContainer = document.createElement('div');
     letterContainer.classList.add('screensaver-lettercontainer');
@@ -2116,9 +2316,9 @@ function toggleFullScreenSaver() {
     
     letterContainer.appendChild(createScreensaverQuote(text));
 
-    screensaver.appendChild(letterContainer);
+    screensaverDiv.appendChild(letterContainer);
 
-    document.querySelector('body').appendChild(screensaver);
+    document.querySelector('body').appendChild(screensaverDiv);
     /* document.querySelector('body').addEventListener('keydown', (e) => {
         if (e.code === 'Space') { toggleFullScreenSaver(); }
     }); */
@@ -2132,7 +2332,10 @@ function toggleFullScreenSaver() {
         document.exitFullscreen();
     }
     */
-
+    
+    window.clearInterval(screensaver);
+    console.log('screensaver after clear in toggle: ' + screensaver);
+    screensaverChange = window.setInterval(toggleFullScreenSaver, Number.parseInt(60000 * settings.screensaverChangeInterval));
 }
 
 function toggleMainInterfacePosition(e) {
@@ -2151,6 +2354,14 @@ function toggleSettings() {
     let settings = document.querySelector('#settings');
     settings.style.visibility === 'visible' ? settings.style.visibility = 'hidden' : settings.style.visibility = 'visible';
     document.querySelector('#numbersPurge').innerHTML = 'Clicking the purge button will delete <em>' + books.size + ' books</em>, <em>' + authors.size + ' authors</em>, and <em>' + publishers.size + ' publishers</em>!!!';
+    document.querySelector('#localDataList-books').textContent = books.size.toString().padStart(3, '0');
+    document.querySelector('#localDataList-authors').textContent = authors.size.toString().padStart(3, '0');
+    document.querySelector('#localDataList-publishers').textContent = publishers.size.toString().padStart(3, '0');
+    document.querySelector('#localDataList-quotes').textContent = quotes.size.toString().padStart(3, '0');
+    document.querySelector('#localDataList-notes').textContent = notes.size.toString().padStart(3, '0');
+    document.querySelector('#localDataList-tags').textContent = tags.size.toString().padStart(3, '0');
+    document.querySelector('#localDataList-collections').textContent = collections.size.toString().padStart(3, '0');
+    document.querySelector('#localDataList-signatures').textContent = signatures.size.toString().padStart(3, '0');
 }
 
 function updateAuthorsPane() {

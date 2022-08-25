@@ -306,19 +306,19 @@
 
           <div class="settingsItem">
             <label for="languageSelect">Language</label>
-            <select id="languageSelect" name="languageSelect" value="en">
+            <select id="languageSelect" name="languageSelect" value="en" class="settingsSetting">
               <option value="en">English</option>
               <option value="de">German</option>
             </select>
           </div>
           <div class="settingsItem">
-            <input id="useScientific" type="checkbox" checked><label for="useScientific" class="labelInlineRight" title="When Scientific Mode is active, you are regularly questioned to fill in the gaps in your data needed for scientific referencing">Use scientific mode</label>
+            <input id="useScientific" type="checkbox" class="settingsSetting" checked><label for="useScientific" class="labelInlineRight" title="When Scientific Mode is active, you are regularly questioned to fill in the gaps in your data needed for scientific referencing">Use scientific mode</label>
           </div>
           <div class="settingsItem">
-            <input id="useAutoSave" type="checkbox" checked><label for="useAutoSave" class="labelInlineRight" title="Automatically backup all data to a JSON file">Use auto save</label>
+            <input id="useAutoSave" type="checkbox" class="settingsSetting" checked><label for="useAutoSave" class="labelInlineRight" title="Automatically backup all data to a JSON file">Use auto save</label>
           </div>
           <div class="settingsItem">
-            <select id="autoSaveInterval" name="autoSaveInterval" value="60">
+            <select id="autoSaveInterval" name="autoSaveInterval" value="60" class="settingsSetting">
               <option value="5">Every 5 Minutes</option>
               <option value="10">Every 10 Minutes</option>
               <option value="20">Every 20 Minutes</option>
@@ -329,59 +329,84 @@
             <label for="autoSaveInterval">Save interval</label>
           </div>
           <div class="settingsItem">
-            <input id="saveTransient" type="checkbox"><label for="saveTransient" class="labelInlineRight" title="Remember the selection in the Stock pane after a reload">Save Transient Selection</label>
+            <input id="saveTransient" type="checkbox" class="settingsSetting"><label for="saveTransient" class="labelInlineRight" title="Remember the selection in the Stock pane after a reload">Save Transient Selection</label>
           </div>
           <div class="settingsItem">
-            <input id="showOrderButtons" type="checkbox" checked><label for="showOrderButtons" class="labelInlineRight" title="Show the 4 order buttons in the panes">Show order buttons in panes</label>
+            <input id="showOrderButtons" type="checkbox" class="settingsSetting" checked><label for="showOrderButtons" class="labelInlineRight" title="Show the 4 order buttons in the panes">Show order buttons in panes</label>
           </div>
           <div class="settingsItem">
-            <input id="showFormOnEmpty" type="checkbox" checked><label for="showFormOnEmpty" class="labelInlineRight" title="Bring up the form for a new title when hitting Return without any contents in the main input">Show new title form on empty Return (in main input)</label>
+            <input id="showFormOnEmpty" type="checkbox" class="settingsSetting" checked><label for="showFormOnEmpty" class="labelInlineRight" title="Bring up the form for a new title when hitting Return without any contents in the main input">Show new title form on empty Return (in main input)</label>
           </div>
           <div class="settingsItem">
-            <input id="useTransparency" type="checkbox" checked><label for="useTransparency" class="labelInlineRight" title="Use transparency for the background of the main content">Use Transparency</label>
+            <input id="useTransparency" type="checkbox" class="settingsSetting" checked><label for="useTransparency" class="labelInlineRight" title="Use transparency for the background of the main content">Use Transparency</label>
+          </div>
+          <div class="settingsItem">
+            <input id="useAlternativePublisherIcon" type="checkbox" class="settingsSetting"><label for="useAlternativePublisherIcon" class="labelInlineRight" title="Depending on your emotional attitude towards publishers you can select an alternative icon for them">Use alternative publisher icon</label>
+            <div id="altPubIcons" class="settingsItemSubIcons">
+              <div class="settingsItemIcon">
+                <input id="useRifleIcon" type="checkbox" class="settingsSetting"><label for="useRifleIcon" class="labelInlineRight" title="Military person with a rifle"><i class="fa-solid fa-person-military-rifle altIconSelect"></i></label>
+              </div>
+              <div class="settingsItemIcon">
+                <input id="useRobberyIcon" type="checkbox" class="settingsSetting"><label for="useRobberyIcon" class="labelInlineRight" title="Two persons in a robbery scene"><i class="fa-solid fa-people-robbery altIconSelect"></i></label>
+              </div>
+              <div class="settingsItemIcon">
+                <input id="useHarassingIcon" type="checkbox" class="settingsSetting"><label for="useHarassingIcon" class="labelInlineRight" title="One person harassing another one"><i class="fa-solid fa-person-harassing altIconSelect"></i></label>
+              </div>
+              <div class="settingsItemIcon">
+                <input id="useGrinIcon" type="checkbox" class="settingsSetting"><label for="useGrinIcon" class="labelInlineRight" title="A grinning emoji with heart eyes"><i class="fa-solid fa-face-grin-hearts altIconSelect"></i></label>
+              </div>
+              <div class="settingsItemIcon">
+                <input id="useHeartIcon" type="checkbox" class="settingsSetting"><label for="useHeartIcon" class="labelInlineRight" title="A heart"><i class="fa-solid fa-heart altIconSelect"></i></label>
+              </div>
+              <div class="settingsItemIcon">
+                <input id="useCowIcon" type="checkbox" class="settingsSetting"><label for="useCowIcon" class="labelInlineRight" title="A cow"><i class="fa-solid fa-cow altIconSelect"></i></label>
+              </div>
+              <div class="settingsItemIcon">
+                <input id="useSpockIcon" type="checkbox" class="settingsSetting"><label for="useSpockIcon" class="labelInlineRight" title="Vulcanic greeting"><i class="fa-solid fa-hand-spock altIconSelect"></i></label>
+              </div>
+            </div>
           </div>
 
           <h3 class="settingsListSubheader">Background</h3>
           <div class="settingsItem">
-            <input id="useBackground" type="checkbox" checked><label for="useBackground" class="labelInlineRight" title="Display a fullscreen image background">Use image background</label>
+            <input id="useBackground" type="checkbox" class="settingsSetting" checked><label for="useBackground" class="labelInlineRight" title="Display a fullscreen image background">Use image background</label>
           </div>
           <div class="settingsItem">
-            <input id="useFixedBackground" type="checkbox"><label for="useFixedBackground" class="labelInlineRight" title="Use a single image inside the images folder as static background">Use fixed image background</label>
+            <input id="useFixedBackground" type="checkbox" class="settingsSetting"><label for="useFixedBackground" class="labelInlineRight" title="Use a single image inside the images folder as static background">Use fixed image background</label>
           </div>
           <div class="settingsItem">
-            <input id="useDynamicBackground" type="checkbox"><label for="useDynamicBackground" class="labelInlineRight" title="Dynamically fetch new background images from Unsplash">Use dynamic image background (requires an Unsplash Api Key)</label>
+            <input id="useDynamicBackground" type="checkbox" class="settingsSetting"><label for="useDynamicBackground" class="labelInlineRight" title="Dynamically fetch new background images from Unsplash">Use dynamic image background (requires an Unsplash Api Key)</label>
           </div>
-
 
           <h3 class="settingsListSubheader">Startpage</h3>
           <div class="settingsItem">
-            <input id="startWithCollapsed" type="checkbox"><label for="startWithCollapsed" class="labelInlineRight">Start with collapsed main input</label>
+            <input id="startWithCollapsed" type="checkbox" class="settingsSetting"><label for="startWithCollapsed" class="labelInlineRight">Start with collapsed main input</label>
           </div>
           <div class="settingsItem">
-            <input id="showLastAdditions" type="checkbox" checked><label for="showLastAdditions" class="labelInlineRight">Show last additions</label>
+            <input id="showLastAdditions" type="checkbox" class="settingsSetting" checked><label for="showLastAdditions" class="labelInlineRight">Show last additions</label>
           </div>
           <div class="settingsItem">
-            <input id="showGaps" type="checkbox" checked><label for="showGaps" class="labelInlineRight">Show scientific gaps</label>
+            <input id="showGaps" type="checkbox" class="settingsSetting" checked><label for="showGaps" class="labelInlineRight">Show scientific gaps</label>
           </div>
           <div class="settingsItem">
-            <input id="showLastQuotes" type="checkbox" checked><label for="showLastQuotes" class="labelInlineRight">Show last quotes</label>
+            <input id="showLastQuotes" type="checkbox" class="settingsSetting" checked><label for="showLastQuotes" class="labelInlineRight">Show last quotes</label>
           </div>
           <div class="settingsItem">
-            <input id="showLastNotes" type="checkbox" checked><label for="showLastNotes" class="labelInlineRight">Show last notes</label>
+            <input id="showLastNotes" type="checkbox" class="settingsSetting" checked><label for="showLastNotes" class="labelInlineRight">Show last notes</label>
           </div>
 
           <h3 class="settingsListSubheader">Screensaver</h3>
           <div class="settingsItem">
-            <input id="useScreensaver" type="checkbox" checked><label for="useScreensaver" class="labelInlineRight">Use screensaver</label>
+            <input id="useScreensaver" type="checkbox" class="settingsSetting" checked><label for="useScreensaver" class="labelInlineRight">Use screensaver</label>
           </div>
           <div class="settingsItem">
-            <input id="useQuotes" type="checkbox" checked><label for="useQuotes" class="labelInlineRight">Use quotes</label>
+            <input id="useQuotes" type="checkbox" class="settingsSetting" checked><label for="useQuotes" class="labelInlineRight">Use quotes</label>
           </div>
           <div class="settingsItem">
-            <input id="useNotes" type="checkbox"><label for="useNotes" class="labelInlineRight">Use notes</label>
+            <input id="useNotes" type="checkbox" class="settingsSetting"><label for="useNotes" class="labelInlineRight">Use notes</label>
           </div>
           <div class="settingsItem">
-            <select id="screensaverActivateInterval" name="screensaverActivateInterval" value="2">
+            <select id="screensaverActivateInterval" name="screensaverActivateInterval" value="2" class="settingsSetting">
               <option value="1">1 Minute</option>
               <option value="2" selected>2 Minutes</option>
               <option value="5">5 Minutes</option>
@@ -392,7 +417,7 @@
             <label for="screensaverActivateInterval">Motionless time until activation</label>
           </div>
           <div class="settingsItem">
-            <select id="screensaverChangeInterval" name="screensaverChangeInterval" value="1">
+            <select id="screensaverChangeInterval" name="screensaverChangeInterval" value="1" class="settingsSetting">
               <option value="0.5">30 Seconds</option>
               <option value="1" selected>1 Minute</option>
               <option value="2">2 Minutes</option>
@@ -403,8 +428,8 @@
             <label for="screensaverChangeInterval">Change interval of quotes/notes</label>
           </div>
           <div class="settingsItem">
-            <select id="screensaverEffect" name="screensaverEffect" value="flicker">
-              <option value="flicker" selected>Flicker Glow</option>
+            <select id="screensaverEffect" name="screensaverEffect" value="flicker" class="settingsSetting">
+              <option value="flicker-glow" selected>Flicker Glow</option>
               <option value="typing">Typing</option>
             </select>
             <label for="screensaverEffect">Display effect</label>
@@ -477,6 +502,19 @@
         </div>
         <div id="settingsListManagement" class="settingsSectionDiv">
           <h2 class="settingsListHeader">Management</h2>
+          <h3 class="settingsListSubheader">Local Data</h3>
+          <div class="settingsItem">
+            Your current local data contains the following:
+            <div class="localDataListItem"><span id="localDataList-books"></span> books/titles</div>
+            <div class="localDataListItem"><span id="localDataList-authors"></span> authors</div>
+            <div class="localDataListItem"><span id="localDataList-publishers"></span> publishing houses</div>
+            <div class="localDataListItem"><span id="localDataList-quotes"></span> quotes</div>
+            <div class="localDataListItem"><span id="localDataList-notes"></span> notes</div>
+            <div class="localDataListItem"><span id="localDataList-tags"></span> tags</div>
+            <div class="localDataListItem"><span id="localDataList-collections"></span> collections</div>
+            <div class="localDataListItem"><span id="localDataList-signatures"></span> signatures</div>
+          </div>
+
           <h3 class="settingsListSubheader">Purge Local Data</h3>
           <div class="settingsItem">
             <i class="fa-solid fa-dumpster-fire"></i>
