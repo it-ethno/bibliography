@@ -193,6 +193,7 @@ class Book {
     link;
     tags;
     date_added;
+    authors;
 
     constructor(title, options = {}) {
         if (books.has(title)) {
@@ -216,6 +217,7 @@ class Book {
             this.author_prename = options.author_prename || '';
             this.publisher_name = options.publisher_name || '';
             this.date_added = options.date_added || new Date();
+            this.authors = options.authors || [];
 
             let author = (options.author_surname || '') + ', ' + (options.author_prename || '');
 
@@ -236,8 +238,7 @@ class Book {
             }
 
             books.set(this.title, this);
-            localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
-            
+            this.save();            
         }
     }
 
@@ -583,7 +584,6 @@ class Book {
     }
 
     save = () => {
-        console.log('Saving...');
         books.set(this.title, this);
         localStorage.setItem('books', JSON.stringify(Object.fromEntries(books)));
     }
@@ -674,6 +674,10 @@ class Publisher {
         this.places = Array.from(new Set(this.places));
 
         publishers.set(this.name, this);
+        this.save();
+    }
+
+    save = () => {
         localStorage.setItem('publishers', JSON.stringify(Object.fromEntries(publishers)));
     }
 }
@@ -903,7 +907,7 @@ function changeTitleType(e) {
 function constructStartPage() {
     let sp = document.querySelector('#startPage');
     let coords = sp.getBoundingClientRect();
-    console.log(coords);
+    
     sp.style.height = window.innerHeight - coords.top - 50 + 'px';
     if (settings.startCollapsed) {
 
@@ -966,6 +970,11 @@ function createBooksFromFile(e) {
     
 }
 
+function createBookFromForm(e) {
+    e.preventDefault();
+
+}
+
 function createNewCollection(e) {
     let name = document.querySelector('#stockPane-newCollectionInput').value;
     let c = new Collection(name, { titles: Array.from(transientSelection) });
@@ -1018,6 +1027,45 @@ function createScreensaverQuote(text) {
     return wordsDiv;
 }
 
+function createSearchResultsDisplay() {
+    if (!document.querySelector('#mainInputSearchResults')) {
+        let coords = document.querySelector('#mainInput').getBoundingClientRect();
+        let newDiv = document.createElement('div');
+        newDiv.id = 'mainInputSearchResults';
+        newDiv.style.top = coords.top + 30 + 'px';
+        newDiv.style.left = coords.left + 'px';
+
+        let newH = document.createElement('div');
+        newH.textContent = 'Search Results';
+        newDiv.appendChild(newH);
+
+        let newAuthors = document.createElement('div');
+        
+        let newAuthorsH = document.createElement('div');
+        newAuthorsH.textContent = 'Authors';
+        newAuthors.appendChild(newAuthorsH);
+
+        let newAuthorsList = document.createElement('div');
+        newAuthorsList.id = 'mainInputSearchResults-Authors';
+        newAuthors.appendChild(newAuthorsList);
+        newDiv.appendChild(newAuthors);
+
+        let newTitles = document.createElement('div');
+        
+        let newTitlesH = document.createElement('div');
+        newTitlesH.textContent = 'Titles';
+        newAuthors.appendChild(newTitlesH);
+
+        let newTitlesList = document.createElement('div');
+        newTitlesList.id = 'mainInputSearchResults-Titles';
+        newTitles.appendChild(newTitlesList);
+        newDiv.appendChild(newTitles);
+
+        document.querySelector('body').appendChild(newDiv);
+    }
+    
+}
+
 function deleteBook(e) {
     e.preventDefault();
     books.delete(e.target.id.substring(7));
@@ -1060,7 +1108,7 @@ function equipListeners() {
     document.querySelector('#settingsToggler').addEventListener('click', toggleSettings);
     document.querySelector('#closeSettings').addEventListener('click', toggleSettings);
     
-    document.querySelector('#mainInput').addEventListener('keydown', observeMainInput);
+    document.querySelector('#mainInput').addEventListener('input', observeMainInput);
     document.querySelector('#mainInput').addEventListener('focus', mainInputFocus);
     document.querySelector('#mainInput').addEventListener('blur', mainInputBlur);
 
@@ -1602,6 +1650,17 @@ function observeMainInput(e) {
     if (e.keyCode === 13) {
         parseMainInput();
     }
+    let input = document.querySelector('#mainInput').value;
+    console.log(input);
+    if (input.length > 0) {
+        createSearchResultsDisplay();
+        searchAuthors(input.toLowerCase());
+        searchBooks(input.toLowerCase());
+    } else {
+        if (document.querySelector('#mainInputSearchResults')) {
+            document.querySelector('#mainInputSearchResults').remove();
+        }
+    }
     /* TODO Parse input and reflect current progress in Standard Format String below mainInput (green coloring) */
 }
 
@@ -1768,6 +1827,61 @@ function saveBooksToLocalStorage() {
 
 function saveSettings() {
     localStorage.setItem('settings', JSON.stringify(settings));
+}
+
+function searchAuthors(str) {
+    let resultsDiv = document.querySelector('#mainInputSearchResults-Authors');
+    resultsDiv.innerHTML = '';
+    let names = Array.from(authors.keys());
+    console.log(names);
+    let results = [];
+    names.forEach((name) => {
+        if (name.toLowerCase().indexOf(str) > -1) {
+            results.push(name);
+        }
+    });
+    if (results.length > 0) {
+        results.forEach((result) => {
+            let newDiv = document.createElement('div');
+            newDiv.textContent = result;
+            newDiv.classList.add('searchResultItem');
+            resultsDiv.appendChild(newDiv);
+        });
+    } else {
+        let newDiv = document.createElement('div');
+        newDiv.textContent = 'No Authors found';
+        newDiv.classList.add('searchResultItem');
+        resultsDiv.appendChild(newDiv);
+    }
+    
+}
+
+function searchBooks(str) {
+    let resultsDiv = document.querySelector('#mainInputSearchResults-Titles');
+    resultsDiv.innerHTML = '';
+    let names = Array.from(books.keys());
+    console.log(names);
+    let results = [];
+    names.forEach((name) => {
+        if (name.toLowerCase().indexOf(str) > -1) {
+            results.push(name);
+        }
+    });
+    if (results.length > 0) {
+        results.forEach((result) => {
+            let newDiv = document.createElement('div');
+            newDiv.textContent = result;
+            newDiv.classList.add('searchResultItem');
+            newDiv.addEventListener('click', books.get(result).showDetails);
+            resultsDiv.appendChild(newDiv);
+        });
+    } else {
+        let newDiv = document.createElement('div');
+        newDiv.textContent = 'No Titles found';
+        newDiv.classList.add('searchResultItem');
+        resultsDiv.appendChild(newDiv);
+    }
+    
 }
 
 function serialDeleteBooks(e) {
