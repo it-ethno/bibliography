@@ -36,7 +36,7 @@
       </div>
       <div id="mainFocusPane">
         <div id="mainFocusContent">          
-          <div id="detailView">
+          <div id="detailView" class="mainFocusView">
             <div id="bookDetails">
               <div id="detailTitle" class="detailItem"></div>
               <div id="detailSubtitle" class="detailItem"></div>
@@ -65,7 +65,7 @@
               </div>
             </div>
           </div>
-          <div id="authorView">
+          <div id="authorView" class="mainFocusView">
             <div id="authorDetails">
               <div id="authorName"></div>
               <div id="authorPlace"></div>
@@ -86,7 +86,7 @@
               </div>
             </div>
           </div>
-          <div id="newBookView">
+          <div id="newBookView" class="mainFocusView">
             <div id="newBookFormDiv">
               <form id="newBookForm">
                 <h1 class="newTitle">Create a new title</h1>
@@ -216,7 +216,23 @@
               </div>
             </div>
           </div>
-          <div id="startPage">
+          <div id="tagView" class="mainFocusView">
+            <div id="tagDetails">
+              <div id="tagName"></div>
+              <div id="tagCount"></div>
+              <div id="tagUses">
+                <div id="tagUsesTitles">
+                  <h2 class="tagDetailSubheader">Titles</h2>
+                  <div id="tagUsesTitlesList"></div>
+                  <h2 class="tagDetailSubheader">Authors</h2>
+                  <div id="tagUsesAuthorsList"></div>
+                  <h2 class="tagDetailSubheader">Quotes</h2>
+                  <div id="tagUsesQuotesList"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="startPage" class="mainFocusView">
             <div id="latestAdditions">
               <h2>Latest Titles</h2>
               <div id="latestAdditionsList"></div>

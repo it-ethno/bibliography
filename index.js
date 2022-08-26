@@ -102,6 +102,11 @@ class Author {
     showDetails = () => {
         showAuthorDetailsDisplay();
         this.fillBooksArray();
+        if (document.querySelector('#mainInputSearchResults')) {
+            document.querySelector('#mainInputSearchResults').remove();
+            document.querySelector('#mainInput').value = this.surname + ', ' + this.prename;
+        }
+        hideStartPage();
         document.querySelector('#authorName').innerHTML = this.prename + ' ' + this.surname;
         if (this.date_birth !== '' && this.date_death !== '') {
             document.querySelector('#authorDates').innerHTML = this.date_birth + ' - ' + this.date_death;
@@ -192,6 +197,7 @@ class Book {
     language;
     link;
     tags;
+    tags_labels;
     date_added;
     authors;
 
@@ -209,6 +215,7 @@ class Book {
             this.notes = options.notes || [];
             this.quotes = options.quotes || [];
             this.tags = options.tags || [];
+            this.tags_labels = options.tags_labels || [];
             this.signatures = options.signatures || [];
             this.isbn = options.isbn || '';
             this.number_pages = options.number_pages || 0;
@@ -244,6 +251,10 @@ class Book {
 
     showDetails = () => {
         prepareForDetailsView();
+        clearSearchResults();
+        clearMainFocus();
+        /* this.repairTagsList(); */
+        document.querySelector('#detailView').style.display = 'block flex';
         document.querySelector('#detailView').setAttribute('data-title', this.title);
         document.querySelector('#detailTitle').innerHTML = '&laquo; ' + this.title + ' &raquo;';
         if (this.subtitle !== '') {
@@ -344,12 +355,13 @@ class Book {
             quotesList.textContent = 'No Quotes yet';
         }
 
-        if (this.tags.length > 0) {
-            this.tags.forEach((tag) => {
+        if (this.tags_labels.length > 0) {
+            this.tags_labels.forEach((tag) => {
                 let tagObj = tags.get(tag);
                 let newDiv = document.createElement('div');
                 newDiv.classList.add('tagItem');
                 newDiv.textContent = '#' + tagObj.label.toLowerCase();
+                newDiv.addEventListener('click', tagObj.showDetails);
                 tagsList.appendChild(newDiv);
             });
         } else {
@@ -468,7 +480,7 @@ class Book {
                 let tagDiv = document.createElement('div');
                 tagDiv.classList.add('tagListItem');
                 tagDiv.textContent = tag.label;
-                tagDiv.setAttribute('data-tag-uid', tag.uid);
+                tagDiv.setAttribute('data-tag-label', tag.label);
                 tagDiv.addEventListener('click', this.addTag);
                 knownTagsDiv.appendChild(tagDiv);
             })
@@ -544,18 +556,21 @@ class Book {
 
     addTag = (e) => {
         if (e.target.classList.contains('tagListItem')) {
-            let t = tags.get(e.target.getAttribute('data-tag-uid'));
+            let t = tags.get(e.target.getAttribute('data-tag-label'));
             this.tags.push(t.uid);
+            this.tags_labels.push(t.label);
             t.countUp();
             t.addBook(this.uid);
         } else {
             let inputTag = document.querySelector('#addTagInput-' + this.uid).value;
             let newTag = new Tag(inputTag);
             this.tags.push(newTag.uid);
+            this.tags_labels.push(newTag.label);
             newTag.countUp();
             newTag.addBook(this.uid);
         }
         this.tags = Array.from(new Set(this.tags));
+        this.tags_labels = Array.from(new Set(this.tags_labels));
         this.save();
         document.querySelector('#tagForm-' + this.uid).remove();
         this.showDetails();
@@ -580,6 +595,15 @@ class Book {
             }
         });
         this.quotes = Array.from(quotesSet);
+        this.save();
+    }
+
+    repairTagsList = () => {
+        this.tags.forEach((tag) => {
+            let t = tags.get(tag);
+            this.tags_labels.push(t.label);
+        });
+        this.tags_labels = Array.from(new Set(this.tags_labels));
         this.save();
     }
 
@@ -702,8 +726,9 @@ class Quote {
         this.tags = options.tags || [];
         this.notes = options.notes || [];
 
+        /* this.repairBookAttributes(); */
         quotes.set(this.uid, this);
-        localStorage.setItem('quotes', JSON.stringify(Object.fromEntries(quotes)));
+        this.save();
 
     }
 
@@ -754,6 +779,13 @@ class Quote {
     copyToClipboard = () => {
         navigator.clipboard.writeText(this.quote_text);
     }
+
+    repairBookAttributes = () => {
+        let cBook = Array.from(books.values()).filter((book) => book.quotes.indexOf(this.uid) > -1);
+        console.log(cBook);
+        this.book_id = cBook[0].uid;
+        this.book_title = cBook[0].title;        
+    }
 }
 
 class Signature {
@@ -797,13 +829,42 @@ class Tag {
         this.uses_book = options.uses_book || [];
         this.uses_authors = options.uses_authors || [];
 
-        this.repairCounts();
-        tags.set(this.uid, this);
+        /* this.repairCounts(); */
+        /* tags.set(this.uid, this); */
+        tags.set(this.label, this);
         this.save();
     }
 
     save = () => {
         localStorage.setItem('tags', JSON.stringify(Object.fromEntries(tags)));
+    }
+
+    showDetails = () => {
+        clearMainFocus();
+        clearSearchResults();
+        document.querySelector('#tagView').style.display = 'block flex';
+        document.querySelector('#tagName').textContent = '#' + this.label.toLowerCase();
+        document.querySelector('#tagCount').textContent = this.uses_count + ' uses';
+        let listDiv = document.querySelector('#tagUsesTitlesList');
+        listDiv.innerHTML = '';
+        this.uses_book.forEach((book) => {
+            let b = books.get(book);
+            let newDiv = document.createElement('div');
+            newDiv.classList.add('tagDetailsTitleItem');
+            newDiv.addEventListener('click', b.showDetails);
+
+            let newTit = document.createElement('div');
+            newTit.classList.add('tagDetailsListTitle');
+            newTit.textContent = b.title;
+            newDiv.appendChild(newTit);
+
+            let newAut = document.createElement('div');
+            newAut.classList.add('tagDetailsListAuthor');
+            newAut.textContent = 'by ' + b.author_prename + ' ' + b.author_surname;
+            newDiv.appendChild(newAut);
+
+            listDiv.appendChild(newDiv);
+        });
     }
 
     countUp = () => {
@@ -843,13 +904,13 @@ class Tag {
         let a = Array.from(authors.values());
         b.forEach((book) => {
             if (book.tags.indexOf(this.uid) > -1) {
-                this.addBook(book.uid);
+                this.addBook(book.title);
                 this.countUp();
             }
         });
         a.forEach((author) => {
             if (author.tags.indexOf(this.uid) > -1) {
-                this.addAuthor(author.uid);
+                this.addAuthor(author.prename + ' ' + author.surname);
                 this.countUp();
             }
         });
@@ -901,6 +962,16 @@ function changeTitleType(e) {
             break;
         case 'video':
             break;
+    }
+}
+
+function clearMainFocus() {
+    document.querySelectorAll('.mainFocusView').forEach((node) => node.style.display = 'none');
+}
+
+function clearSearchResults() {
+    if (document.querySelector('#mainInputSearchResults')) {
+        document.querySelector('#mainInputSearchResults').remove();
     }
 }
 
@@ -1037,12 +1108,14 @@ function createSearchResultsDisplay() {
 
         let newH = document.createElement('div');
         newH.textContent = 'Search Results';
+        newH.classList.add('searchResultsHeader');
         newDiv.appendChild(newH);
 
         let newAuthors = document.createElement('div');
         
         let newAuthorsH = document.createElement('div');
         newAuthorsH.textContent = 'Authors';
+        newAuthorsH.classList.add('searchResultsCategory');
         newAuthors.appendChild(newAuthorsH);
 
         let newAuthorsList = document.createElement('div');
@@ -1054,12 +1127,37 @@ function createSearchResultsDisplay() {
         
         let newTitlesH = document.createElement('div');
         newTitlesH.textContent = 'Titles';
+        newTitlesH.classList.add('searchResultsCategory');
         newAuthors.appendChild(newTitlesH);
 
         let newTitlesList = document.createElement('div');
         newTitlesList.id = 'mainInputSearchResults-Titles';
         newTitles.appendChild(newTitlesList);
         newDiv.appendChild(newTitles);
+
+        let newTags = document.createElement('div');
+        
+        let newTagsH = document.createElement('div');
+        newTagsH.textContent = 'Tags';
+        newTagsH.classList.add('searchResultsCategory');
+        newTags.appendChild(newTagsH);
+
+        let newTagsList = document.createElement('div');
+        newTagsList.id = 'mainInputSearchResults-Tags';
+        newTags.appendChild(newTagsList);
+        newDiv.appendChild(newTags);
+
+        let newQuotes = document.createElement('div');
+        
+        let newQuotesH = document.createElement('div');
+        newQuotesH.textContent = 'Quotes';
+        newQuotesH.classList.add('searchResultsCategory');
+        newQuotes.appendChild(newQuotesH);
+
+        let newQuotesList = document.createElement('div');
+        newQuotesList.id = 'mainInputSearchResults-Quotes';
+        newQuotes.appendChild(newQuotesList);
+        newDiv.appendChild(newQuotes);
 
         document.querySelector('body').appendChild(newDiv);
     }
@@ -1432,6 +1530,10 @@ function hideQuoteActions(e) {
     e.currentTarget.querySelector('.quoteActions').remove();
 }
 
+function hideStartPage() {
+    document.querySelector('#startPage').style.display = 'none';
+}
+
 function importDataFile(e) {
     let files = e.target.files;
     let reader = new FileReader();
@@ -1539,12 +1641,21 @@ function mainInputBlur() {
     let mainInputClue = document.querySelector('#mainInputClue');
     mainInputClue.classList.remove('shake-horizontal');
     mainInputClue.style.color = 'rgba(100, 100, 100, 0.5)';
+    
 }
 
 function mainInputFocus() {
     let mainInputClue = document.querySelector('#mainInputClue');
     mainInputClue.style.color = 'rgba(30, 30, 30, 1.0)';
     mainInputClue.classList.add('shake-horizontal');
+    let input = document.querySelector('#mainInput').value;
+    if (input.length > 0) {
+        createSearchResultsDisplay();
+        searchAuthors(input.toLowerCase());
+        searchBooks(input.toLowerCase());
+        searchTags(input.toLowerCase());
+        searchQuotes(input.toLowerCase());
+    }
 }
 
 function maximizeMainContent(e) {
@@ -1656,6 +1767,8 @@ function observeMainInput(e) {
         createSearchResultsDisplay();
         searchAuthors(input.toLowerCase());
         searchBooks(input.toLowerCase());
+        searchTags(input.toLowerCase());
+        searchQuotes(input.toLowerCase());
     } else {
         if (document.querySelector('#mainInputSearchResults')) {
             document.querySelector('#mainInputSearchResults').remove();
@@ -1833,7 +1946,7 @@ function searchAuthors(str) {
     let resultsDiv = document.querySelector('#mainInputSearchResults-Authors');
     resultsDiv.innerHTML = '';
     let names = Array.from(authors.keys());
-    console.log(names);
+    
     let results = [];
     names.forEach((name) => {
         if (name.toLowerCase().indexOf(str) > -1) {
@@ -1841,10 +1954,11 @@ function searchAuthors(str) {
         }
     });
     if (results.length > 0) {
-        results.forEach((result) => {
+        results.sort().forEach((result) => {
             let newDiv = document.createElement('div');
             newDiv.textContent = result;
             newDiv.classList.add('searchResultItem');
+            newDiv.addEventListener('click', authors.get(result).showDetails);
             resultsDiv.appendChild(newDiv);
         });
     } else {
@@ -1860,7 +1974,7 @@ function searchBooks(str) {
     let resultsDiv = document.querySelector('#mainInputSearchResults-Titles');
     resultsDiv.innerHTML = '';
     let names = Array.from(books.keys());
-    console.log(names);
+    
     let results = [];
     names.forEach((name) => {
         if (name.toLowerCase().indexOf(str) > -1) {
@@ -1868,7 +1982,7 @@ function searchBooks(str) {
         }
     });
     if (results.length > 0) {
-        results.forEach((result) => {
+        results.sort().forEach((result) => {
             let newDiv = document.createElement('div');
             newDiv.textContent = result;
             newDiv.classList.add('searchResultItem');
@@ -1880,8 +1994,67 @@ function searchBooks(str) {
         newDiv.textContent = 'No Titles found';
         newDiv.classList.add('searchResultItem');
         resultsDiv.appendChild(newDiv);
-    }
+    }   
+}
+
+function searchQuotes(str) {
+    let resultsDiv = document.querySelector('#mainInputSearchResults-Quotes');
+    resultsDiv.innerHTML = '';
+    let names = Array.from(quotes.values()).map((quote) => [quote.quote_text, quote.book_title]);
+      
+    let results = [];
+
+    names.forEach((name) => {
+        if (name[0].toLowerCase().indexOf(str) > -1) {
+            results.push(name);
+        }
+    });
+    if (results.length > 0) {
+        results.forEach((result) => {
+            let newDiv = document.createElement('div');
+            if (result[0].length > 80) {
+                newDiv.textContent = result[0].substring(0, 80) + ' ...';
+            } else {
+                newDiv.textContent = result[0];
+            }  
+            
+            newDiv.classList.add('searchResultItem');
+            newDiv.addEventListener('click', books.get(result[1]).showDetails);
+            resultsDiv.appendChild(newDiv);
+        });
+    } else {
+        let newDiv = document.createElement('div');
+        newDiv.textContent = 'No Quotes found';
+        newDiv.classList.add('searchResultItem');
+        resultsDiv.appendChild(newDiv);
+    }   
+}
+
+function searchTags(str) {
+    let resultsDiv = document.querySelector('#mainInputSearchResults-Tags');
+    resultsDiv.innerHTML = '';
+    let names = Array.from(tags.values()).map((tag) => tag.label);
     
+    let results = [];
+    names.forEach((name) => {
+        if (name.toLowerCase().indexOf(str) > -1) {
+            results.push(name);
+        }
+    });
+    if (results.length > 0) {
+        results.forEach((result) => {
+            let newDiv = document.createElement('div');
+            newDiv.textContent = result;
+            newDiv.classList.add('searchResultItem');
+            newDiv.addEventListener('click', tags.get(result).showDetails);
+            resultsDiv.appendChild(newDiv);
+        });
+    } else {
+        let newDiv = document.createElement('div');
+        newDiv.textContent = 'No Tags found';
+        newDiv.classList.add('searchResultItem');
+        resultsDiv.appendChild(newDiv);
+    }  
 }
 
 function serialDeleteBooks(e) {

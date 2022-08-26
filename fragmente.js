@@ -58,3 +58,10 @@ Array.from(note).forEach((letter) => {
     noteDiv.appendChild(letterChar);
 });
 wordsDiv.appendChild(noteDiv);
+
+/* Maintenance function to remove tags saved under uid */
+removeIdTags = () => {
+    let idTags = Array.from(tags.keys()).filter((tag) => tag.length === 20);
+    idTags.forEach((tag) => tags.delete(tag));
+    this.save();
+}
