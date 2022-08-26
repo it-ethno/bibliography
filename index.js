@@ -371,6 +371,15 @@ class Book {
 
     }
 
+    showDetailsCompact = () => {
+        console.log('HI! from Compact!');
+        let compactDetails = document.querySelector('#fullscreenDetails');
+        compactDetails.innerHTML = '';
+        let newDiv = document.createElement('div');
+        newDiv.textContent = this.title;
+        compactDetails.appendChild(newDiv);
+    }
+
     addSignatureForm = (e) => {
         if (!document.querySelector('.addSignatureForm')) {
             let plusPosition = e.target.getBoundingClientRect();
@@ -1696,6 +1705,12 @@ function maximizePane(e) {
     target.style.borderRadius = '15px';
     target.style.backgroundColor = 'rgba(240, 240, 240, 0.98)';
     target.style.zIndex = '10';
+
+    if (e.target.id.substring(16) === 'stockPane') {
+        document.querySelector('#fullscreenDetails').style.display = 'block flex';
+        let t = document.querySelector('#tableStock');
+        t.style.height = '80%';
+    }
 }
 
 function minimizeMainContent(e) {
@@ -1743,6 +1758,8 @@ function minimizePane(e) {
             target.style.width = '';
             target.style.borderRadius = '15px 15px 0 0';
             target.style.backgroundColor = 'rgba(240, 240, 240, 1.0)';
+            document.querySelector('#fullscreenDetails').style.display = 'none';
+            document.querySelector('#tableStock').style.height = '84%';
             break;
         case 'exportPane':
             target.style.top = '0px';
@@ -2934,6 +2951,10 @@ function updateStockPane() {
     document.querySelector('#stockNumberTitles').textContent = books.size + ' Titles';
     document.querySelector('#stockLastSaved').textContent = Math.abs(Math.round(((lastSave.getTime() - new Date().getTime()) / 1000) / 60));
     stockPane.innerHTML = '';
+
+    let tableDiv = document.createElement('div');
+    tableDiv.id = 'tableStock';
+
     let table = document.createElement('table');
     table.classList.add('stockTable');
     table.setAttribute('cellspacing', '0');
@@ -2979,7 +3000,9 @@ function updateStockPane() {
     headerRow.appendChild(headerActions);
 
     table.appendChild(headerRow);
-    stockPane.appendChild(table);
+    
+    tableDiv.appendChild(table);
+    stockPane.appendChild(tableDiv);
     
     setStockOrderIcon();
 
@@ -3004,6 +3027,7 @@ function updateStockPane() {
         let bookRow = document.createElement('tr');
         bookRow.classList.add('stockRow');
         bookRow.addEventListener('click', book[1].showDetails);
+        bookRow.addEventListener('click', book[1].showDetailsCompact);
 
         let bookCheck = document.createElement('td');
         bookCheck.classList.add('stockColCheckItem');
@@ -3051,4 +3075,8 @@ function updateStockPane() {
         bookRow.appendChild(bookActions);
         table.appendChild(bookRow);
     });
+
+    let newDetails = document.createElement('div');
+    newDetails.id = 'fullscreenDetails';
+    stockPane.appendChild(newDetails);
 }

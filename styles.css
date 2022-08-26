@@ -1117,6 +1117,12 @@ td {
   background-color: rgba(240, 240, 240, 0.95);
 }
 
+#fullscreenDetails {
+  display: none;
+  height: 20%;
+  display: flex;
+}
+
 #latestAdditions {
   opacity: 1;
   visibility: visible;
@@ -1294,9 +1300,9 @@ td {
 #stock {
   padding: 0px 0px 10px;
   color: rgba(50, 50, 50, 1.0);
-  overflow-y: scroll;
+  overflow-y: hidden;
   height: 100%;
-  scrollbar-width: thin;
+  
 }
 
 #stockPane {
@@ -1318,6 +1324,12 @@ td {
   opacity: 0;
   
   transition: opacity 0.8s ease, visibility 0.9s ease, top 1s ease, right 1s ease, bottom 1s ease, left 1s ease, height 1s ease, width 1s ease, border-radius 1s ease;
+}
+
+#tableStock {
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  height: 84%;
 }
 
 #tagCount {
