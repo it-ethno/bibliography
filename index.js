@@ -376,8 +376,77 @@ class Book {
         let compactDetails = document.querySelector('#fullscreenDetails');
         compactDetails.innerHTML = '';
         let newDiv = document.createElement('div');
-        newDiv.textContent = this.title;
+        newDiv.classList.add('compactDetails');
+        
+        let newTit = document.createElement('div');        
+        newTit.innerHTML = '&laquo; ' + this.title + ' &raquo;';
+        newTit.classList.add('compactTitle');
+        newDiv.appendChild(newTit);
+
+        if (this.subtitle !== '') {
+            let newSub = document.createElement('div');
+            newSub.innerHTML = '&raquo; ' + this.subtitle + ' &laquo;';
+            newSub.classList.add('compactSubtitle');
+            newDiv.appendChild(newSub);
+        }
+        
+        let newBy = document.createElement('div');
+        newBy.innerHTML = 'by ' + this.author_prename + ' ' + this.author_surname;
+        newBy.classList.add('compactBy');        
+        newDiv.appendChild(newBy);
+
+        let newTags = document.createElement('div');
+        newTags.classList.add('compactTags');
+        let cTags = '';
+        this.tags_labels.forEach((tag) => cTags += '<span class="compactTag">#' + tag.toLowerCase() + '</span>');
+        newTags.innerHTML = cTags;
+        newDiv.appendChild(newTags);
+
+        let newSigns = document.createElement('div');
+        newSigns.classList.add('compactSigns');
+        let cSigns = '';
+        this.signatures.forEach((sign) => cSigns += '<span class="compactSign">' + signatures.get(sign).label.toLowerCase() + '</span>');
+        newSigns.innerHTML = cSigns;
+        newDiv.appendChild(newSigns);
+
         compactDetails.appendChild(newDiv);
+
+        if (this.notes.length > 0) {
+
+            let newN = document.createElement('div');
+            newN.classList.add('compactNotesSurround');
+
+            let newNH = document.createElement('div');
+            newNH.classList.add('compactSubheader');
+            newNH.textContent = this.notes.length + ' Notes';
+            newN.appendChild(newNH);
+
+            let newNL = document.createElement('div');
+            newNL.classList.add('compactNotes');
+
+            this.notes.forEach((note) => {
+                let n = notes.get(note);
+                let newND = document.createElement('div');
+                newND.classList.add('compactNote');
+                newND.textContent = n.note_text;
+                newNL.appendChild(newND);
+            });
+
+            newN.appendChild(newNL);
+            compactDetails.appendChild(newN);
+        }
+
+        let newQ = document.createElement('div');
+        newQ.classList.add('compactQuotes');
+        this.quotes.forEach((quote) => {
+            let q = quotes.get(quote);
+            let newQD = document.createElement('div');
+            newQD.classList.add('compactQuote');
+            newQD.textContent = q.quote_text;
+            newQ.appendChild(newQD);
+        });
+
+        compactDetails.appendChild(newQ);
     }
 
     addSignatureForm = (e) => {
