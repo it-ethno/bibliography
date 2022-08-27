@@ -326,19 +326,18 @@
       <div id="settingsSections">
         <h1 class="settingsSectionsHeader">Settings</h1>
         <div id="settingsSectionsList">
-          <div id="sectionsList-display" class="settingsSectionsItem settingsSectionsItemSelected"><i class="fa-solid fa-display"></i> Common & Display</div>
+          <div id="sectionsList-common" class="settingsSectionsItem settingsSectionsItemSelected"><i class="fa-solid fa-mug-saucer"></i> Common</div>
+          <div id="sectionsList-display" class="settingsSectionsItem"><i class="fa-solid fa-display"></i> Display</div>
           <div id="sectionsList-formats" class="settingsSectionsItem"><i class="fa-solid fa-ruler-combined"></i> String Formats</div>
           <div id="sectionsList-export" class="settingsSectionsItem"><i class="fa-solid fa-file-export"></i> Export</div>
           <div id="sectionsList-storage" class="settingsSectionsItem"><i class="fa-solid fa-database"></i> Storage</div>
           <div id="sectionsList-management" class="settingsSectionsItem"><i class="fa-solid fa-hotel"></i> Management</div>
           <i id="closeSettings" class="fa-solid fa-rectangle-xmark action"></i>
-
         </div>
       </div>
       <div id="settingsList">
-        <div id="settingsListDisplay" class="settingsSectionDiv settingsSectionDivSelected">
-          <h2 class="settingsListHeader">Common & Display</h2>
-
+        <div id="settingsListCommon" class="settingsSectionDiv settingsSectionDivSelected">
+          <h2 class="settingsListHeader"><i class="fa-solid fa-mug-saucer settingsIconHeader"></i> Common</h2>
           <div class="settingsItem">
             <label for="languageSelect">Language</label>
             <select id="languageSelect" name="languageSelect" value="en" class="settingsSetting">
@@ -372,6 +371,11 @@
           <div class="settingsItem">
             <input id="showFormOnEmpty" type="checkbox" class="settingsSetting" checked><label for="showFormOnEmpty" class="labelInlineRight" title="Bring up the form for a new title when hitting Return without any contents in the main input">Show new title form on empty Return (in main input)</label>
           </div>
+        </div>
+
+        <div id="settingsListDisplay" class="settingsSectionDiv">
+          <h2 class="settingsListHeader"><i class="fa-solid fa-display settingsIconHeader"></i> Display</h2>
+
           <div class="settingsItem">
             <input id="useTransparency" type="checkbox" class="settingsSetting" checked><label for="useTransparency" class="labelInlineRight" title="Use transparency for the background of the main content">Use Transparency</label>
           </div>
@@ -415,9 +419,6 @@
 
           <h3 class="settingsListSubheader">Startpage</h3>
           <div class="settingsItem">
-            <input id="startWithCollapsed" type="checkbox" class="settingsSetting"><label for="startWithCollapsed" class="labelInlineRight">Start with collapsed main input</label>
-          </div>
-          <div class="settingsItem">
             <input id="showLastAdditions" type="checkbox" class="settingsSetting" checked><label for="showLastAdditions" class="labelInlineRight">Show last additions</label>
           </div>
           <div class="settingsItem">
@@ -428,6 +429,9 @@
           </div>
           <div class="settingsItem">
             <input id="showLastNotes" type="checkbox" class="settingsSetting" checked><label for="showLastNotes" class="labelInlineRight">Show last notes</label>
+          </div>
+          <div class="settingsItem">
+            <input id="startWithCollapsed" type="checkbox" class="settingsSetting"><label for="startWithCollapsed" class="labelInlineRight">Start with collapsed main input</label>
           </div>
 
           <h3 class="settingsListSubheader">Screensaver</h3>
@@ -474,21 +478,36 @@
           </div>
         </div>
         <div id="settingsListFormats" class="settingsSectionDiv">
-          <h2 class="settingsListHeader">String Formats</h2>
-          <div class="settingsItem">
-            <label for="standardInput" class="labelBlock">Input</label>
-            <input id="standardInput" type="text" class="inputLongText" placeholder="author.surname, author.prename. year-of-publication. title: subtitle. place-of-publication: publisher.">
-            <i class="fa-solid fa-wrench configuratorToggler action"></i>
+          <h2 class="settingsListHeader"><i class="fa-solid fa-ruler-combined settingsIconHeader"></i> String Formats</h2>
+          <h3 class="settingsListSubheader">Main Input</h3>
+          <div class="settingsItem settingsExplaination">
+            There are certain formats of input you can utilize with the big main input interface.
+            If you enter the information of a book/article/etc. in one of the defined formats,
+            your new title will automatically be created without the need to fill in any form.
           </div>
-          <div class="settingsItem">
-            <label for="standardOutput" class="labelBlock">Output/Export</label>
-            <input id="standardOutput" type="text" class="inputLongText" placeholder="author.surname, author.prename. year-of-publication. title: subtitle. place-of-publication: publisher.">
-            <i class="fa-solid fa-wrench configuratorToggler action"></i>
+          <div class="settingsItem settingsExplaination">
+            The current formats defined are as follows:
+            <h4 class="settingsExplainationSubHeader">Book</h4>
+            <div class="settingsExplainationSub">
+              &lt;Surname Author&gt;, &lt;Prename Author&gt;. &lt;Year of Publication&gt;. &lt;Title&gt;: &lt;Subtitle (optional!)&gt;. &lt;Place of Publication&gt;: &lt;Publishing House&gt;.
+            </div>
+            <h4 class="settingsExplainationSubHeader">Article in Book</h4>
+            <div class="settingsExplainationSub">
+              &lt;Surname Author&gt;, &lt;Prename Author&gt;. &lt;Year of Publication&gt;. &lt;Title&gt;: &lt;Subtitle (optional!)&gt;. in: &lt;Surname Editor&gt;, &lt;Prename Editor&gt;. &lt;Title of the containing book&gt;. &lt;Place of Publication&gt;: &lt;Publishing House&gt;.
+            </div>
+            <h4 class="settingsExplainationSubHeader">Article in Journal</h4>
+            <div class="settingsExplainationSub">
+              &lt;Surname Author&gt;, &lt;Prename Author&gt;. &lt;Year of Publication&gt;. &lt;Title&gt;: &lt;Subtitle (optional!)&gt;. in: &lt;Title of the Journal&gt;, &lt;Issue Nr. or Date&gt;. &lt;Place of Publication&gt;: &lt;Publishing House&gt;.
+            </div>
+          </div>
+          <div class="settingsItem settingsExplaination">
+             <i class="fa-solid fa-wrench configuratorToggler action"></i> When you are a scientist or use your bibliographic collection in any academic work, you surely want to configure these strings to fit your institutional requirements.  
           </div>
         </div>
         <div id="settingsListExport" class="settingsSectionDiv">
-          <h2 class="settingsListHeader">Export</h2>
+          <h2 class="settingsListHeader"><i class="fa-solid fa-file-export settingsIconHeader"></i> Export</h2>
           <h3 class="settingsListSubheader">PDF</h3>
+
           <div class="settingsItem">
             <input id="exportPdfUseTitle" type="checkbox" checked><label for="exportPdfUseTitle" class="labelInlineRight">Use a title</label>
           </div>
@@ -501,53 +520,80 @@
             </select>
             <label for="exportPdfFont">Font used in PDF file</label>
           </div>
+          <div class="settingsItem settingsExplaination">
+            Right now (end of August 2022) the PDF export is still a little bit buggy and produces unwished results when the exported titles exceed one single page. 
+            Furthermore the exported files are rather large and text inside them can not be selected. 
+          </div>
+          <div class="settingsItem settingsExplaination">
+            The development plan for Bibliography provides for the following improvements:
+            <div class="settingsExplainationSub">
+              End of October 2022: PDF-Export utilizing node.js technologies, shrinking file sizes and enabling text selection.
+            </div>
+            <div class="settingsExplainationSub">
+              End of 2022: More technology options for PDF-Export.
+            </div>
+          </div>
+
           <h3 class="settingsListSubheader">JSON</h3>
 
           <h3 class="settingsListSubheader">BibTex</h3>
 
         </div>
         <div id="settingsListStorage" class="settingsSectionDiv">
-          <h2 class="settingsListHeader">Storage</h2>
+          <h2 class="settingsListHeader"><i class="fa-solid fa-database settingsIconHeader"></i> Storage</h2>
+          <div class="settingsItem settingsExplaination">
+            Right now (end of August 2022) the only working option for storage is the Local Storage of your browser, which is limited to something
+            between 5 to 10 mb. This is still enough for several hundred books and quotes, but the data should be backed up to a file regularly, because
+            the Local Storage is subject to the browsers own memory eviction policies and could be deleted without notice.
+          </div>
+          <div class="settingsItem settingsExplaination">
+            The development plan for Bibliography provides for the extension of the storage options as follows:
+            <div class="settingsExplainationSub">
+              <b>End of September 2022</b>: Storage of data inside the IndexedDB of the browser, which will increase the available memory to something between
+              some hundred mb up to several gigabyte, depending on the platform and browser used. 
+            </div>
+            <div class="settingsExplainationSub">
+              <b>End of October 2022</b>: Storage of data inside concrete files on users hard disk utilizing node.js functionality. This feature will only be available
+              from inside the installable app package of Bibliography. 
+            </div>
+            <div class="settingsExplainationSub">
+              <b>End of 2022</b>: Network Storage of data on a special server designed to work in library settings as well as home server. 
+            </div>
+          </div>
+
           <h3 class="settingsListSubheader">Local Storage</h3>
           <div class="settingsItem">
-            <input id="useLocalStorage" type="checkbox" checked><label for="useLocalStorage" class="labelInlineRight" title="Use Local Storage of the browser to persist data over closes">Use Local Storage</label>
+            <input id="useLocalStorage" type="checkbox" checked disabled><label for="useLocalStorage" class="labelInlineRight labelDisabled" title="Use Local Storage of the browser to persist data over closes">Use Local Storage</label>
           </div>
           <div class="settingsItem">
             <input id="useIndexedDB" type="checkbox" disabled><label for="useIndexedDB" class="labelInlineRight labelDisabled" title="Use IndexedDB of the browser to persist data over closes">Use IndexedDB</label>
           </div>
+          <div class="settingsItem settingsExplaination">
+            For more information on your current data please have a look at the Management section.
+          </div>
           <h3 class="settingsListSubheader">Server Storage</h3>
           <div class="settingsItem">
-            <input id="useServerStorage" type="checkbox" checked><label for="useServerStorage" class="labelInlineRight" title="Use the server storage infrastructure">Use server storage infrastructure</label>
+            <input id="useServerStorage" type="checkbox" checked disabled><label for="useServerStorage" class="labelInlineRight labelDisabled" title="Use the server storage infrastructure">Use server storage infrastructure</label>
           </div>
           <div class="settingsItem">
-            <input id="preferPersonalData" type="checkbox" checked><label for="preferPersonalData" class="labelInlineRight" title="Always prefer personal data sets over foreign data from servers">Prefer personal data sets</label>
+            <input id="preferPersonalData" type="checkbox" checked disabled><label for="preferPersonalData" class="labelInlineRight labelDisabled" title="Always prefer personal data sets over foreign data from servers">Prefer personal data sets</label>
           </div>
-          <div class="settingsItem">
-            <label for="serverURL" class="labelBlock">Add a new Server URL/IP Address</label>
-            <input id="serverURL" type="text" class="inputLongText" placeholder="something like 'https://abc.example.org/bibserver/' or '129.130.131.139'">
-          </div>
-          <div class="settingsItem">
-            <label for="serverURL" class="labelInlineLeft">or select a known Server</label>
-            <select id="knownServer" name="knownServer" value="1">
-              <option value="1">Example Server 1</option>
-              <option value="2" title="Set up by Monsieur Bummskopp himself">Local Bummskopp Server</option>
-              <option value="3" title="For the biggest dataset ever">Server from UN Bibliographic Squad</option>
-            </select>
-          </div>
+
         </div>
         <div id="settingsListManagement" class="settingsSectionDiv">
-          <h2 class="settingsListHeader">Management</h2>
+          <h2 class="settingsListHeader"><i class="fa-solid fa-hotel settingsIconHeader"></i> Management</h2>
           <h3 class="settingsListSubheader">Local Data</h3>
-          <div class="settingsItem">
-            Your current local data contains the following:
-            <div class="localDataListItem"><span id="localDataList-books"></span> books/titles</div>
-            <div class="localDataListItem"><span id="localDataList-authors"></span> authors</div>
-            <div class="localDataListItem"><span id="localDataList-publishers"></span> publishing houses</div>
-            <div class="localDataListItem"><span id="localDataList-quotes"></span> quotes</div>
-            <div class="localDataListItem"><span id="localDataList-notes"></span> notes</div>
-            <div class="localDataListItem"><span id="localDataList-tags"></span> tags</div>
-            <div class="localDataListItem"><span id="localDataList-collections"></span> collections</div>
-            <div class="localDataListItem"><span id="localDataList-signatures"></span> signatures</div>
+          <div class="settingsItem settingsExplaination">Your current local data contains the following:</div>
+          <div class="settingsItem settingsExplaination">
+            
+            <div class="settingsExplainationSubSmall"><span id="localDataList-books"></span> books/titles</div>
+            <div class="settingsExplainationSubSmall"><span id="localDataList-authors"></span> authors</div>
+            <div class="settingsExplainationSubSmall"><span id="localDataList-publishers"></span> publishing houses</div>
+            <div class="settingsExplainationSubSmall"><span id="localDataList-quotes"></span> quotes</div>
+            <div class="settingsExplainationSubSmall"><span id="localDataList-notes"></span> notes</div>
+            <div class="settingsExplainationSubSmall"><span id="localDataList-tags"></span> tags</div>
+            <div class="settingsExplainationSubSmall"><span id="localDataList-collections"></span> collections</div>
+            <div class="settingsExplainationSubSmall"><span id="localDataList-signatures"></span> signatures</div>
           </div>
 
           <h3 class="settingsListSubheader">Purge Local Data</h3>
@@ -555,7 +601,6 @@
             <i class="fa-solid fa-dumpster-fire"></i>
             <button id="localPurgeBtn" type="button" class="btnDanger" title="CAUTION! This purges all local data storage including ALL books, ALL authors, ALL quotes! Do you really want this?!? CAUTION!">Purge Local Data</button>
             <div style="margin-top:10px;">CAUTION! This deletes ALL local data FOREVER! Perhaps you want to <a id="directExportLink" href="#">back it up to a file</a> beforehand?</div>
-            <div id="numbersPurge" style="margin-top:5px;">Clicking the purge button will delete </div>
           </div>
           <h3 class="settingsListSubheader">Import Data</h3>
           <div class="settingsItem">

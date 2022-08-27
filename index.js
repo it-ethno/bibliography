@@ -377,6 +377,7 @@ class Book {
         compactDetails.innerHTML = '';
         let newDiv = document.createElement('div');
         newDiv.classList.add('compactDetails');
+        newDiv.addEventListener('click', showDetailsInMain);
         
         let newTit = document.createElement('div');        
         newTit.innerHTML = '&laquo; ' + this.title + ' &raquo;';
@@ -1719,7 +1720,9 @@ function mainInputBlur() {
     let mainInputClue = document.querySelector('#mainInputClue');
     mainInputClue.classList.remove('shake-horizontal');
     mainInputClue.style.color = 'rgba(100, 100, 100, 0.5)';
-    
+    setTimeout(() => {
+        document.querySelector('#mainInputSearchResults').remove();
+    }, 200);
 }
 
 function mainInputFocus() {
@@ -2103,7 +2106,7 @@ function searchQuotes(str) {
             } else {
                 newDiv.textContent = result[0];
             }  
-            
+            newDiv.title = result[0];
             newDiv.classList.add('searchResultItem');
             newDiv.addEventListener('click', books.get(result[1]).showDetails);
             resultsDiv.appendChild(newDiv);
@@ -2532,6 +2535,10 @@ function showDBSetup() {
     document.querySelector('body').appendChild(newDiv);
 }
 
+function showDetailsInMain() {
+    document.querySelector('#maximizeToggler-stockPane').click();
+}
+
 function showFullscreenStock() {
     console.log('HI! from showFullscreenStock!');
     document.documentElement.requestFullscreen();
@@ -2749,6 +2756,9 @@ function showSettingsTab(e) {
     let secTabs = document.querySelectorAll('.settingsSectionDiv');
     secTabs.forEach((node) => { node.classList.remove('settingsSectionDivSelected'); node.style.display = 'none'; });
     switch (e.target.id) {
+        case 'sectionsList-common':
+            document.querySelector('#settingsListCommon').style.display = 'block';
+            break;
         case 'sectionsList-display':
             document.querySelector('#settingsListDisplay').style.display = 'block';
             break;
@@ -2919,7 +2929,7 @@ function togglePane(e) {
 function toggleSettings() {
     let settingsDiv = document.querySelector('#settings');
     settingsDiv.style.visibility === 'visible' ? settingsDiv.style.visibility = 'hidden' : settingsDiv.style.visibility = 'visible';
-    document.querySelector('#numbersPurge').innerHTML = 'Clicking the purge button will delete <em>' + books.size + ' books</em>, <em>' + authors.size + ' authors</em>, and <em>' + publishers.size + ' publishers</em>!!!';
+
     document.querySelector('#localDataList-books').textContent = books.size.toString().padStart(3, '0');
     document.querySelector('#localDataList-authors').textContent = authors.size.toString().padStart(3, '0');
     document.querySelector('#localDataList-publishers').textContent = publishers.size.toString().padStart(3, '0');

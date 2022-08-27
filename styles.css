@@ -208,6 +208,7 @@ td {
   font-family: 'EB Garamond';
   border-right: 1px solid rgba(200, 200, 200, 0.7);
   margin: 10px 0;
+  cursor: pointer;
 }
 
 .compactNote {
@@ -849,6 +850,37 @@ td {
   font-size: 90%;
 }
 
+.settingsExplaination {
+  padding: 20px;
+  max-width: 700px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+  font-size: 80%;
+}
+
+.settingsExplainationSub {
+  background-color: rgba(255, 255, 255, 1);
+  padding: 10px 20px;
+  font-size: 90%;
+  border-radius: 5px;
+}
+
+.settingsExplainationSubSmall {
+  background-color: rgba(255, 255, 255, 1);
+  padding: 5px 20px;
+  font-size: 100%;
+  border-radius: 5px;
+}
+
+.settingsExplainationSubHeader {
+  margin: 10px 20px 0px 10px;
+  padding: 0;
+}
+
+.settingsIconHeader {
+  font-size: 90%;
+}
+
 .settingsItemIcon {
   margin: 8px 10px;
 }
@@ -1024,6 +1056,7 @@ td {
   background-color: rgba(255, 255, 255, 0.9);
   border-radius: 5px;
   cursor: pointer;
+  font-size: 90%;
 }
 
 .tagListItem {
