@@ -1,0 +1,1019 @@
+.action {
+    cursor: pointer;
+    color: rgba(30, 30, 30, 0.7);
+    padding: 3px;
+  }
+  
+  .action:hover {
+    color: rgba(30, 30, 30, 0.95);
+  }
+  
+  .addTagBtn {
+    padding: 2px 10px;
+    font-size: 80%;
+  }
+  
+  .addNoteBtn {
+    display: block;
+  }
+  
+  .addNoteForm {
+    padding: 10px;
+    background-color: rgba(70, 70, 70, 0.9);
+    color: rgba(240, 240, 240, 0.9);
+    position: absolute;
+    border-radius: 10px;
+    min-width: 100px;
+  }
+  
+  .addNoteTextArea {
+    display: block;
+    width: 250px;
+    height: 70px;
+  }
+  
+  .addNoteTitleInput {
+    display: block;
+    width: 250px;
+  }
+  
+  .addQuoteForm {
+    padding: 10px;
+    background-color: rgba(70, 70, 70, 0.9);
+    color: rgba(240, 240, 240, 0.9);
+    position: absolute;
+    border-radius: 10px;
+  }
+  
+  .addQuotePageInput {
+    display: block;
+  }
+  
+  .addQuoteTextArea {
+    display: block;
+    width: 250px;
+    height: 70px;
+  }
+  
+  .addQuoteTitleInput {
+    display: block;
+    width: 250px;
+  }
+  
+  .addSignatureForm {
+    padding: 10px;
+    background-color: rgba(70, 70, 70, 0.9);
+    color: rgba(240, 240, 240, 0.9);
+    position: absolute;
+    border-radius: 10px;
+  }
+  
+  .addTagForm {
+    padding: 10px;
+    background-color: rgba(70, 70, 70, 0.9);
+    color: rgba(240, 240, 240, 0.9);
+    position: absolute;
+    border-radius: 10px;
+    max-width: 300px;
+  }
+  
+  .addTagInput {
+    width: 120px;
+  }
+  
+  .altIconSelect {
+    font-size: 170%;
+  }
+  
+  .authorBookItem {
+    padding: 10px 20px;
+    font-size: 90%;
+    border-bottom: 1px solid rgba(200, 200, 200, 0.7);
+    cursor: pointer;
+  }
+  
+  .authorsPaneItem {
+    padding: 5px 20px;
+    border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+    cursor: pointer;
+  }
+  /*
+  .authorsPaneItem:nth-child(odd) {
+    background-color: rgba(250, 250, 250, 1);
+  }
+  
+  .authorsPaneItem:nth-child(odd):hover {
+    background-color: rgba(210, 210, 210, 1);
+  }
+  
+  .authorsPaneItem:nth-child(even) {
+    background-color: rgba(230, 230, 230, 1);
+  }
+  
+  .authorsPaneItem:nth-child(even):hover {
+    background-color: rgba(210, 210, 210, 1);
+  }
+  */
+  .authorsPaneItem:hover {
+    background-color: rgba(210, 210, 210, 1);
+  }
+  
+  .bounce-top {
+      animation: bounce-top 0.9s both;
+  }
+  
+  .btnDanger {
+    background-color: rgba(210, 48, 48, 0.2);
+    color: rgb(50, 50, 50);
+    font-family: 'Open Sans';
+    font-weight: 500;
+    padding: 5px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .btnDanger:hover {
+    background-color: rgba(210, 48, 48, 1.0);
+  }
+  
+  .closeBtn {
+    margin-left: auto;
+    font-size: 160%;
+  }
+  
+  .compactDetails {
+    padding: 0 30px;
+    font-family: 'EB Garamond';
+    border-right: 1px solid rgba(200, 200, 200, 0.7);
+    margin: 10px 0;
+    cursor: pointer;
+  }
+  
+  .compactNote {
+    padding: 5px 10px;
+    font-size: 90%;
+    background-color: rgba(250, 250, 250, 0.95);
+    margin-right: 5px;
+    border-radius: 5px;
+  }
+  
+  .compactNotes {
+    display: flex;
+    align-items: flex-start;
+    font-family: 'EB Garamond';
+  }
+  
+  .compactNotesSurround {
+    padding: 10px 20px;
+    border-right: 1px solid rgba(200, 200, 200, 0.7);
+  }
+  
+  .compactQuote {
+    padding: 10px;
+    font-size: 90%;
+    background-color: rgba(250, 250, 250, 0.95);
+    border-radius: 5px;
+    margin-right: 5px;
+    max-width: 250px;
+  }
+  
+  .compactQuotes {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px 20px;
+  }
+  
+  .compactSign {
+    background-color: rgba(200, 200, 200, 0.9);
+    padding: 2px 5px;
+    font-size: 90%;
+    margin-right: 5px;
+    border-radius: 5px;
+  }
+  
+  .compactSigns {
+    margin-top: 10px;
+  }
+  
+  .compactSubheader {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  
+  .compactTag {
+    background-color: rgba(250, 250, 250, 0.95);
+    padding: 2px 5px;
+    font-size: 90%;
+    margin-right: 5px;
+    border-radius: 5px;
+  }
+  
+  .compactTags {
+    margin-top: 10px;
+  }
+  
+  .compactTitle {
+    font-size: 140%;
+  }
+  
+  .compactSubtitle {
+    font-size: 120%;
+  }
+  
+  .compactBy {
+    font-size: 100%;
+  }
+  
+  .coveredAction {
+    color:rgba(100, 100, 100, 0.5);
+  }
+  
+  .dbActionIcon {
+    margin-right: 10px;
+  }
+  
+  .dbActions {
+    background-color: rgba(100, 100, 100, 0.8);
+    border-radius: 0 0 10px 10px;
+    padding: 10px 20px;
+    color: rgba(250, 250, 250, 1);
+    display: flex;
+  }
+  
+  .dbDescription {
+    font-size: 70%;
+    margin-top: 10px;
+  }
+  
+  .dbDetails {
+    font-size: 90%;
+  }
+  
+  .dbInfo {
+    color:rgba(70, 70, 70, 0.9);
+    padding: 20px;
+    background-color: rgba(230, 230, 230, 1);
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+    font-family: 'DM Mono';
+  }
+  
+  .dbItem {
+    width: 250px;
+  }
+  
+  .dbItemIcon {
+    font-size: 200%;
+  }
+  
+  .dbName {
+    font-size: 130%;
+  }
+  
+  .dbOptionName {
+    font-size: 100%;
+    margin-top: 10px;
+  }
+  
+  .dbOptionsArrow {
+    font-size: 200%;
+    color: rgba(70, 70, 70, 0.9);
+    margin-top: 20px;
+  }
+  
+  .dbOptionsAvailable {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    align-content: stretch;
+  }
+  
+  .dbOptionsHeader {
+    color: rgb(131, 181, 25);
+    font-family: 'DM Mono';
+    margin-top: 20px;
+  }
+  
+  .dbSettingsHeader {
+    font-family: 'DM Mono';
+    font-size: 180%;
+  }
+  
+  .detailAction {
+    cursor: pointer;
+  }
+  
+  .detailAuthorLink {
+    cursor: pointer;
+  }
+  
+  .detailSubheader {
+    margin-bottom: 7px;
+  }
+  
+  .detailToggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+  
+  .exportAction {
+    cursor: pointer;
+  }
+  
+  .exportDoc {
+    padding: 40px;
+  }
+  
+  .exportHeader {
+    font-family: 'EB Garamond';
+    text-align: left;
+    font-size: 150%;
+    padding-left: 20px;
+  }
+  
+  .exportFileType {
+    font-size: 130%;
+  }
+  
+  .exportListItem {
+    font-family: 'DM Mono';
+    padding: 5px 20px;
+    font-size: 90%;
+  }
+  
+  .exportPaneItem {
+    padding: 5px 20px;
+    border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+  }
+  
+  .flexRightItem {
+    margin-left: auto;
+  }
+  
+  .flextainer {
+    display: flex;
+    align-items: top;
+  }
+  
+  .fullscreenBtnCancel {
+    padding: 10px;
+    margin: 10px;
+    background-color: rgba(146, 202, 26, 0.905);
+    font-family: 'Fredericka the Great';
+    font-size: 120%;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  
+  .fullscreenBtnOk {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: rgba(202, 26, 26, 0.905);
+    font-family: 'Fredericka the Great';
+    font-size: 120%;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  
+  .fullscreenDescription {
+    color: rgba(202, 26, 26, 0.905);
+    font-size: 120%;
+  }
+  
+  .fullscreenDialog {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    z-index: 2;
+    background-color: rgba(202, 26, 26, 0.905);
+    color: rgba(250, 250, 250, 1);
+    font-family: 'Fredericka the Great';
+    transition: top 1s ease, right 1s ease, bottom 1s ease, left 1s ease;
+  }
+  
+  .fullscreenDialogTop {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    z-index: 2;
+    color: rgba(250, 250, 250, 1);
+    font-family: 'Fredericka the Great';
+    transition: top 1s ease, right 1s ease, bottom 1s ease, left 1s ease;
+    padding: 30px;
+  }
+  
+  .fullscreenDialogInner {
+    padding: 50px;
+    background-color: rgba(240, 240, 240, 0.95);
+    text-align: center;
+    border-radius: 15px;
+  }
+  
+  .fullscreenList {
+    color: rgba(202, 26, 26, 0.905);
+  }
+  
+  .fullscreenListHeader {
+    font-size: 120%;
+    color: rgba(202, 26, 26, 0.905);
+  }
+  
+  .fullscreenUnderline {
+    text-decoration: underline;
+  }
+  
+  .fullscreenWarning {
+  
+  }
+  .fullwindowInnerDiv {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .headerAction {
+    font-size:80%;
+    color:rgba(80, 80, 80, 0.9);
+  }
+  
+  .heartbeat {
+      animation: heartbeat 1.5s ease-in-out 0.5s 2 both;
+  }
+  
+  .input_clue {
+    text-align:center;
+    font-size:0.9em;
+    font-style: italic;
+    margin-top:8px;
+    color:rgba(100, 100, 100, 0.5);
+    transition: color 1s ease;
+  }
+  
+  .input_clue:hover {
+    color:rgba(30, 30, 30, 0.9);
+  }
+  
+  .inputLongText {
+    width: 60%;
+    min-width: 300px;
+  }
+  
+  .jello-horizontal {
+      animation: jello-horizontal 0.9s both;
+  }
+  
+  .knownTagsList {
+    margin-top: 10px;
+  }
+  
+  .labelBlock {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .labelDisabled {
+    color: rgba(70, 70, 70, 0.5);
+  }
+  
+  .labelInlineLeft {
+    margin-right: 10px;
+  }
+  
+  .labelInlineRight {
+    margin-left: 10px;
+  }
+  
+  .labelNewForm {
+    font-family: 'DM Mono';
+    font-size: 85%;
+    margin-bottom: 0px;
+  }
+  
+  .lastAdditionsItem {
+    font-family: 'DM Mono';
+    font-size: 85%;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .latestNotesItem {
+    padding: 10px 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    width: 48%;
+    font-size: 90%;
+    font-family: 'EB Garamond';
+  }
+  
+  .latestQuotesItem {
+    padding: 10px 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    max-width: 45%;
+    width: 250px;
+    font-size: 90%;
+    font-family: 'EB Garamond';
+  }
+  
+  .localDataListItem {
+    background-color: rgba(255, 255, 255, 0.905);
+    padding: 10px 20px;
+    margin: 5px 0;
+    border-radius: 5px;
+  }
+  
+  .modalDialog {
+    position: absolute;
+    z-index: 2;
+    padding: 10px;
+    background-color: rgba(100, 100, 100, 0.8);
+    color: rgba(250, 250, 250, 1);
+    border-radius: 10px;
+  }
+  
+  .modalEdit {
+    background-color: rgba(70, 70, 70, 0.9);
+    padding: 10px;
+    position: absolute;
+    width: 300px;
+    border-radius: 10px;
+  }
+  
+  .modalEditTextArea {
+    width: 100%;
+    height: 100px;
+  }
+  
+  .newFormHelpItem {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    font-size: 90%;
+    margin-bottom: 10px;
+  }
+  
+  .newFormItem {
+    margin-bottom: 10px;
+    padding-left: 10px;
+  }
+  
+  .newFormRow {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    padding-left: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .newInput {
+    border-radius: 5px;
+    padding: 2px 10px;
+  }
+  
+  .newInputFull {
+    width: 100%;
+  }
+  
+  .newTitle {
+    font-family: 'EB Garamond';
+    font-size: 180%;
+    text-align: left;
+    margin-bottom: 10px;
+  }
+  
+  .noteItem {
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+  }
+  
+  .paneActions {
+    display: flex;
+    padding: 5px 20px;
+    background-color: rgba(100, 100, 100, 1);
+    color: rgba(240, 240, 240, 1);
+    font-family: 'Open Sans';
+    align-items: center;
+  }
+  
+  .paneActionsLabel {
+    font-size: 85%;
+  }
+  
+  .paneActionsRight {
+    margin-left: auto;
+  }
+  
+  .paneHeader {
+    padding: 5px 20px;
+    background-color: rgba(220, 220, 220, 0.9);
+    color: rgba(100, 100, 100, 1);
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+    
+  }
+  
+  .paneHeaderActions {
+    margin-left: auto;
+  }
+  
+  .paneHeaderIcon {
+    margin-right: 5px;
+    font-size: 130%;
+    color:rgb(150,150,150);
+  }
+  
+  .paneHeaderTitle {
+    font-family: "Open Sans";
+  }
+  
+  .paneHeaderTitleSource {
+    font-size: 80%;
+  }
+  
+  .paneSettingsDialog {
+    padding: 15px;
+    background-color: rgba(70, 70, 70, 0.9);
+    color: rgba(250, 250, 250, 1);
+    position: fixed;
+    border-radius: 10px;
+    font-family: 'DM Mono';
+    font-size: 85%;
+    z-index: 10;
+  }
+  
+  .paneSettingsH3 {
+    color: rgba(250, 250, 250, 1);
+  }
+  
+  .paneSettingsH4 {
+    color: rgba(250, 250, 250, 1);
+  }
+  
+  .quoteAction {
+    margin-right: 5px;
+    cursor: pointer;
+  }
+  
+  .quoteActions {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    border-radius: 10px 0px 10px 0px;
+    padding: 5px 5px 5px 10px;
+    background-color: rgba(70, 70, 70, 0.3);
+    color: rgba(240, 240, 240, 1);
+    font-size: 80%;
+  }
+  
+  .quoteActions:hover {
+    background-color: rgba(70, 70, 70, 0.9);
+  }
+  
+  .quoteItem {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgba(250, 250, 250, 0.7);
+    margin-bottom: 5px;
+    position: relative;
+    font-size: 90%;
+  }
+  
+  .quotePage {
+    font-size: 85%;
+  }
+  
+  .sciReq {
+    background-color: rgba(255, 236, 232, 0.905);
+  }
+  
+  .screenMessage {
+    position: fixed;
+    top:30%;
+    padding: 20px;
+    background-color: rgba(240, 240, 240, 0.95);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    gap: 20px;
+    border: 15px solid rgba(70, 70, 70, 0.9);
+  }
+  
+  .screensaver {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: rgba(20, 20, 20, 1.0);
+    color: rgba(250, 250, 250, 1.0);
+    z-index: 100;
+    padding: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .screensaver-lettercontainer {
+    width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+  }
+  
+  .screenSaverLetter { 
+    font-family: 'Open Sans';
+  }
+  
+  .screenSaverWord {
+    margin-right: 30px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+  }
+  
+  .screenSaverWords {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+  }
+  
+  .searchResultItem {
+    cursor: pointer;
+  }
+  
+  .searchResultsCategory {
+    margin-top: 5px;
+    font-size: 110%;
+  }
+  
+  .searchResultsHeader {
+    font-size: 120%;
+  }
+  
+  .selected {
+    background-color: rgba(100, 100, 100, 0.9);
+    color: rgba(240, 240, 240, 1);
+    padding: 3px;
+    border-radius: 5px;
+  }
+  
+  .selected:hover {
+    color: rgba(240, 240, 240, 1);
+  }
+  
+  .settingsItem {
+    margin: 8px 0px;
+    font-family: 'DM Mono';
+    font-size: 90%;
+  }
+  
+  .settingsExplaination {
+    padding: 20px;
+    max-width: 700px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    font-size: 80%;
+  }
+  
+  .settingsExplainationSub {
+    background-color: rgba(255, 255, 255, 1);
+    padding: 10px 20px;
+    font-size: 90%;
+    border-radius: 5px;
+  }
+  
+  .settingsExplainationSubSmall {
+    background-color: rgba(255, 255, 255, 1);
+    padding: 5px 20px;
+    font-size: 100%;
+    border-radius: 5px;
+  }
+  
+  .settingsExplainationSubHeader {
+    margin: 10px 20px 0px 10px;
+    padding: 0;
+  }
+  
+  .settingsIconHeader {
+    font-size: 90%;
+  }
+  
+  .settingsItemIcon {
+    margin: 8px 10px;
+  }
+  
+  .settingsItemSub {
+    padding-left: 20px;
+  
+  }
+  
+  .settingsItemSubIcons {
+    padding-left: 20px;
+    display: flex;
+    
+  }
+  
+  .settingsListHeader {
+    font-family: 'DM Mono';
+    text-align: left;
+  }
+  
+  .settingsListSubheader {
+    font-family: 'DM Mono';
+    text-align: left;
+    font-weight: 500;
+    margin-top: 20px;
+    font-size: 110%;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+  }
+  
+  .settingsSectionDiv {
+    display: none;
+  }
+  
+  .settingsSectionDivSelected {
+    display: block;
+  }
+  
+  .settingsSectionHeader {
+    font-family: 'DM Mono';
+    font-size: 20px;
+    
+  }
+  
+  .settingsSectionsHeader {
+    font-family: 'DM Mono';
+    font-size: 180%;
+    text-align: left;
+    margin-bottom: 20px;
+    margin-left: 20px;
+  }
+  
+  .settingsSectionsItem {
+    padding: 10px 20px 10px 20px;
+    margin: 0 10px;
+    font-size: 110%;
+    border-bottom: 1px solid rgba(200, 200, 200, 0.9);
+    font-family: 'DM Mono';
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .settingsSectionsItemSelected {
+    background-color: rgba(200, 200, 200, 0.8);
+  }
+  
+  .settingsSet {
+    font-family: "Fredericka the Great";
+    color: rgba(50, 50, 50, 1.0);
+    margin-bottom: 20px;
+  }
+  
+  .shake-horizontal {
+      animation: shake-horizontal 1.5s cubic-bezier(0.455, 0.030, 0.515, 0.955) 0.3s both;
+  }
+  
+  .signatureItem {
+    padding: 5px 10px;
+    border-left: 1px solid rgba(150, 150, 150, 0.8);
+    border-collapse: collapse;
+    font-size: 90%;
+  }
+  
+  .stockColActions {
+    text-align: right;
+  }
+  
+  .stockColCheck {
+    width: 25px;
+  }
+  
+  .stockColCheckItem {
+    width: 25px;
+  }
+  
+  .stockColYear {
+    width: 50px;
+  }
+  
+  .stockPaneItem {
+    padding: 5px 20px;
+    border-bottom: 1px solid rgba(150, 150, 150, 1.0);
+  }
+  
+  .stockRow {
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .stockRow:hover {
+    background-color: rgba(210, 210, 210, 1);
+  }
+  
+  .stockRow:nth-child(odd) {
+    background-color: rgba(250, 250, 250, 1);
+  }
+  
+  .stockRow:nth-child(odd):hover {
+    background-color: rgba(210, 210, 210, 1);
+  }
+  
+  .stockRow:nth-child(even) {
+    background-color: rgba(230, 230, 230, 1);
+  }
+  
+  .stockRow:nth-child(even):hover {
+    background-color: rgba(210, 210, 210, 1);
+  }
+  
+  .stockTable {
+    width: 100%;
+  }
+  
+  .tabIcon {
+    margin-left: 10px;
+    padding: 5px;
+    border-radius: 10px;
+    border-left: 1px solid rgba(150, 150, 150, 0.8);
+    border-top: 1px solid rgba(150, 150, 150, 0.8);
+    border-right: 1px solid rgba(150, 150, 150, 0.8);
+  }
+  
+  .tableHeaderRight {
+    text-align: right;
+  }
+  
+  .tableHeaderRow {
+    position: sticky;
+    top: 0px;
+  }
+  
+  .tagDetailSubheader {
+    font-family: 'DM Mono';
+    margin-left: 0;
+    margin-top: 15px;
+    padding-left: 0;
+    font-size: 115%;
+    text-align: left;
+  }
+  
+  .tagDetailsListAuthor {
+    font-size: 80%;
+    font-style: italic;
+  }
+  
+  .tagDetailsTitleItem {
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  .tagItem {
+    padding: 2px 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 90%;
+  }
+  
+  .tagListItem {
+    display: inline;
+    margin: 5px;
+    padding: 3px 5px;
+    background-color: rgba(250, 250, 250, 0.95);
+    color: rgba(70, 70, 70, 0.9);
+    border-radius: 5px;
+    font-size: 80%;
+    font-family: 'EB Garamond';
+    cursor: pointer;
+  }
+  
+  .text-flicker-in-glow {
+      animation: text-flicker-in-glow 4s linear both;
+  }
+  
+  .wobble-hor-bottom {
+      animation: wobble-hor-bottom 0.8s both;
+  }
+  
