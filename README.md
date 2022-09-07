@@ -21,4 +21,7 @@ A single-page HTML/JS app for the management of bibliographic references, quotes
 - **April 2023**: fourth public release with an integrated search engine connected to publicly available library apis
 
 I also plan to integrate some kind of server setup, so that libraries could serve their books stock as catalog, but did not yet make any decision on the technologies involved.
-Initially such a server setup was planned as a Ruby on Rails app, but now I consider using a node server/service so that every installation (December Release) could act as it's own server. More planning needed. 
+Initially such a server setup was planned as a Ruby on Rails app, but now I consider using a node server/service so that every installation (December Release) could act as it's own server. More planning needed.
+
+## Have a look
+If you want to have a closer look at this work in progress, I recommend loading the accompanying *example-data.json* file via the 'Management' tab in the settings screen. It contains some 50 books and about as many quotes on the topic 'sausage' and related. All titles are pure fiction and do NOT correspond to any real published book. After loading the file the browser needs a refresh to show the imported data correctly. Right now only tested on Chrome and Firefox.
