@@ -7,6 +7,7 @@ A single-page HTML/JS app for the management of bibliographic references, quotes
 
 ## Features
 - Management of books, authors, bibliographic references, quotes, and notes - adhering to scientific requirements
+- Single line input of new titles - no form filling needed!
 - Export of data to JSON
 - PDF export of bibliographic lists
 - Utilizes browser storage (no need for local installation)
@@ -15,10 +16,11 @@ A single-page HTML/JS app for the management of bibliographic references, quotes
 - Screensaver showing quotes and notes
 
 ## Development Plan (Projected Milestones)
-- **October 2022**: first public release with all features savely useable, and use of Indexed DB for storage (until then use of Local Storage) 
-- **December 2022**: second public release with the option to install locally as desktop app (utilizing Electron) and filebased data storage
-- **February 2023**: third public release with extended import/export options to maximize compability with other bibliographic software
-- **April 2023**: fourth public release with an integrated search engine connected to publicly available library apis
+*(I will take part in a programming bootcamp from October 2022 - February 2023 so I have to delay the whole development plan for 4 months - updated accordingly below!)*
+- **March 2023**: first public release with all features savely useable, and use of Indexed DB for storage (until then use of Local Storage) 
+- **June 2023**: second public release with the option to install locally as desktop app (utilizing Electron) and filebased data storage
+- **August 2023**: third public release with extended import/export options to maximize compability with other bibliographic software
+- **October 2023**: fourth public release with an integrated search engine connected to publicly available library apis
 
 I also plan to integrate some kind of server setup, so that libraries could serve their books stock as catalog, but did not yet make any decision on the technologies involved.
 Initially such a server setup was planned as a Ruby on Rails app, but now I consider using a node server/service so that every installation (December Release) could act as it's own server. More planning needed.
